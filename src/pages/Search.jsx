@@ -186,7 +186,7 @@ export default function Search() {
       console.log('GameSession et invitation créées avec succès');
       
       // Rediriger l'expéditeur vers la game room en attente
-      navigate(createPageUrl('GameRoom') + `?roomId=${roomId}&waiting=true`);
+      navigate(`/GameRoom?roomId=${roomId}`);
       
       setTimeout(() => {
         setSentInvitations(prev => {
