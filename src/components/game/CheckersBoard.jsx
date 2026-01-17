@@ -33,11 +33,12 @@ const getSquareNumber = (row, col) => {
 
 const cloneBoard = (board) => board.map(r => r.map(c => c ? { ...c } : null));
 
-export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium', onGameEnd, isMultiplayer = false, canMove = true, blockBoard = false, initialBoardState = null, onSaveMove = null }) {
+export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium', onGameEnd, isMultiplayer = false, canMove = true, blockBoard = false, initialBoardState = null, onSaveMove = null, currentTurnOverride = null }) {
   const [board, setBoard] = useState(() => initialBoardState ? initialBoardState : createInitialBoard());
   const [selectedSquare, setSelectedSquare] = useState(null);
   const [validMoves, setValidMoves] = useState([]);
   const [currentTurn, setCurrentTurn] = useState('white');
+  const effectiveTurn = isMultiplayer && currentTurnOverride ? currentTurnOverride : currentTurn;
   const [gameStatus, setGameStatus] = useState('playing');
   const [score, setScore] = useState({ white: 0, black: 0 });
   const [mustCapture, setMustCapture] = useState([]);
@@ -319,7 +320,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     if (blockBoard) return;
     if (gameStatus !== 'playing') return;
     if (!canMove) return;
-    if (currentTurn !== playerColor) return;
+    if (effectiveTurn !== playerColor) return;
 
     const piece = board[row][col];
 
@@ -480,11 +481,11 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
   }, [gameStatus, playerColor, aiLevel, getValidMoves, getCaptureMoves, getForcedCaptures, checkGameEnd]);
 
   useEffect(() => {
-    if (currentTurn !== playerColor && gameStatus === 'playing' && !chainCapture) {
+    if (!isMultiplayer && currentTurn !== playerColor && gameStatus === 'playing' && !chainCapture) {
       const timer = setTimeout(() => makeAIMove(board), 500);
       return () => clearTimeout(timer);
     }
-  }, [currentTurn, playerColor, gameStatus, board, chainCapture, makeAIMove]);
+  }, [isMultiplayer, currentTurn, playerColor, gameStatus, board, chainCapture, makeAIMove]);
 
   const resetGame = () => {
     setBoard(createInitialBoard());
@@ -545,15 +546,15 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
         borderRadius: '8px',
         fontSize: '12px',
         fontWeight: '500',
-        backgroundColor: currentTurn === playerColor ? 'rgba(217, 119, 6, 0.2)' : 'rgba(255,255,255,0.05)',
-        border: currentTurn === playerColor ? '1px solid #d97706' : 'none',
+        backgroundColor: effectiveTurn === playerColor ? 'rgba(217, 119, 6, 0.2)' : 'rgba(255,255,255,0.05)',
+        border: effectiveTurn === playerColor ? '1px solid #d97706' : 'none',
         color: '#fff',
         zIndex: 10
       }}>
         {gameStatus === 'playing' 
-          ? (currentTurn === playerColor 
+          ? (effectiveTurn === playerColor 
               ? `Votre tour (${playerColor === 'white' ? 'Blancs' : 'Noirs'})`
-              : 'Tour de l\'IA')
+              : (isMultiplayer ? 'Tour de l\'adversaire' : 'Tour de l\'IA'))
           : gameStatus === 'whiteWins' 
             ? '⚪ Blancs gagnent !'
             : '⚫ Noirs gagnent !'

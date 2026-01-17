@@ -475,6 +475,7 @@ export default function GameRoom() {
             initialBoardState={boardState}
             onSaveMove={handleSaveMove}
             blockBoard={!gameStarted}
+            currentTurnOverride={session?.current_turn}
           />
         ) : (
           <CheckersBoard 
@@ -485,6 +486,7 @@ export default function GameRoom() {
             initialBoardState={boardState}
             onSaveMove={handleSaveMove}
             blockBoard={!gameStarted}
+            currentTurnOverride={session?.current_turn}
           />
         )}
       </div>

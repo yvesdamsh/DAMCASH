@@ -20,10 +20,11 @@ const initialBoard = [
   ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
 ];
 
-export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', onGameEnd, isMultiplayer = false, canMove = true, blockBoard = false, initialBoardState = null, onSaveMove = null }) {
+export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', onGameEnd, isMultiplayer = false, canMove = true, blockBoard = false, initialBoardState = null, onSaveMove = null, currentTurnOverride = null }) {
   const [board, setBoard] = useState(() => initialBoardState ? initialBoardState : initialBoard);
   const [selectedSquare, setSelectedSquare] = useState(null);
   const [currentTurn, setCurrentTurn] = useState('white');
+  const effectiveTurn = isMultiplayer && currentTurnOverride ? currentTurnOverride : currentTurn;
   const [validMoves, setValidMoves] = useState([]);
   const [gameStatus, setGameStatus] = useState('playing');
   const [moveHistory, setMoveHistory] = useState([]);
@@ -368,7 +369,7 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
     if (blockBoard) return;
     if (gameStatus !== 'playing') return;
     if (!canMove) return;
-    if (currentTurn !== playerColor) return;
+    if (effectiveTurn !== playerColor) return;
 
     const piece = board[row][col];
 
@@ -404,6 +405,7 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
   const makeAIMove = (currentBoard) => {
     if (gameStatus !== 'playing') return;
     
+    if (isMultiplayer) return;
     const aiColor = playerColor === 'white' ? 'black' : 'white';
     const possibleMoves = [];
 
@@ -486,7 +488,7 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
         <div className={`px-4 py-2 rounded-lg ${currentTurn === playerColor ? 'bg-amber-500/20 border border-amber-500' : 'bg-white/5'}`}>
           <span className="text-sm font-medium">
             {gameStatus === 'playing' 
-              ? (currentTurn === playerColor ? 'Votre tour' : 'Tour de l\'IA')
+              ? (effectiveTurn === playerColor ? 'Votre tour' : (isMultiplayer ? 'Tour de l\'adversaire' : 'Tour de l\'IA'))
               : gameStatus === 'whiteWins' 
                 ? '⚪ Blancs gagnent !'
                 : gameStatus === 'blackWins'
