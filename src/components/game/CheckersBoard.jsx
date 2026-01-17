@@ -248,7 +248,9 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
   };
 
   const handleSquareClick = (row, col) => {
+    if (blockBoard) return;
     if (gameStatus !== 'playing') return;
+    if (!canMove) return;
     if (currentTurn !== playerColor) return;
 
     const piece = board[row][col];
