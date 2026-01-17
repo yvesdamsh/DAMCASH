@@ -457,66 +457,92 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       </div>
 
       <div className="relative">
-        <div className="grid grid-cols-10 border-2 border-amber-900/50 rounded-lg overflow-hidden shadow-2xl">
-          {displayBoard.map((row, rowIndex) => (
-            row.map((cell, colIndex) => {
-              const actualRow = playerColor === 'black' ? 9 - rowIndex : rowIndex;
-              const actualCol = playerColor === 'black' ? 9 - colIndex : colIndex;
-              const isDark = (actualRow + actualCol) % 2 === 1;
-              const squareNum = getSquareNumber(actualRow, actualCol);
-              const isSelected = selectedSquare?.row === actualRow && selectedSquare?.col === actualCol;
-              const isValidMove = validMoves.some(m => m.row === actualRow && m.col === actualCol);
-              const isCapture = validMoves.find(m => m.row === actualRow && m.col === actualCol)?.isCapture;
-              const isMustCapture = mustCapture.some(c => c.row === actualRow && c.col === actualCol);
+        {/* Wooden frame */}
+        <div className="p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-amber-900 via-amber-800 to-amber-900 shadow-2xl">
+          <div className="p-1 bg-gradient-to-br from-amber-950 to-amber-900 rounded-xl">
+            <div className="grid grid-cols-10 rounded-lg overflow-hidden shadow-inner">
+              {displayBoard.map((row, rowIndex) => (
+                row.map((cell, colIndex) => {
+                  const actualRow = playerColor === 'black' ? 9 - rowIndex : rowIndex;
+                  const actualCol = playerColor === 'black' ? 9 - colIndex : colIndex;
+                  const isDark = (actualRow + actualCol) % 2 === 1;
+                  const squareNum = getSquareNumber(actualRow, actualCol);
+                  const isSelected = selectedSquare?.row === actualRow && selectedSquare?.col === actualCol;
+                  const isValidMove = validMoves.some(m => m.row === actualRow && m.col === actualCol);
+                  const isCapture = validMoves.find(m => m.row === actualRow && m.col === actualCol)?.isCapture;
+                  const isMustCapture = mustCapture.some(c => c.row === actualRow && c.col === actualCol);
 
-              return (
-                <div
-                  key={`${rowIndex}-${colIndex}`}
-                  onClick={() => isDark && handleSquareClick(actualRow, actualCol)}
-                  className={`
-                    w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center relative
-                    ${isDark ? 'bg-[#B58863] cursor-pointer' : 'bg-[#F0D9B5]'}
-                    ${isSelected ? 'ring-2 ring-amber-400 ring-inset' : ''}
-                    ${isMustCapture ? 'ring-2 ring-red-400 ring-inset' : ''}
-                  `}
-                >
-                  {isDark && squareNum && (
-                    <span className="absolute top-0.5 left-0.5 text-[8px] text-amber-200/50">
-                      {squareNum}
-                    </span>
-                  )}
-                  
-                  {cell && (
-                    <div className={`
-                      w-5 h-5 sm:w-7 sm:h-7 rounded-full relative
-                      ${cell.color === 'white' 
-                        ? 'bg-gradient-to-br from-gray-100 to-gray-300 border-2 border-gray-400 shadow-md' 
-                        : 'bg-gradient-to-br from-gray-700 to-gray-900 border-2 border-gray-600 shadow-md'
-                      }
-                    `}>
-                      {cell.isKing && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className={`text-xs sm:text-sm ${cell.color === 'white' ? 'text-amber-600' : 'text-amber-400'}`}>
-                            ♔
-                          </span>
+                  return (
+                    <div
+                      key={`${rowIndex}-${colIndex}`}
+                      onClick={() => isDark && handleSquareClick(actualRow, actualCol)}
+                      className={`
+                        w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center relative
+                        ${isDark ? 'bg-[#4a2f1f] cursor-pointer' : 'bg-[#f5e6d3]'}
+                        ${isSelected ? 'ring-2 ring-amber-400 ring-inset' : ''}
+                        ${isMustCapture ? 'ring-2 ring-red-400 ring-inset' : ''}
+                      `}
+                    >
+                      {isDark && squareNum && (
+                        <span className="absolute top-0.5 left-0.5 text-[9px] font-bold text-amber-200/70 select-none">
+                          {squareNum}
+                        </span>
+                      )}
+                      
+                      {cell && (
+                        <div className={`
+                          w-5 h-5 sm:w-7 sm:h-7 rounded-full relative
+                          ${cell.color === 'white' 
+                            ? 'bg-gradient-to-br from-gray-50 via-gray-200 to-gray-300' 
+                            : 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700'
+                          }
+                          shadow-lg
+                        `}
+                        style={{
+                          boxShadow: cell.color === 'white' 
+                            ? '0 3px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.8), inset 0 -1px 2px rgba(0,0,0,0.2)'
+                            : '0 3px 8px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.2), inset 0 -1px 2px rgba(0,0,0,0.4)'
+                        }}>
+                          {/* Concentric circles for 3D effect */}
+                          <div className={`absolute inset-[15%] rounded-full ${
+                            cell.color === 'white' ? 'bg-gray-100' : 'bg-gray-800'
+                          }`}></div>
+                          <div className={`absolute inset-[30%] rounded-full ${
+                            cell.color === 'white' ? 'bg-gray-200' : 'bg-gray-700'
+                          }`}></div>
+                          <div className={`absolute inset-[42%] rounded-full ${
+                            cell.color === 'white' ? 'bg-gray-300' : 'bg-gray-600'
+                          }`}></div>
+                          
+                          {/* Highlight on top */}
+                          <div className={`absolute top-[20%] left-[30%] w-[25%] h-[25%] rounded-full ${
+                            cell.color === 'white' ? 'bg-white/60' : 'bg-white/10'
+                          } blur-sm`}></div>
+                          
+                          {cell.isKing && (
+                            <div className="absolute inset-0 flex items-center justify-center z-10">
+                              <span className={`text-xs sm:text-sm font-bold drop-shadow-md ${
+                                cell.color === 'white' ? 'text-amber-600' : 'text-amber-400'
+                              }`}>
+                                ♔
+                              </span>
+                            </div>
+                          )}
                         </div>
                       )}
-                      {!cell.isKing && cell.color === 'white' && (
-                        <div className="absolute inset-1 rounded-full border-2 border-gray-400"></div>
+                      
+                      {isValidMove && !cell && (
+                        <div className="absolute w-2.5 h-2.5 rounded-full bg-amber-500/60 shadow-md"></div>
+                      )}
+                      {isValidMove && isCapture && (
+                        <div className="absolute inset-0 border-3 border-red-500/60 rounded-sm"></div>
                       )}
                     </div>
-                  )}
-                  
-                  {isValidMove && !cell && (
-                    <div className="absolute w-2.5 h-2.5 rounded-full bg-amber-500/60"></div>
-                  )}
-                  {isValidMove && isCapture && (
-                    <div className="absolute inset-0 border-3 border-red-500/60 rounded-sm"></div>
-                  )}
-                </div>
-              );
-            })
-          ))}
+                  );
+                })
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
