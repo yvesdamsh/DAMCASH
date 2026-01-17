@@ -155,6 +155,8 @@ export default function Search() {
       await base44.entities.GameSession.create({
         room_id: roomId,
         player1_id: user.id,
+        player1_email: user.email,
+        player1_name: user.full_name,
         game_type: config.game_type,
         status: 'waiting',
         current_turn: 'white',
