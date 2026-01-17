@@ -14,6 +14,7 @@ import Shop from './pages/Shop';
 import Spectate from './pages/Spectate';
 import Tournaments from './pages/Tournaments';
 import GameRoom from './pages/GameRoom';
+import RoomLobby from './pages/RoomLobby';
 import __Layout from './Layout.jsx';
 
 
@@ -34,6 +35,7 @@ export const PAGES = {
     "Spectate": Spectate,
     "Tournaments": Tournaments,
     "GameRoom": GameRoom,
+    "RoomLobby": RoomLobby,
 }
 
 export const pagesConfig = {
