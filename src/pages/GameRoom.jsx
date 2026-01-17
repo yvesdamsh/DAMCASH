@@ -134,21 +134,26 @@ export default function GameRoom() {
     try {
       const playerColor = user.id === session.player1_id ? 'white' : 'black';
       
-      // Mettre à jour le temps du joueur qui vient de jouer
+      // SAUVEGARDER: board_state + current_turn + timestamp + timer
       const updateData = {
         board_state: JSON.stringify(newBoardState),
         current_turn: nextTurn,
         last_move_timestamp: new Date().toISOString()
       };
 
+      // Sauvegarder le temps du joueur qui VIENT de jouer
       if (playerColor === 'white') {
         updateData.white_time = whiteTime;
       } else {
         updateData.black_time = blackTime;
       }
 
+      // Envoyer à la base de données
       await base44.entities.GameSession.update(session.id, updateData);
+      
+      // Mettre à jour le state local
       setBoardState(newBoardState);
+      setSession(prev => ({ ...prev, ...updateData }));
     } catch (error) {
       console.error('Erreur sauvegarde coup:', error);
     }
