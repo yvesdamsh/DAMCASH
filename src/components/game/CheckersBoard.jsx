@@ -728,7 +728,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                                 width: '40%',
                                 height: '25%',
                                 borderRadius: '50%',
-                                background: cell.color === 'white'
+                                background: piece.color === 'white'
                                   ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.5) 50%, transparent 70%)'
                                   : 'radial-gradient(ellipse at center, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 50%, transparent 70%)',
                                 filter: 'blur(0.5px)',
