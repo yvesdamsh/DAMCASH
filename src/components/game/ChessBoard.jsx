@@ -517,21 +517,7 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
               ))}
             </div>
 
-            {/* Coordonnées droite */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '20px',
-              justifyContent: 'space-around',
-              textAlign: 'center',
-              color: '#F5E6D3',
-              fontSize: '12px',
-              fontWeight: 'bold'
-            }}>
-              {(playerColor === 'black' ? [1,2,3,4,5,6,7,8] : [1,2,3,4,5,6,7,8]).map(n => (
-                <div key={`right-${n}`}>{n}</div>
-              ))}
-            </div>
+
           </div>
 
           {/* Coordonnées bas */}
