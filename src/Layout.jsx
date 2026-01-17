@@ -83,31 +83,37 @@ export default function Layout({ children, currentPageName }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0f0f] via-[#2d1515] to-[#1a0f0f] text-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3]">
       <style>{`
         :root {
-          --gold: #C9A227;
-          --gold-light: #FFD700;
-          --burgundy-dark: #1a0f0f;
-          --burgundy: #2d1515;
-          --burgundy-light: #4a2020;
+          --earth-dark: #2C1810;
+          --earth-medium: #5D3A1A;
+          --earth-light: #8B5A2B;
+          --gold-accent: #D4A574;
+          --cream-text: #F5E6D3;
         }
         .glass-card {
-          background: rgba(255, 255, 255, 0.05);
+          background: rgba(93, 58, 26, 0.3);
           backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(212, 165, 116, 0.2);
         }
         .gold-gradient {
-          background: linear-gradient(135deg, #FFD700, #C9A227);
+          background: linear-gradient(135deg, #D4A574, #8B5A2B);
+        }
+        .premium-gradient {
+          background: linear-gradient(135deg, #5D3A1A, #2C1810);
         }
         .nav-active {
-          background: linear-gradient(135deg, rgba(201, 162, 39, 0.3), rgba(255, 215, 0, 0.1));
-          border-color: rgba(201, 162, 39, 0.5);
+          background: linear-gradient(135deg, rgba(212, 165, 116, 0.3), rgba(139, 90, 43, 0.2));
+          border-color: rgba(212, 165, 116, 0.5);
+        }
+        body {
+          background: #2C1810;
         }
       `}</style>
 
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-amber-900/30">
+      <header className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-[#D4A574]/30">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to={createPageUrl('Home')} className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-lg gold-gradient flex items-center justify-center shadow-lg shadow-amber-500/20">
@@ -115,7 +121,7 @@ export default function Layout({ children, currentPageName }) {
                 <path d="M5 20h14v2H5v-2zm7-18L4 8h3v8h4V8h2v8h4V8h3l-8-6z"/>
               </svg>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-amber-200 to-amber-500 bg-clip-text text-transparent hidden sm:block">
+            <span className="text-xl font-bold bg-gradient-to-r from-[#F5E6D3] to-[#D4A574] bg-clip-text text-transparent hidden sm:block">
               Board Masters
             </span>
           </Link>
@@ -124,23 +130,23 @@ export default function Layout({ children, currentPageName }) {
             {user ? (
               <>
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full glass-card">
-                  <Gem className="w-4 h-4 text-cyan-400" />
-                  <span className="font-semibold text-amber-200">{userData?.gems || 100}</span>
+                  <Gem className="w-4 h-4 text-[#D4A574]" />
+                  <span className="font-semibold text-[#F5E6D3]">{userData?.gems || 100}</span>
                 </div>
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                      <Avatar className="w-9 h-9 border-2 border-amber-500/50">
+                      <Avatar className="w-9 h-9 border-2 border-[#D4A574]/50">
                         <AvatarImage src={userData?.avatar_url} />
-                        <AvatarFallback className="bg-amber-900 text-amber-200">
+                        <AvatarFallback className="bg-[#5D3A1A] text-[#F5E6D3]">
                           {user.full_name?.charAt(0) || 'U'}
                         </AvatarFallback>
                       </Avatar>
                       <span className="text-sm font-medium hidden sm:block">{user.full_name}</span>
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-[#2d1515] border-amber-900/50 text-white">
+                  <DropdownMenuContent className="bg-[#5D3A1A] border-[#D4A574]/50 text-[#F5E6D3]">
                     <DropdownMenuItem asChild>
                       <Link to={createPageUrl('Profile')} className="flex items-center gap-2 cursor-pointer">
                         <User className="w-4 h-4" />
@@ -159,7 +165,7 @@ export default function Layout({ children, currentPageName }) {
                         Boutique
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-amber-900/30" />
+                    <DropdownMenuSeparator className="bg-[#D4A574]/30" />
                     <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 cursor-pointer text-red-400">
                       <LogOut className="w-4 h-4" />
                       Déconnexion
@@ -170,7 +176,7 @@ export default function Layout({ children, currentPageName }) {
             ) : (
               <Button 
                 onClick={handleLogin}
-                className="gold-gradient text-[#1a0f0f] font-semibold hover:opacity-90"
+                className="gold-gradient text-[#2C1810] font-semibold hover:opacity-90 shadow-lg"
               >
                 Connexion
               </Button>
@@ -185,7 +191,7 @@ export default function Layout({ children, currentPageName }) {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-amber-900/30">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-[#D4A574]/30">
         <div className="max-w-lg mx-auto px-2 py-2">
           <div className="flex items-center justify-around">
             {navItems.map((item) => (
@@ -205,7 +211,7 @@ export default function Layout({ children, currentPageName }) {
                 >
                   <item.icon 
                     className={`w-5 h-5 ${
-                      isActive(item.page) ? 'text-amber-400' : 'text-gray-400'
+                      isActive(item.page) ? 'text-[#D4A574]' : 'text-[#F5E6D3]/50'
                     }`} 
                   />
                   {item.showBadge && user && (
@@ -213,7 +219,7 @@ export default function Layout({ children, currentPageName }) {
                   )}
                 </motion.div>
                 <span className={`text-xs ${
-                  isActive(item.page) ? 'text-amber-400' : 'text-gray-400'
+                  isActive(item.page) ? 'text-[#D4A574]' : 'text-[#F5E6D3]/50'
                 }`}>
                   {item.name}
                 </span>
