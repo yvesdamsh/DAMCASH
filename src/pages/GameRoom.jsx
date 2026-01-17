@@ -50,7 +50,9 @@ export default function GameRoom() {
     if (!roomId) return;
 
     const unsubscribe = base44.entities.GameSession.subscribe(async (event) => {
-      if (!event?.data || event.data.room_id !== roomId) return;
+      const matchesRoom = event?.data?.room_id === roomId;
+      const matchesSession = event?.id && session?.id && event.id === session.id;
+      if (!matchesRoom && !matchesSession) return;
       const sess = event.data;
 
       setSession(prev => ({ ...prev, ...sess }));
@@ -95,7 +97,7 @@ export default function GameRoom() {
     return () => {
       if (typeof unsubscribe === 'function') unsubscribe();
     };
-  }, [roomId, user?.id, opponent?.id]);
+  }, [roomId, user?.id, opponent?.id, session?.id]);
 
   // Realtime dédié aux coups: écouter les créations de GameMove
   useEffect(() => {
@@ -103,7 +105,8 @@ export default function GameRoom() {
 
     const unsubscribe = base44.entities.GameMove?.subscribe?.((event) => {
       if (event?.type !== 'create') return;
-      if (!event?.data || event.data.room_id !== roomId) return;
+      const matchesRoom = event?.data?.room_id === roomId;
+      if (!matchesRoom) return;
 
       const move = event.data;
 
