@@ -465,7 +465,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
         setGameStatus(endStatus);
       }
     }
-  }, [gameStatus, playerColor, aiLevel, getValidMoves, getCaptureMoves, getAllCaptureMoves, checkGameEnd]);
+  }, [gameStatus, playerColor, aiLevel, getValidMoves, getCaptureMoves, getForcedCaptures, checkGameEnd]);
 
   useEffect(() => {
     if (currentTurn !== playerColor && gameStatus === 'playing' && !chainCapture) {
