@@ -233,7 +233,7 @@ export default function GameRoom() {
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-[#D4A574]/30">
+      <div className="p-4 border-b border-[#D4A574]/30 bg-gradient-to-b from-[#5D3A1A] to-[#2C1810]">
         <div className="flex items-center justify-between">
           <Button
             variant="ghost"
@@ -250,26 +250,38 @@ export default function GameRoom() {
         </div>
       </div>
 
-      {/* Joueur en haut (Adversaire) */}
+      {/* Barre Adversaire - EN HAUT */}
       {opponent && (
-        <div className="p-4 border-b border-[#D4A574]/30 bg-white/5">
-          <div className="flex items-center justify-between max-w-lg mx-auto">
-            <div className="flex items-center gap-3">
-              <Avatar className="w-12 h-12">
+        <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-b-2 border-[#D4A574]/40 px-6 py-4 shadow-lg">
+          <div className="max-w-6xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-4 flex-1">
+              <Avatar className="w-14 h-14 border-3 border-[#D4A574]">
                 <AvatarImage src={opponent.avatar_url} />
-                <AvatarFallback className="bg-[#5D3A1A] text-[#F5E6D3]">
+                <AvatarFallback className="bg-[#8B5A2B] text-[#F5E6D3] text-lg font-bold">
                   {opponent.full_name?.charAt(0) || 'A'}
                 </AvatarFallback>
               </Avatar>
-              <div>
-                <p className="font-semibold">{opponent.full_name}</p>
-                <p className="text-sm text-[#D4A574]">
-                  {session.current_turn === (isPlayerWhite ? 'black' : 'white') ? 'En train de jouer...' : 'En attente'}
+              <div className="flex-1">
+                <p className="font-bold text-lg text-[#F5E6D3]">{opponent.full_name}</p>
+                <p className={`text-sm font-semibold ${
+                  session.current_turn === (isPlayerWhite ? 'black' : 'white') 
+                    ? 'text-yellow-400' 
+                    : 'text-[#D4A574]'
+                }`}>
+                  {session.player2_id ? (
+                    session.current_turn === (isPlayerWhite ? 'black' : 'white') 
+                      ? 'En train de jouer...' 
+                      : 'En attente'
+                  ) : (
+                    'En attente de rejoindre...'
+                  )}
                 </p>
               </div>
             </div>
-            <div className={`text-3xl font-bold font-mono ${
-              session.current_turn === (isPlayerWhite ? 'black' : 'white') ? 'text-red-400' : 'text-[#D4A574]'
+            <div className={`text-4xl font-bold font-mono px-6 py-2 rounded-lg ${
+              session.current_turn === (isPlayerWhite ? 'black' : 'white') 
+                ? 'bg-red-500/20 border-2 border-red-500 text-red-400' 
+                : 'bg-[#2C1810] border-2 border-[#D4A574]/50 text-[#F5E6D3]'
             }`}>
               {formatTime(isPlayerWhite ? blackTime : whiteTime)}
             </div>
@@ -278,7 +290,7 @@ export default function GameRoom() {
       )}
 
       {/* Plateau de jeu */}
-      <div className="flex-1 flex items-center justify-center overflow-auto p-4">
+      <div className="flex-1 flex items-center justify-center overflow-auto p-6">
         {gameType === 'chess' ? (
           <ChessBoard 
             playerColor={playerColor}
@@ -300,26 +312,30 @@ export default function GameRoom() {
         )}
       </div>
 
-      {/* Joueur en bas (Courant) */}
+      {/* Barre Joueur Courant - EN BAS */}
       {user && (
-        <div className="p-4 border-t border-[#D4A574]/30 bg-white/5">
-          <div className="flex items-center justify-between max-w-lg mx-auto">
-            <div className="flex items-center gap-3">
-              <Avatar className="w-12 h-12">
+        <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-t-2 border-[#D4A574]/40 px-6 py-4 shadow-lg">
+          <div className="max-w-6xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-4 flex-1">
+              <Avatar className="w-14 h-14 border-3 border-[#D4A574]">
                 <AvatarImage src={user.avatar_url} />
-                <AvatarFallback className="bg-[#5D3A1A] text-[#F5E6D3]">
+                <AvatarFallback className="bg-[#8B5A2B] text-[#F5E6D3] text-lg font-bold">
                   {user.full_name?.charAt(0) || 'U'}
                 </AvatarFallback>
               </Avatar>
-              <div>
-                <p className="font-semibold">{user.full_name}</p>
-                <p className="text-sm text-[#D4A574]">
+              <div className="flex-1">
+                <p className="font-bold text-lg text-[#F5E6D3]">{user.full_name}</p>
+                <p className={`text-sm font-semibold ${
+                  canMove ? 'text-lime-400' : 'text-[#D4A574]'
+                }`}>
                   {canMove ? 'Votre tour' : 'En attente'}
                 </p>
               </div>
             </div>
-            <div className={`text-3xl font-bold font-mono ${
-              canMove ? 'text-green-400' : 'text-[#D4A574]'
+            <div className={`text-4xl font-bold font-mono px-6 py-2 rounded-lg ${
+              canMove 
+                ? 'bg-green-500/20 border-2 border-green-500 text-green-400' 
+                : 'bg-[#2C1810] border-2 border-[#D4A574]/50 text-[#F5E6D3]'
             }`}>
               {formatTime(isPlayerWhite ? whiteTime : blackTime)}
             </div>
