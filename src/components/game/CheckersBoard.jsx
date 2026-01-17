@@ -462,40 +462,42 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
         </span>
       </div>
 
-      <div className="relative">
-        {/* Wooden frame */}
-        <div className="p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-amber-900 via-amber-800 to-amber-900 shadow-2xl">
-          <div className="p-1 bg-gradient-to-br from-amber-950 to-amber-900 rounded-xl">
-            <div className="grid grid-cols-10 rounded-lg overflow-hidden shadow-inner">
-              {displayBoard.map((row, rowIndex) => (
-                row.map((cell, colIndex) => {
-                  const actualRow = playerColor === 'black' ? 9 - rowIndex : rowIndex;
-                  const actualCol = playerColor === 'black' ? 9 - colIndex : colIndex;
-                  const isDark = (actualRow + actualCol) % 2 === 1;
-                  const squareNum = getSquareNumber(actualRow, actualCol);
-                  const isSelected = selectedSquare?.row === actualRow && selectedSquare?.col === actualCol;
-                  const isValidMove = validMoves.some(m => m.row === actualRow && m.col === actualCol);
-                  const isCapture = validMoves.find(m => m.row === actualRow && m.col === actualCol)?.isCapture;
-                  const isMustCapture = mustCapture.some(c => c.row === actualRow && c.col === actualCol);
+      <div className="relative w-full flex justify-center">
+         {/* Wooden frame */}
+         <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-amber-900 via-amber-800 to-amber-900 shadow-2xl" style={{ minWidth: '400px', width: 'min(100%, 600px)' }}>
+           <div className="p-1 bg-gradient-to-br from-amber-950 to-amber-900 rounded-xl">
+             <div className="grid grid-cols-10 rounded-lg overflow-hidden shadow-inner" style={{ aspectRatio: '1' }}>
+               {displayBoard.map((row, rowIndex) => (
+                 row.map((cell, colIndex) => {
+                   const actualRow = playerColor === 'black' ? 9 - rowIndex : rowIndex;
+                   const actualCol = playerColor === 'black' ? 9 - colIndex : colIndex;
+                   const isDark = (actualRow + actualCol) % 2 === 1;
+                   const squareNum = getSquareNumber(actualRow, actualCol);
+                   const isSelected = selectedSquare?.row === actualRow && selectedSquare?.col === actualCol;
+                   const isValidMove = validMoves.some(m => m.row === actualRow && m.col === actualCol);
+                   const isCapture = validMoves.find(m => m.row === actualRow && m.col === actualCol)?.isCapture;
+                   const isMustCapture = mustCapture.some(c => c.row === actualRow && c.col === actualCol);
 
-                  return (
-                    <motion.div
-                      key={`${rowIndex}-${colIndex}`}
-                      onClick={() => isDark && handleSquareClick(actualRow, actualCol)}
-                      whileHover={isDark ? { scale: 1.05 } : {}}
-                      whileTap={isDark ? { scale: 0.95 } : {}}
-                      className={`
-                        w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center relative
-                        ${isDark ? 'bg-[#4a2f1f] cursor-pointer' : 'bg-[#f5e6d3]'}
-                        ${isSelected ? 'ring-2 ring-amber-400 ring-inset' : ''}
-                        ${isMustCapture ? 'ring-2 ring-red-400 ring-inset' : ''}
-                      `}
-                    >
+                   return (
+                     <motion.div
+                       key={`${rowIndex}-${colIndex}`}
+                       onClick={() => isDark && handleSquareClick(actualRow, actualCol)}
+                       whileHover={isDark ? { scale: 1.05 } : {}}
+                       whileTap={isDark ? { scale: 0.95 } : {}}
+                       className={`
+                         flex items-center justify-center relative
+                         ${isDark ? 'bg-[#4a2f1f] cursor-pointer' : 'bg-[#f5e6d3]'}
+                         ${isSelected ? 'ring-4 ring-yellow-400 ring-inset shadow-lg shadow-yellow-400/50' : ''}
+                         ${isValidMove && !isCapture && !isSelected ? 'bg-green-500/40 ring-2 ring-green-400 ring-inset' : ''}
+                         ${isValidMove && isCapture && !isSelected ? 'bg-red-500/40 ring-2 ring-red-500 ring-inset' : ''}
+                         ${isMustCapture && !isSelected ? 'ring-2 ring-orange-400 ring-inset' : ''}
+                       `}
+                     >
                       {isDark && squareNum && (
-                        <span className="absolute top-0.5 left-0.5 text-[9px] font-bold text-amber-200/70 select-none">
-                          {squareNum}
-                        </span>
-                      )}
+                         <span className="absolute top-1 left-1 text-[10px] sm:text-xs font-bold text-amber-200/50 select-none">
+                           {squareNum}
+                         </span>
+                       )}
                       
                       <AnimatePresence mode="wait">
                         {cell && (
@@ -627,14 +629,8 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                         <motion.div 
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
-                          className="absolute w-2.5 h-2.5 rounded-full bg-amber-500/60 shadow-md"
-                        />
-                      )}
-                      {isValidMove && isCapture && (
-                        <motion.div 
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="absolute inset-0 border-3 border-red-500/60 rounded-sm"
+                          className="absolute w-1/3 h-1/3 rounded-full bg-green-400 shadow-lg shadow-green-400/70"
+                          style={{ boxShadow: '0 0 12px rgba(34, 197, 94, 0.8)' }}
                         />
                       )}
                     </motion.div>
