@@ -12,45 +12,50 @@ export default function GameRoom() {
   const roomId = urlParams.get('roomId');
   const isWaiting = urlParams.get('waiting') === 'true';
   
-  const [invitation, setInvitation] = useState(null);
+  const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [gameStarted, setGameStarted] = useState(isWaiting !== 'true');
   const [opponent, setOpponent] = useState(null);
+  const [boardState, setBoardState] = useState(null);
 
   useEffect(() => {
     if (roomId) {
       loadData();
-      // Vérifier l'état du jeu toutes les 2 secondes si en attente
-      if (isWaiting) {
-        const interval = setInterval(loadData, 2000);
-        return () => clearInterval(interval);
-      }
+      // Rafraîchir toutes les 2 secondes (même quand jeu actif pour voir les coups adversaire)
+      const interval = setInterval(loadData, 2000);
+      return () => clearInterval(interval);
     }
-  }, [roomId, isWaiting]);
+  }, [roomId]);
 
   const loadData = async () => {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
-      const invitations = await base44.entities.GameInvitation.filter({
+      const sessions = await base44.entities.GameSession.filter({
         room_id: roomId
       });
 
-      if (invitations.length > 0) {
-        const inv = invitations[0];
-        setInvitation(inv);
+      if (sessions.length > 0) {
+        const sess = sessions[0];
+        setSession(sess);
         
-        // Charger les infos de l'adversaire
-        const senderId = inv.sender_id === currentUser.id ? inv.receiver_id : inv.sender_id;
-        const senderUsers = await base44.entities.User.filter({ id: senderId });
-        if (senderUsers.length > 0) {
-          setOpponent(senderUsers[0]);
+        if (sess.board_state) {
+          setBoardState(JSON.parse(sess.board_state));
         }
 
-        // Si le jeu a commencé (invitation acceptée), démarrer le jeu
-        if (inv.status === 'accepted') {
+        // Charger adversaire
+        const opponentId = sess.player1_id === currentUser.id ? sess.player2_id : sess.player1_id;
+        if (opponentId) {
+          const opponentUsers = await base44.entities.User.filter({ id: opponentId });
+          if (opponentUsers.length > 0) {
+            setOpponent(opponentUsers[0]);
+          }
+        }
+
+        // Vérifier si le jeu a démarré (player2 connecté)
+        if (sess.status === 'in_progress' && sess.player2_id) {
           setGameStarted(true);
         }
       }
@@ -58,6 +63,20 @@ export default function GameRoom() {
       console.error('Error loading game room:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveMove = async (newBoardState, nextTurn) => {
+    if (!session) return;
+    
+    try {
+      await base44.entities.GameSession.update(session.id, {
+        board_state: JSON.stringify(newBoardState),
+        current_turn: nextTurn
+      });
+      setBoardState(newBoardState);
+    } catch (error) {
+      console.error('Erreur sauvegarde coup:', error);
     }
   };
 
@@ -73,7 +92,7 @@ export default function GameRoom() {
     );
   }
 
-  if (!invitation) {
+  if (!session) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] flex flex-col items-center justify-center gap-4">
         <p className="text-xl">Jeu introuvable</p>
@@ -84,8 +103,11 @@ export default function GameRoom() {
     );
   }
 
-  const isPlayerWhite = user && invitation && user.id === invitation.sender_id;
-  const gameType = invitation?.game_type;
+  const isPlayerWhite = user && session && user.id === session.player1_id;
+  const playerColor = isPlayerWhite ? 'white' : 'black';
+  const gameType = session?.game_type;
+  const canMove = (playerColor === 'white' && session.current_turn === 'white') || 
+                  (playerColor === 'black' && session.current_turn === 'black');
 
   // Écran d'attente
   if (!gameStarted) {
@@ -136,13 +158,21 @@ export default function GameRoom() {
       <div className="flex-1 flex items-center justify-center overflow-auto p-4">
         {gameType === 'chess' ? (
           <ChessBoard 
-            playerColor={isPlayerWhite ? 'white' : 'black'}
+            playerColor={playerColor}
             onGameEnd={handleGameEnd}
+            isMultiplayer={true}
+            canMove={canMove}
+            initialBoardState={boardState}
+            onSaveMove={handleSaveMove}
           />
         ) : (
           <CheckersBoard 
-            playerColor={isPlayerWhite ? 'white' : 'black'}
+            playerColor={playerColor}
             onGameEnd={handleGameEnd}
+            isMultiplayer={true}
+            canMove={canMove}
+            initialBoardState={boardState}
+            onSaveMove={handleSaveMove}
           />
         )}
       </div>

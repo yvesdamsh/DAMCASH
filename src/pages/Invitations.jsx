@@ -94,6 +94,18 @@ export default function Invitations() {
   const handleAcceptGame = async (invitation) => {
     try {
       console.log('Acceptation invitation:', invitation.id);
+      
+      // Mettre à jour GameSession avec player2 (Madina - noirs) et démarrer
+      await base44.entities.GameSession.filter({ room_id: invitation.room_id }).then(sessions => {
+        if (sessions.length > 0) {
+          const session = sessions[0];
+          return base44.entities.GameSession.update(session.id, {
+            player2_id: user.id,
+            status: 'in_progress'
+          });
+        }
+      });
+
       await base44.entities.GameInvitation.update(invitation.id, { status: 'accepted' });
       console.log('Redirection vers room:', invitation.room_id);
       navigate(`/GameRoom?roomId=${invitation.room_id}`);

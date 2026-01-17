@@ -135,6 +135,15 @@ export default function Search() {
         time_control: config.time_control
       });
       
+      // Créer GameSession avec player1 (Yves - blancs)
+      await base44.entities.GameSession.create({
+        room_id: roomId,
+        player1_id: user.id,
+        game_type: config.game_type,
+        status: 'waiting',
+        current_turn: 'white'
+      });
+
       await base44.entities.GameInvitation.create({
         sender_id: user.id,
         receiver_id: selectedOpponent.user_id,
@@ -154,7 +163,7 @@ export default function Search() {
       });
 
       setSentInvitations(prev => new Set(prev).add(playerId));
-      console.log('Invitation et notification créées avec succès');
+      console.log('GameSession et invitation créées avec succès');
       
       // Rediriger l'expéditeur vers la game room en attente
       navigate(createPageUrl('GameRoom') + `?roomId=${roomId}&waiting=true`);
