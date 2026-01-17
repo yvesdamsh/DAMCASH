@@ -83,22 +83,11 @@ export default function Invitations() {
       console.log('Demandes d\'ami trouvées:', friendReqs);
       setFriendRequests(friendReqs);
 
-      // Charger les noms des expéditeurs
+      // Charger les noms des expéditeurs (sans accès User)
       const names = {};
       for (const inv of gameInvs) {
-        if (!names[inv.sender_id]) {
-          const userList = await base44.entities.User.filter({ id: inv.sender_id });
-          if (userList.length > 0) {
-            names[inv.sender_id] = userList[0].full_name || 'Utilisateur inconnu';
-          }
-        }
-      }
-      for (const req of friendReqs) {
-        if (!names[req.sender_id]) {
-          const userList = await base44.entities.User.filter({ id: req.sender_id });
-          if (userList.length > 0) {
-            names[req.sender_id] = userList[0].full_name || 'Utilisateur inconnu';
-          }
+        if (!names[inv.sender_id] && inv.sender_name) {
+          names[inv.sender_id] = inv.sender_name;
         }
       }
       setSenderNames(names);

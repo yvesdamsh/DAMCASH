@@ -157,6 +157,8 @@ export default function Search() {
         player1_id: user.id,
         player1_email: user.email,
         player1_name: user.full_name,
+        invited_player_id: selectedOpponent.user_id,
+        invited_player_name: selectedOpponent.username,
         game_type: config.game_type,
         status: 'waiting',
         current_turn: 'white',
@@ -168,6 +170,7 @@ export default function Search() {
 
       await base44.entities.GameInvitation.create({
         sender_id: user.id,
+        sender_name: user.full_name,
         receiver_id: selectedOpponent.user_id,
         game_type: config.game_type,
         status: 'pending',
@@ -175,11 +178,9 @@ export default function Search() {
       });
 
       console.log('Création notification pour:', selectedOpponent.user_id);
-      const opponentUsers = await base44.entities.User.filter({ id: selectedOpponent.user_id });
-      const opponentEmail = opponentUsers?.[0]?.email;
-      if (opponentEmail) {
+      if (selectedOpponent.email) {
         await base44.entities.Notification.create({
-          user_email: opponentEmail,
+          user_email: selectedOpponent.email,
           type: 'match_invitation',
           title: `Invitation à jouer aux ${config.game_type === 'chess' ? 'Échecs' : 'Dames'}`,
           message: `${user.full_name} vous invite à jouer aux ${config.game_type === 'chess' ? 'Échecs' : 'Dames'}`,

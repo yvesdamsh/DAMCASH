@@ -72,12 +72,22 @@ export default function GameRoom() {
 
       setGameStarted(!!sess.player2_id);
 
-      // Rafraîchir l'adversaire si nécessaire
+      // Rafraîchir l'adversaire si nécessaire (sans accès User)
       const opponentId = user?.id === sess.player1_id ? sess.player2_id : sess.player1_id;
       if (opponentId && opponent?.id !== opponentId) {
-        const opponentUsers = await base44.entities.User.filter({ id: opponentId });
-        if (opponentUsers.length > 0) {
-          setOpponent(opponentUsers[0]);
+        const onlineUsers = await base44.entities.OnlineUser.filter({ user_id: opponentId });
+        if (onlineUsers.length > 0) {
+          setOpponent({
+            id: opponentId,
+            full_name: onlineUsers[0].username || sess.player2_name || sess.invited_player_name,
+            avatar_url: onlineUsers[0].avatar_url
+          });
+        } else {
+          setOpponent({
+            id: opponentId,
+            full_name: sess.player2_name || sess.invited_player_name || 'Adversaire',
+            avatar_url: null
+          });
         }
       }
     });
@@ -204,13 +214,29 @@ export default function GameRoom() {
           setBlackTime(sess.black_time);
         }
 
-        // Charger adversaire
+        // Charger adversaire (sans accès User)
         const opponentId = sess.player1_id === currentUser.id ? sess.player2_id : sess.player1_id;
         if (opponentId) {
-          const opponentUsers = await base44.entities.User.filter({ id: opponentId });
-          if (opponentUsers.length > 0) {
-            setOpponent(opponentUsers[0]);
+          const onlineUsers = await base44.entities.OnlineUser.filter({ user_id: opponentId });
+          if (onlineUsers.length > 0) {
+            setOpponent({
+              id: opponentId,
+              full_name: onlineUsers[0].username || sess.player2_name || sess.invited_player_name,
+              avatar_url: onlineUsers[0].avatar_url
+            });
+          } else {
+            setOpponent({
+              id: opponentId,
+              full_name: sess.player2_name || sess.invited_player_name || 'Adversaire',
+              avatar_url: null
+            });
           }
+        } else if (sess.invited_player_name) {
+          setOpponent({
+            id: sess.invited_player_id || null,
+            full_name: sess.invited_player_name,
+            avatar_url: null
+          });
         }
 
         // Vérifier si le jeu a démarré: player2_id existe
