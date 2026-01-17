@@ -56,8 +56,13 @@ export default function Layout({ children, currentPageName }) {
     }
   };
 
-  const handleLogout = () => {
-    base44.auth.logout();
+  const handleLogout = async () => {
+    try {
+      await base44.auth.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+      window.location.href = '/';
+    }
   };
 
   const handleLogin = () => {
