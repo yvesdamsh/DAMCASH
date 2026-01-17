@@ -60,6 +60,15 @@ export default function Layout({ children, currentPageName }) {
     base44.auth.redirectToLogin();
   };
 
+  const handleLogout = () => {
+    try {
+      if (typeof base44 !== 'undefined' && base44.auth) {
+        base44.auth.logout();
+      }
+    } catch(e) {}
+    window.location.href = window.location.origin;
+  };
+
   const navItems = [
     { name: 'Accueil', icon: Home, page: 'Home' },
     { name: 'Recherche', icon: Search, page: 'Search' },
@@ -162,7 +171,7 @@ export default function Layout({ children, currentPageName }) {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-[#D4A574]/30" />
-                    <DropdownMenuItem onClick={() => { localStorage.clear(); sessionStorage.clear(); window.location.reload(); }} className="flex items-center gap-2 cursor-pointer text-red-400">
+                    <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 cursor-pointer text-red-400">
                       <LogOut className="w-4 h-4" />
                       Déconnexion
                     </DropdownMenuItem>
