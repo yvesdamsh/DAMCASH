@@ -72,6 +72,15 @@ export default function Profile() {
     }
   };
 
+  const handleLogout = () => {
+    try {
+      if (typeof base44 !== 'undefined' && base44.auth) {
+        base44.auth.logout();
+      }
+    } catch(e) {}
+    window.location.href = window.location.origin;
+  };
+
 
 
   const calculateWinRate = () => {
