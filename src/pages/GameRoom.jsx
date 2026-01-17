@@ -134,9 +134,8 @@ export default function GameRoom() {
         }
 
         // Vérifier si le jeu a démarré: player2_email existe
-        if (sess.player2_email) {
-          setGameStarted(true);
-        }
+        // Dès que player2_email est rempli, le jeu commence pour les deux joueurs
+        setGameStarted(!!sess.player2_email);
       }
     } catch (error) {
       console.error('Error loading game room:', error);
