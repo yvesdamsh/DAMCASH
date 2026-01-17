@@ -643,9 +643,9 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                        )}
                       
                       <AnimatePresence mode="wait">
-                        {cell && (
+                        {piece && (
                           <motion.div 
-                            key={`${actualRow}-${actualCol}-${cell.color}-${cell.isKing}`}
+                            key={`${actualRow}-${actualCol}-${piece.color}-${piece.isKing}`}
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             exit={{ scale: 0 }}
