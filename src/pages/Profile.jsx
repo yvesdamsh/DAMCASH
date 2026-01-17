@@ -139,7 +139,7 @@ export default function Profile() {
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="relative mb-6 p-6 rounded-2xl premium-gradient border border-[#D4A574]/30 shadow-2xl overflow-hidden"
+        className="relative mb-6 p-6 rounded-2xl premium-gradient border border-[#D4A574]/30 shadow-2xl shadow-black/50 backdrop-blur-xl overflow-hidden"
       >
         {/* Background pattern */}
         <div className="absolute inset-0 opacity-5">
@@ -248,7 +248,7 @@ export default function Profile() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: index * 0.1 }}
-            className="p-4 rounded-xl bg-[#5D3A1A]/30 border border-[#D4A574]/20 backdrop-blur-sm"
+            className="p-4 rounded-xl bg-[#5D3A1A]/40 border border-[#D4A574]/30 backdrop-blur-lg shadow-lg hover:bg-[#5D3A1A]/50 transition-all"
           >
             <stat.icon className={`w-6 h-6 mb-2 ${stat.color}`} />
             <div className="text-2xl font-bold text-[#F5E6D3]">{stat.value}</div>

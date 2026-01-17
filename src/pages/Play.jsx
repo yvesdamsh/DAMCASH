@@ -35,7 +35,7 @@ export default function Play() {
         {modes.map((mode) => (
           <div
             key={mode.id}
-            className={`p-6 rounded-2xl bg-gradient-to-r ${mode.gradient} border border-white/10 hover:border-white/20 transition-all hover:scale-[1.02] hover:shadow-xl`}
+            className={`p-6 rounded-2xl bg-gradient-to-r ${mode.gradient} border border-white/20 hover:border-white/40 transition-all hover:scale-[1.02] hover:shadow-2xl backdrop-blur-lg shadow-lg`}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -84,7 +84,7 @@ export default function Play() {
               to={createPageUrl(game.page)}
               className="block group"
             >
-              <div className={`p-6 rounded-2xl bg-gradient-to-r ${game.color} border border-white/10 hover:border-white/20 transition-all hover:scale-[1.02] hover:shadow-xl`}>
+              <div className={`p-6 rounded-2xl bg-gradient-to-r ${game.color} border border-white/20 hover:border-white/40 transition-all hover:scale-[1.02] hover:shadow-xl backdrop-blur-lg shadow-lg`}>
                 <div className="flex items-center gap-4">
                   <div className={`w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center ${game.iconColor}`}>
                     <game.icon className="w-6 h-6" />
