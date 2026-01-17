@@ -31,8 +31,8 @@ const getSquareNumber = (row, col) => {
   return Math.floor(row * 5 + col / 2) + 1;
 };
 
-export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium', onGameEnd, isMultiplayer = false, canMove = true, blockBoard = false }) {
-  const [board, setBoard] = useState(createInitialBoard);
+export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium', onGameEnd, isMultiplayer = false, canMove = true, blockBoard = false, initialBoardState = null, onSaveMove = null }) {
+  const [board, setBoard] = useState(() => initialBoardState ? initialBoardState : createInitialBoard());
   const [selectedSquare, setSelectedSquare] = useState(null);
   const [validMoves, setValidMoves] = useState([]);
   const [currentTurn, setCurrentTurn] = useState('white');
