@@ -418,7 +418,7 @@ export default function Profile() {
               Compte
             </h3>
             <Button
-              onClick={() => { window.location.href = '/login'; }}
+              onClick={() => base44.auth.logout()}
               className="w-full bg-red-600 hover:bg-red-700 text-white"
             >
               <LogOut className="w-4 h-4 mr-2" />
