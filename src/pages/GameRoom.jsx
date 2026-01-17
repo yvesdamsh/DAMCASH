@@ -549,7 +549,7 @@ export default function GameRoom() {
 
       {/* Barre Adversaire - EN HAUT */}
       {opponent && (
-        <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-b-2 border-[#D4A574]/40 px-6 py-4 shadow-lg">
+        <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-b-2 border-[#D4A574]/40 px-6 py-4 shadow-xl shadow-black/50 backdrop-blur-lg">
           <div className="max-w-6xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-4 flex-1">
               <Avatar className="w-14 h-14 border-3 border-[#D4A574]">
@@ -622,7 +622,7 @@ export default function GameRoom() {
 
       {/* Chat */}
       <div className="px-6 pb-4">
-        <div className="bg-[#2C1810] border border-[#D4A574]/30 rounded-xl p-4">
+        <div className="bg-[#2C1810]/70 backdrop-blur-lg border border-[#D4A574]/30 rounded-xl p-4 shadow-lg">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-[#F5E6D3]">Chat</h3>
             {loadingMessages && (
@@ -666,7 +666,7 @@ export default function GameRoom() {
 
       {/* Barre Joueur Courant - EN BAS */}
       {user && (
-        <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-t-2 border-[#D4A574]/40 px-6 py-4 shadow-lg">
+        <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-t-2 border-[#D4A574]/40 px-6 py-4 shadow-xl shadow-black/50 backdrop-blur-lg">
           <div className="max-w-6xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-4 flex-1">
               <Avatar className="w-14 h-14 border-3 border-[#D4A574]">
