@@ -285,17 +285,21 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     const newBoard = board.map(r => r.map(c => c ? { ...c } : null));
     const piece = { ...newBoard[fromRow][fromCol] };
 
+    // Supprimer les pions capturés
     capturedSquares.forEach(({ row, col }) => {
       newBoard[row][col] = null;
     });
 
+    // Promotion: si un pion atteint la dernière rangée, il devient Dame
     if ((piece.color === 'white' && toRow === 0) || (piece.color === 'black' && toRow === 9)) {
       piece.isKing = true;
     }
 
+    // Déplacer le pion
     newBoard[toRow][toCol] = piece;
     newBoard[fromRow][fromCol] = null;
 
+    // Mettre à jour le score
     if (capturedSquares.length > 0) {
       setScore(prev => ({
         ...prev,
@@ -307,9 +311,11 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     setSelectedSquare(null);
     setValidMoves([]);
 
+    // Vérifier si une prise multiple (rafle) est possible
     if (capturedSquares.length > 0) {
       const nextCapture = getMaxCaptureMovesForPiece(newBoard, toRow, toCol, newBoard[toRow][toCol]);
       if (nextCapture.moves.length > 0) {
+        // La rafle est obligatoire
         setChainCapture({ row: toRow, col: toCol });
         setSelectedSquare({ row: toRow, col: toCol });
         setValidMoves(nextCapture.moves);
@@ -317,13 +323,16 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       }
     }
 
+    // Changement de tour
     const nextColor = piece.color === 'white' ? 'black' : 'white';
     setCurrentTurn(nextColor);
     setChainCapture(null);
 
+    // Vérifier les captures obligatoires pour le prochain joueur
     const forced = getForcedCaptures(newBoard, nextColor);
     setMustCapture(forced.captures);
 
+    // Vérifier si la partie est terminée
     const endStatus = checkGameEnd(newBoard, nextColor);
     if (endStatus) {
       setGameStatus(endStatus);
