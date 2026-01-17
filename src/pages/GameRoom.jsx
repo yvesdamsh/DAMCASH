@@ -24,7 +24,7 @@ export default function GameRoom() {
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [gameStarted, setGameStarted] = useState(isWaiting !== 'true');
+  const [gameStarted, setGameStarted] = useState(false);
   const [opponent, setOpponent] = useState(null);
   const [boardState, setBoardState] = useState(null);
   const [whiteTime, setWhiteTime] = useState(null);
@@ -38,12 +38,12 @@ export default function GameRoom() {
     }
   }, [roomId]);
 
-  // Recharger toutes les 2 secondes pour voir les coups adversaire
+  // Recharger toutes les 2 secondes CONTINUELLEMENT pour synchroniser
   useEffect(() => {
-    if (!roomId || !gameStarted) return;
+    if (!roomId) return;
     const interval = setInterval(() => loadData(), 2000);
     return () => clearInterval(interval);
-  }, [roomId, gameStarted]);
+  }, [roomId]);
 
   // Timer qui décrémente chaque seconde pour le joueur dont c'est le tour
   useEffect(() => {
