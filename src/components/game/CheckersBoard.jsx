@@ -235,13 +235,23 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     const piece = boardState[row][col];
     if (!piece) return [];
 
-    if (mustCapture.length > 0) {
-      const forced = mustCapture.find(c => c.row === row && c.col === col);
-      return forced ? forced.moves : [];
+    // Vérifier les captures forcées pour cette pièce
+    const forced = getForcedCaptures(boardState, piece.color);
+    if (forced.captures.length > 0) {
+      // Il y a des captures obligatoires
+      const forcedEntry = forced.captures.find(c => c.row === row && c.col === col);
+      if (forcedEntry) {
+        // Cette pièce peut capturer
+        return forcedEntry.moves;
+      }
+      // Cette pièce ne peut pas capturer, donc pas de mouvements valides
+      return [];
     }
 
-    return getRegularMoves(row, col, boardState, piece);
-  }, [getRegularMoves, mustCapture]);
+    // Pas de captures forcées, mouvements réguliers autorisés
+    const regularMoves = getRegularMoves(row, col, boardState, piece);
+    return regularMoves;
+  }, [getRegularMoves, getForcedCaptures]);
 
   const getValidMovesForColor = useCallback((row, col, boardState, color) => {
     const piece = boardState[row][col];
