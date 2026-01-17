@@ -15,6 +15,9 @@ export default function Search() {
 
   useEffect(() => {
     loadUser();
+  }, []);
+
+  useEffect(() => {
     initializeTestPlayers();
   }, []);
 
@@ -34,13 +37,15 @@ export default function Search() {
       const existing = await base44.entities.Player.list();
       if (existing.length === 0) {
         const testPlayers = [
-          { username: 'Jean Dupont', email: 'jean@example.com', level: 15, chess_rating: 1450, is_online: true, avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jean' },
-          { username: 'Marie Martin', email: 'marie@example.com', level: 22, chess_rating: 1680, is_online: true, avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marie' },
-          { username: 'Pierre Bernard', email: 'pierre@example.com', level: 8, chess_rating: 1200, is_online: false, avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Pierre' },
-          { username: 'Sophie Petit', email: 'sophie@example.com', level: 18, chess_rating: 1520, is_online: true, avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sophie' },
-          { username: 'Lucas Moreau', email: 'lucas@example.com', level: 12, chess_rating: 1380, is_online: false, avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas' }
+          { username: 'Jean Dupont', level: 5, is_online: true },
+          { username: 'Marie Martin', level: 8, is_online: false },
+          { username: 'Pierre Bernard', level: 3, is_online: true },
+          { username: 'Sophie Petit', level: 12, is_online: false },
+          { username: 'Lucas Moreau', level: 7, is_online: true }
         ];
-        await base44.entities.Player.bulkCreate(testPlayers);
+        for (const player of testPlayers) {
+          await base44.entities.Player.create(player);
+        }
       }
     } catch (error) {
       console.error('Erreur initialisation joueurs:', error);
@@ -68,11 +73,10 @@ export default function Search() {
     
     setIsSearching(true);
     try {
-      const players = await base44.entities.Player.list();
-      const filtered = players.filter(p => 
-        p.username && p.username.toLowerCase().includes(query.toLowerCase())
-      );
-      setResults(filtered);
+      const players = await base44.entities.Player.filter({
+        username: { $contains: query }
+      });
+      setResults(players);
     } catch (error) {
       console.error('Erreur recherche:', error);
       setResults([]);
