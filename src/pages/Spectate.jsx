@@ -1,71 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Eye, Crown, Circle, Users, Clock, Flame } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Spectate() {
+  const navigate = useNavigate();
   const { data: matches = [] } = useQuery({
     queryKey: ['liveMatches'],
-    queryFn: () => base44.entities.GameMatch.filter({ status: 'in_progress' }),
-    refetchInterval: 30000
+    queryFn: () => base44.entities.GameSession.filter({ status: 'in_progress' }),
+    refetchInterval: 15000
+  });
+  const { data: statsList = [] } = useQuery({
+    queryKey: ['playerStats'],
+    queryFn: () => base44.entities.PlayerStats.list(),
+    refetchInterval: 60000
   });
 
-  // Mock live games for demo
-  const mockGames = [
-    {
-      id: '1',
-      game_type: 'chess',
-      player_white_name: 'Magnus Pro',
-      player_black_name: 'Alexandra GM',
-      time_control: 'blitz',
-      spectators_count: 234,
-      move_count: 42,
-      rating_white: 2650,
-      rating_black: 2580,
-      featured: true
-    },
-    {
-      id: '2',
-      game_type: 'chess',
-      player_white_name: 'Pierre Master',
-      player_black_name: 'Sophie Expert',
-      time_control: 'rapid',
-      spectators_count: 89,
-      move_count: 28,
-      rating_white: 2100,
-      rating_black: 2050
-    },
-    {
-      id: '3',
-      game_type: 'checkers',
-      player_white_name: 'Dame Royale',
-      player_black_name: 'Rafle Pro',
-      time_control: 'blitz',
-      spectators_count: 156,
-      move_count: 35,
-      rating_white: 2400,
-      rating_black: 2350,
-      featured: true
-    },
-    {
-      id: '4',
-      game_type: 'chess',
-      player_white_name: 'Nouveau Talent',
-      player_black_name: 'Rising Star',
-      time_control: 'bullet',
-      spectators_count: 45,
-      move_count: 56,
-      rating_white: 1800,
-      rating_black: 1820
-    }
-  ];
+  const statsMap = (statsList || []).reduce((acc, s) => {
+    acc[s.user_id] = s;
+    return acc;
+  }, {});
 
-  const displayGames = matches.length > 0 ? matches : mockGames;
+  const displayGames = matches.map((m) => ({
+    id: m.id,
+    room_id: m.room_id,
+    game_type: m.game_type,
+    player_white_name: m.player1_name || 'Joueur',
+    player_black_name: m.player2_name || m.invited_player_name || 'Joueur',
+    rating_white: statsMap[m.player1_id]?.[m.game_type === 'chess' ? 'chess_rating' : 'checkers_rating'],
+    rating_black: statsMap[m.player2_id]?.[m.game_type === 'chess' ? 'chess_rating' : 'checkers_rating'],
+    time_control: m.time_control || 'blitz',
+    spectators_count: m.spectators_count || 0,
+    move_count: m.move_count || 0,
+    featured: !!m.ranked
+  }));
 
-  const handleSpectate = (gameId) => {
-    alert(`Ouverture de la partie ${gameId} en mode spectateur...`);
+  const handleSpectate = (roomId) => {
+    if (!roomId) return;
+    navigate(`/GameRoom?roomId=${roomId}&spectate=true`);
   };
 
   return (
@@ -86,6 +61,12 @@ export default function Spectate() {
         <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
         <span>EN DIRECT</span>
       </div>
+
+      {displayGames.length === 0 && (
+        <div className="text-center text-gray-400 py-12">
+          Aucune partie en cours
+        </div>
+      )}
 
       {/* Featured Games */}
       {displayGames.filter(g => g.featured).length > 0 && (
@@ -138,7 +119,7 @@ export default function Spectate() {
                     <span>{game.move_count} coups</span>
                   </div>
                   <Button
-                    onClick={() => handleSpectate(game.id)}
+                    onClick={() => handleSpectate(game.room_id)}
                     className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500"
                   >
                     <Eye className="w-4 h-4 mr-1" />
@@ -191,7 +172,7 @@ export default function Spectate() {
               </div>
 
               <Button
-                onClick={() => handleSpectate(game.id)}
+                onClick={() => handleSpectate(game.room_id)}
                 variant="outline"
                 className="border-purple-500/50 text-purple-400 hover:bg-purple-500/10"
               >

@@ -22,6 +22,7 @@ export default function GameRoom() {
   const urlParams = new URLSearchParams(window.location.search);
   const roomId = urlParams.get('roomId');
   const isWaiting = urlParams.get('waiting') === 'true';
+  const isSpectator = urlParams.get('spectate') === 'true';
   
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
@@ -36,6 +37,7 @@ export default function GameRoom() {
   const [newMessage, setNewMessage] = useState('');
   const [loadingMessages, setLoadingMessages] = useState(false);
   const endGameSentRef = useRef(false);
+  const spectatorJoinedRef = useRef(false);
 
   // Charger les données initiales
   useEffect(() => {
@@ -183,6 +185,7 @@ export default function GameRoom() {
   const handleSendMessage = async () => {
     const text = newMessage.trim();
     if (!text || !user || !roomId) return;
+    if (isSpectator) return;
 
     try {
       await base44.entities.GameChatMessage?.create?.({
@@ -245,7 +248,7 @@ export default function GameRoom() {
         
         // Si l'utilisateur courant n'est pas player1 et player2_id est vide
         // Alors c'est player2 qui rejoint - mettre à jour immédiatement
-        if (sess.player1_id !== currentUser.id && !sess.player2_id) {
+        if (!isSpectator && sess.player1_id !== currentUser.id && !sess.player2_id) {
           await base44.entities.GameSession.update(sess.id, {
             player2_id: currentUser.id,
             player2_email: currentUser.email,
@@ -325,6 +328,35 @@ export default function GameRoom() {
     }
   };
 
+  // Spectateur: incrémenter/décrémenter le compteur
+  useEffect(() => {
+    if (!isSpectator || !roomId) return;
+
+    const updateSpectators = async (delta) => {
+      try {
+        const sessions = await base44.entities.GameSession.filter({ room_id: roomId });
+        if (sessions.length === 0) return;
+        const sess = sessions[0];
+        const nextCount = Math.max(0, (sess.spectators_count || 0) + delta);
+        await base44.entities.GameSession.update(sess.id, { spectators_count: nextCount });
+      } catch (e) {
+        console.log('Erreur spectators_count:', e?.message || e);
+      }
+    };
+
+    if (!spectatorJoinedRef.current) {
+      spectatorJoinedRef.current = true;
+      updateSpectators(1);
+    }
+
+    return () => {
+      if (spectatorJoinedRef.current) {
+        updateSpectators(-1);
+        spectatorJoinedRef.current = false;
+      }
+    };
+  }, [isSpectator, roomId]);
+
   const handleSaveMove = async (newBoardState, nextTurn) => {
     if (!session || !user) return;
     
@@ -346,7 +378,10 @@ export default function GameRoom() {
       }
 
       // Envoyer à la base de données
-      await base44.entities.GameSession.update(session.id, updateData);
+      await base44.entities.GameSession.update(session.id, {
+        ...updateData,
+        move_count: (session.move_count || 0) + 1
+      });
 
       // Enregistrer le coup en realtime (best-effort)
       try {
@@ -432,7 +467,7 @@ export default function GameRoom() {
 
   const handleGameEnd = async (status) => {
     if (!session || endGameSentRef.current) return;
-    if (session.status === 'finished') {
+    if (session.status === 'finished' || isSpectator) {
       navigate('/Play');
       return;
     }
@@ -445,6 +480,7 @@ export default function GameRoom() {
     const blackWinner = status === 'blackWins';
     const winnerId = isDraw ? null : (whiteWinner ? session.player1_id : session.player2_id);
     const loserId = isDraw ? null : (whiteWinner ? session.player2_id : session.player1_id);
+    const ranked = !!session.ranked;
 
     try {
       await base44.entities.GameSession.update(session.id, {
@@ -458,13 +494,46 @@ export default function GameRoom() {
         game_type: gameType,
         winner_id: winnerId,
         loser_id: loserId,
+        player1_id: session.player1_id,
+        player1_name: session.player1_name,
+        player2_id: session.player2_id,
+        player2_name: session.player2_name || session.invited_player_name,
         result: isDraw ? 'draw' : (whiteWinner ? 'white' : 'black')
       });
 
-      await Promise.all([
-        updatePlayerStats(session.player1_id, session.player1_name, isDraw ? 'draw' : (whiteWinner ? 'win' : 'loss'), gameType),
-        updatePlayerStats(session.player2_id, session.player2_name || session.invited_player_name, isDraw ? 'draw' : (blackWinner ? 'win' : 'loss'), gameType)
-      ]);
+      if (ranked) {
+        await Promise.all([
+          updatePlayerStats(session.player1_id, session.player1_name, isDraw ? 'draw' : (whiteWinner ? 'win' : 'loss'), gameType),
+          updatePlayerStats(session.player2_id, session.player2_name || session.invited_player_name, isDraw ? 'draw' : (blackWinner ? 'win' : 'loss'), gameType)
+        ]);
+      }
+
+      // Notifications in-app (non-push)
+      try {
+        const notify = async (userId, title, message) => {
+          if (!userId) return;
+          await base44.entities.Notification?.create?.({
+            user_email: userId,
+            type: 'game_result',
+            title,
+            message,
+            link: `GameRoom?roomId=${roomId}`
+          });
+        };
+        if (isDraw) {
+          await Promise.all([
+            notify(session.player1_id, 'Match nul', 'La partie s’est terminée par un nul'),
+            notify(session.player2_id, 'Match nul', 'La partie s’est terminée par un nul')
+          ]);
+        } else {
+          await Promise.all([
+            notify(winnerId, 'Victoire', 'Vous avez gagné la partie'),
+            notify(loserId, 'Défaite', 'Vous avez perdu la partie')
+          ]);
+        }
+      } catch (e) {
+        console.log('Notification résultat échouée:', e?.message || e);
+      }
     } catch (e) {
       console.log('Erreur fin de partie:', e?.message || e);
     } finally {
@@ -494,8 +563,10 @@ export default function GameRoom() {
   const isPlayerWhite = user && session && user.id === session.player1_id;
   const playerColor = isPlayerWhite ? 'white' : 'black';
   const gameType = session?.game_type;
-  const canMove = (playerColor === 'white' && session.current_turn === 'white') || 
-                  (playerColor === 'black' && session.current_turn === 'black');
+  const canMove = !isSpectator && (
+    (playerColor === 'white' && session.current_turn === 'white') || 
+    (playerColor === 'black' && session.current_turn === 'black')
+  );
 
   // Écran d'attente
   if (!gameStarted) {
@@ -600,7 +671,7 @@ export default function GameRoom() {
             playerColor={playerColor}
             onGameEnd={handleGameEnd}
             isMultiplayer={true}
-            canMove={canMove && gameStarted}
+            canMove={canMove && gameStarted && !isSpectator}
             initialBoardState={boardState}
             onSaveMove={handleSaveMove}
             blockBoard={!gameStarted}
@@ -611,7 +682,7 @@ export default function GameRoom() {
             playerColor={playerColor}
             onGameEnd={handleGameEnd}
             isMultiplayer={true}
-            canMove={canMove && gameStarted}
+            canMove={canMove && gameStarted && !isSpectator}
             initialBoardState={boardState}
             onSaveMove={handleSaveMove}
             blockBoard={!gameStarted}
@@ -656,7 +727,7 @@ export default function GameRoom() {
             <Button
               onClick={handleSendMessage}
               className="bg-amber-600 hover:bg-amber-700"
-              disabled={!newMessage.trim()}
+              disabled={isSpectator || !newMessage.trim()}
             >
               Envoyer
             </Button>
