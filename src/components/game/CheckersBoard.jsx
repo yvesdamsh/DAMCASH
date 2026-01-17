@@ -53,24 +53,33 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     }
   }, [initialBoardState]);
 
+  useEffect(() => {
+    if (gameStatus !== 'playing' && onGameEnd) {
+      onGameEnd(gameStatus);
+    }
+  }, [gameStatus, onGameEnd]);
+
   const getCaptureMoves = useCallback((row, col, boardState, piece) => {
     const moves = [];
-    const allDirections = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+    const directions = piece.isKing 
+      ? [[-1, -1], [-1, 1], [1, -1], [1, 1]]
+      : piece.color === 'white' 
+        ? [[-1, -1], [-1, 1]]
+        : [[1, -1], [1, 1]];
 
     if (piece.isKing) {
-      // Dame: peut capturer en diagonale sur plusieurs cases
-      allDirections.forEach(([dr, dc]) => {
+      directions.forEach(([dr, dc]) => {
         let foundOpponent = null;
         let foundPos = null;
-
+        
         for (let i = 1; i < 10; i++) {
           const checkRow = row + dr * i;
           const checkCol = col + dc * i;
-
+          
           if (checkRow < 0 || checkRow >= 10 || checkCol < 0 || checkCol >= 10) break;
-
+          
           const checkPiece = boardState[checkRow][checkCol];
-
+          
           if (!checkPiece) {
             if (foundOpponent) {
               moves.push({
@@ -84,13 +93,12 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
             foundOpponent = checkPiece;
             foundPos = { row: checkRow, col: checkCol };
           } else {
-            // Bloqué par un pion ami
             break;
           }
         }
       });
     } else {
-      // Pion: saute par-dessus un adversaire (capture obligatoire dans toutes les directions)
+      const allDirections = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
       allDirections.forEach(([dr, dc]) => {
         const midRow = row + dr;
         const midCol = col + dc;
@@ -101,7 +109,6 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
           const midPiece = boardState[midRow]?.[midCol];
           const targetPiece = boardState[targetRow]?.[targetCol];
 
-          // Capture: doit avoir un pion adverse à côté et une case vide après
           if (midPiece && midPiece.color !== piece.color && !targetPiece) {
             moves.push({
               row: targetRow,
@@ -166,7 +173,6 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
   }, [getCaptureSequences]);
 
   const getForcedCaptures = useCallback((boardState, color) => {
-    // Trouver tous les pions qui peuvent capturer et le max de captures possible
     let maxCaptures = 0;
     const captures = [];
 
@@ -177,12 +183,10 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
           const result = getMaxCaptureMovesForPiece(boardState, r, c, piece);
           if (result.maxCaptures > 0) {
             if (result.maxCaptures > maxCaptures) {
-              // Nouveau max trouvé, réinitialiser la liste
               maxCaptures = result.maxCaptures;
               captures.length = 0;
               captures.push({ row: r, col: c, moves: result.moves });
             } else if (result.maxCaptures === maxCaptures) {
-              // Même max, ajouter ce pion aux options
               captures.push({ row: r, col: c, moves: result.moves });
             }
           }
@@ -198,28 +202,26 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     const directions = piece.isKing 
       ? [[-1, -1], [-1, 1], [1, -1], [1, 1]]
       : piece.color === 'white' 
-        ? [[-1, -1], [-1, 1]]  // Blancs avancent vers haut (row décroit)
-        : [[1, -1], [1, 1]];    // Noirs avancent vers bas (row croit)
+        ? [[-1, -1], [-1, 1]]
+        : [[1, -1], [1, 1]];
 
     if (piece.isKing) {
-      // Dame: peut se déplacer sur plusieurs cases en diagonale
       directions.forEach(([dr, dc]) => {
         for (let i = 1; i < 10; i++) {
           const newRow = row + dr * i;
           const newCol = col + dc * i;
-
+          
           if (newRow < 0 || newRow >= 10 || newCol < 0 || newCol >= 10) break;
           if (boardState[newRow][newCol]) break;
-
+          
           moves.push({ row: newRow, col: newCol, isCapture: false });
         }
       });
     } else {
-      // Pion: se déplace d'une case en diagonale (seulement vers l'avant)
       directions.forEach(([dr, dc]) => {
         const newRow = row + dr;
         const newCol = col + dc;
-
+        
         if (newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10) {
           if (!boardState[newRow][newCol]) {
             moves.push({ row: newRow, col: newCol, isCapture: false });
@@ -235,23 +237,13 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     const piece = boardState[row][col];
     if (!piece) return [];
 
-    // Vérifier les captures forcées pour cette pièce
-    const forced = getForcedCaptures(boardState, piece.color);
-    if (forced.captures.length > 0) {
-      // Il y a des captures obligatoires
-      const forcedEntry = forced.captures.find(c => c.row === row && c.col === col);
-      if (forcedEntry) {
-        // Cette pièce peut capturer
-        return forcedEntry.moves;
-      }
-      // Cette pièce ne peut pas capturer, donc pas de mouvements valides
-      return [];
+    if (mustCapture.length > 0) {
+      const forced = mustCapture.find(c => c.row === row && c.col === col);
+      return forced ? forced.moves : [];
     }
 
-    // Pas de captures forcées, mouvements réguliers autorisés
-    const regularMoves = getRegularMoves(row, col, boardState, piece);
-    return regularMoves;
-  }, [getRegularMoves, getForcedCaptures]);
+    return getRegularMoves(row, col, boardState, piece);
+  }, [getRegularMoves, mustCapture]);
 
   const getValidMovesForColor = useCallback((row, col, boardState, color) => {
     const piece = boardState[row][col];
@@ -267,7 +259,6 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
   }, [getForcedCaptures, getRegularMoves]);
 
   const checkGameEnd = useCallback((boardState, nextColor) => {
-    // Victoire si l'adversaire n'a plus de pions OU ne peut plus bouger
     let hasValidMove = false;
     let hasPieces = false;
 
@@ -286,7 +277,6 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       if (hasValidMove) break;
     }
 
-    // Fin de partie: si aucun pion ou aucun coup possible
     if (!hasPieces || !hasValidMove) {
       return nextColor === 'white' ? 'blackWins' : 'whiteWins';
     }
@@ -297,21 +287,17 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     const newBoard = board.map(r => r.map(c => c ? { ...c } : null));
     const piece = { ...newBoard[fromRow][fromCol] };
 
-    // Supprimer les pions capturés
     capturedSquares.forEach(({ row, col }) => {
       newBoard[row][col] = null;
     });
 
-    // Promotion: si un pion atteint la dernière rangée, il devient Dame
     if ((piece.color === 'white' && toRow === 0) || (piece.color === 'black' && toRow === 9)) {
       piece.isKing = true;
     }
 
-    // Déplacer le pion
     newBoard[toRow][toCol] = piece;
     newBoard[fromRow][fromCol] = null;
 
-    // Mettre à jour le score
     if (capturedSquares.length > 0) {
       setScore(prev => ({
         ...prev,
@@ -323,11 +309,9 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     setSelectedSquare(null);
     setValidMoves([]);
 
-    // Vérifier si une prise multiple (rafle) est possible
     if (capturedSquares.length > 0) {
       const nextCapture = getMaxCaptureMovesForPiece(newBoard, toRow, toCol, newBoard[toRow][toCol]);
       if (nextCapture.moves.length > 0) {
-        // La rafle est obligatoire
         setChainCapture({ row: toRow, col: toCol });
         setSelectedSquare({ row: toRow, col: toCol });
         setValidMoves(nextCapture.moves);
@@ -335,16 +319,13 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       }
     }
 
-    // Changement de tour
     const nextColor = piece.color === 'white' ? 'black' : 'white';
     setCurrentTurn(nextColor);
     setChainCapture(null);
 
-    // Vérifier les captures obligatoires pour le prochain joueur
     const forced = getForcedCaptures(newBoard, nextColor);
     setMustCapture(forced.captures);
 
-    // Vérifier si la partie est terminée
     const endStatus = checkGameEnd(newBoard, nextColor);
     if (endStatus) {
       setGameStatus(endStatus);
@@ -361,69 +342,53 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
 
     const piece = board[row][col];
 
-    // Cas 1: Chaînage de captures (rafle obligatoire)
     if (chainCapture) {
       if (row === chainCapture.row && col === chainCapture.col) {
-        return; // Clic sur la pièce elle-même, ignorer
+        return;
       }
       const move = validMoves.find(m => m.row === row && m.col === col);
       if (move) {
-        const movedPiece = board[chainCapture.row][chainCapture.col];
         const result = makeMove(chainCapture.row, chainCapture.col, row, col, move.captured);
-        if (!result.continueChain) {
-          if (isMultiplayer && onSaveMove && movedPiece) {
-            const nextColor = movedPiece.color === 'white' ? 'black' : 'white';
-            onSaveMove(result.board, nextColor);
-          } else if (gameStatus === 'playing') {
-            setTimeout(() => makeAIMove(result.board), 500);
-          }
+        if (!result.continueChain && currentTurn !== playerColor) {
+          setTimeout(() => makeAIMove(result.board), 500);
         }
       }
       return;
     }
 
-    // Cas 2: Pièce déjà sélectionnée - clic sur une destination
     if (selectedSquare) {
-      // Clic sur la même pièce: désélectionner
-      if (row === selectedSquare.row && col === selectedSquare.col) {
-        setSelectedSquare(null);
-        setValidMoves([]);
-        return;
-      }
-
-      // Clic sur une case valide: faire le coup
       const move = validMoves.find(m => m.row === row && m.col === col);
       if (move) {
-        const movedPiece = board[selectedSquare.row][selectedSquare.col];
         const result = makeMove(selectedSquare.row, selectedSquare.col, row, col, move.captured || []);
         if (!result.continueChain) {
-          if (isMultiplayer && onSaveMove && movedPiece) {
-            const nextColor = movedPiece.color === 'white' ? 'black' : 'white';
+          if (isMultiplayer && onSaveMove) {
+            // Sauvegarder le coup pour l'adversaire
+            const nextColor = piece.color === 'white' ? 'black' : 'white';
             onSaveMove(result.board, nextColor);
           } else if (gameStatus === 'playing') {
             setTimeout(() => makeAIMove(result.board), 500);
           }
         }
-        return;
-      }
-
-      // Clic sur une autre pièce du joueur: resélectionner
-      if (piece && piece.color === playerColor) {
+      } else if (piece && piece.color === playerColor) {
+        if (mustCapture.length > 0) {
+          const canCapture = mustCapture.some(c => c.row === row && c.col === col);
+          if (!canCapture) return;
+        }
         setSelectedSquare({ row, col });
         setValidMoves(getValidMoves(row, col, board));
-        return;
+      } else {
+        setSelectedSquare(null);
+        setValidMoves([]);
       }
-
-      // Clic sur une case invalide: désélectionner
-      setSelectedSquare(null);
-      setValidMoves([]);
-      return;
-    }
-
-    // Cas 3: Aucune pièce sélectionnée - clic sur une pièce du joueur
-    if (piece && piece.color === playerColor) {
-      setSelectedSquare({ row, col });
-      setValidMoves(getValidMoves(row, col, board));
+    } else {
+      if (piece && piece.color === playerColor) {
+        if (mustCapture.length > 0) {
+          const canCapture = mustCapture.some(c => c.row === row && c.col === col);
+          if (!canCapture) return;
+        }
+        setSelectedSquare({ row, col });
+        setValidMoves(getValidMoves(row, col, board));
+      }
     }
   };
 
@@ -550,11 +515,10 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     setChainCapture(null);
   };
 
-  // Mettre à jour les captures forcées au début de chaque tour
   useEffect(() => {
-     const forced = getForcedCaptures(board, effectiveTurn);
-     setMustCapture(forced.captures);
-   }, [board, effectiveTurn, getForcedCaptures]);
+    const forced = getForcedCaptures(board, currentTurn);
+    setMustCapture(forced.captures);
+  }, [board, currentTurn, getForcedCaptures]);
 
   const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
 

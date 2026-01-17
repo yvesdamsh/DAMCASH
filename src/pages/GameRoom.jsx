@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import CheckersBoard from '../components/game/CheckersBoard';
@@ -35,6 +35,7 @@ export default function GameRoom() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const endGameSentRef = useRef(false);
 
   // Charger les données initiales
   useEffect(() => {
@@ -391,8 +392,84 @@ export default function GameRoom() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleGameEnd = () => {
-    navigate('/Play');
+  const updatePlayerStats = async (playerId, username, result, gameType) => {
+    if (!playerId) return;
+    const ratingField = gameType === 'chess' ? 'chess_rating' : 'checkers_rating';
+    const list = await base44.entities.PlayerStats.filter({ user_id: playerId });
+    const existing = list?.[0];
+    const stats = existing || {
+      user_id: playerId,
+      username: username || 'Joueur',
+      chess_rating: 1200,
+      checkers_rating: 1200,
+      games_played: 0,
+      games_won: 0,
+      games_lost: 0,
+      games_drawn: 0
+    };
+
+    let delta = 0;
+    if (result === 'win') delta = 20;
+    if (result === 'loss') delta = -20;
+    if (result === 'draw') delta = 5;
+
+    const payload = {
+      ...stats,
+      games_played: (stats.games_played || 0) + 1,
+      games_won: (stats.games_won || 0) + (result === 'win' ? 1 : 0),
+      games_lost: (stats.games_lost || 0) + (result === 'loss' ? 1 : 0),
+      games_drawn: (stats.games_drawn || 0) + (result === 'draw' ? 1 : 0),
+      [ratingField]: Math.max(0, (stats[ratingField] || 1200) + delta),
+      username: username || stats.username
+    };
+
+    if (existing?.id) {
+      await base44.entities.PlayerStats.update(existing.id, payload);
+    } else {
+      await base44.entities.PlayerStats.create(payload);
+    }
+  };
+
+  const handleGameEnd = async (status) => {
+    if (!session || endGameSentRef.current) return;
+    if (session.status === 'finished') {
+      navigate('/Play');
+      return;
+    }
+
+    endGameSentRef.current = true;
+
+    const gameType = session.game_type || 'checkers';
+    const isDraw = status === 'draw';
+    const whiteWinner = status === 'whiteWins';
+    const blackWinner = status === 'blackWins';
+    const winnerId = isDraw ? null : (whiteWinner ? session.player1_id : session.player2_id);
+    const loserId = isDraw ? null : (whiteWinner ? session.player2_id : session.player1_id);
+
+    try {
+      await base44.entities.GameSession.update(session.id, {
+        status: 'finished',
+        winner_id: winnerId,
+        finished_at: new Date().toISOString()
+      });
+
+      await base44.entities.GameResult?.create?.({
+        room_id: roomId,
+        game_type: gameType,
+        winner_id: winnerId,
+        loser_id: loserId,
+        result: isDraw ? 'draw' : (whiteWinner ? 'white' : 'black')
+      });
+
+      await Promise.all([
+        updatePlayerStats(session.player1_id, session.player1_name, isDraw ? 'draw' : (whiteWinner ? 'win' : 'loss'), gameType),
+        updatePlayerStats(session.player2_id, session.player2_name || session.invited_player_name, isDraw ? 'draw' : (blackWinner ? 'win' : 'loss'), gameType)
+      ]);
+    } catch (e) {
+      console.log('Erreur fin de partie:', e?.message || e);
+    } finally {
+      navigate('/Play');
+    }
   };
 
   if (loading) {

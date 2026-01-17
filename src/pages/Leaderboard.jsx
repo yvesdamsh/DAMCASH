@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Trophy, Crown, Circle, Medal, TrendingUp } from 'lucide-react';
@@ -8,6 +7,9 @@ import { Trophy, Crown, Circle, Medal, TrendingUp } from 'lucide-react';
 export default function Leaderboard() {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('chess');
+  const [leaderboard, setLeaderboard] = useState({ chess: [], checkers: [] });
+  const [userStats, setUserStats] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -24,27 +26,48 @@ export default function Leaderboard() {
     }
   };
 
-  // Mock leaderboard data
-  const mockLeaderboard = {
-    chess: [
-      { rank: 1, name: 'Magnus le Grand', rating: 2850, games_won: 342, avatar: '🏆' },
-      { rank: 2, name: 'Alexandra Stratège', rating: 2720, games_won: 289, avatar: '👑' },
-      { rank: 3, name: 'Pierre Gambit', rating: 2680, games_won: 256, avatar: '⚔️' },
-      { rank: 4, name: 'Sophie Échecs', rating: 2550, games_won: 198, avatar: '🎯' },
-      { rank: 5, name: 'Thomas Tactique', rating: 2480, games_won: 176, avatar: '🧠' },
-      { rank: 6, name: 'Marie Défense', rating: 2420, games_won: 165, avatar: '🛡️' },
-      { rank: 7, name: 'Lucas Attaque', rating: 2380, games_won: 154, avatar: '⚡' },
-      { rank: 8, name: 'Emma Finale', rating: 2340, games_won: 143, avatar: '🌟' },
-      { rank: 9, name: 'Hugo Ouverture', rating: 2290, games_won: 132, avatar: '📚' },
-      { rank: 10, name: 'Léa Sacrifice', rating: 2250, games_won: 121, avatar: '💎' }
-    ],
-    checkers: [
-      { rank: 1, name: 'Dame Royale', rating: 2600, games_won: 289, avatar: '👸' },
-      { rank: 2, name: 'Rafle Master', rating: 2520, games_won: 256, avatar: '🎭' },
-      { rank: 3, name: 'Promotion Pro', rating: 2480, games_won: 234, avatar: '⬆️' },
-      { rank: 4, name: 'Diagonale Expert', rating: 2420, games_won: 198, avatar: '↗️' },
-      { rank: 5, name: 'Capture King', rating: 2380, games_won: 176, avatar: '👑' }
-    ]
+  useEffect(() => {
+    loadLeaderboard();
+  }, [user?.id]);
+
+  const loadLeaderboard = async () => {
+    try {
+      setLoading(true);
+      const [chessStats, checkersStats] = await Promise.all([
+        base44.entities.PlayerStats.list('-chess_rating', 50),
+        base44.entities.PlayerStats.list('-checkers_rating', 50)
+      ]);
+
+      const mapStats = (stats, ratingField, emoji) =>
+        (stats || []).map((s, idx) => ({
+          rank: idx + 1,
+          name: s.username || 'Joueur',
+          rating: s[ratingField] || 1200,
+          games_won: s.games_won || 0,
+          avatar: s.avatar || emoji
+        }));
+
+      const chess = mapStats(chessStats, 'chess_rating', '♔');
+      const checkers = mapStats(checkersStats, 'checkers_rating', '⚫');
+      setLeaderboard({ chess, checkers });
+
+      if (user?.id) {
+        const me = await base44.entities.PlayerStats.filter({ user_id: user.id });
+        const stats = me?.[0] || null;
+        if (stats) {
+          const chessRank = chessStats?.findIndex(s => s.user_id === user.id);
+          setUserStats({ ...stats, rank: chessRank >= 0 ? chessRank + 1 : null });
+        } else {
+          setUserStats(null);
+        }
+      } else {
+        setUserStats(null);
+      }
+    } catch (e) {
+      console.log('Erreur chargement classement:', e?.message || e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getRankStyle = (rank) => {
@@ -96,9 +119,13 @@ export default function Leaderboard() {
             <div className="text-right">
               <div className="flex items-center gap-2 text-amber-400">
                 <TrendingUp className="w-4 h-4" />
-                <span className="font-bold">#127</span>
+                <span className="font-bold">
+                  {userStats ? `#${userStats.rank || '-'}` : '--'}
+                </span>
               </div>
-              <p className="text-sm text-gray-400">{user.chess_rating || 1200} pts</p>
+              <p className="text-sm text-gray-400">
+                {userStats?.chess_rating || user.chess_rating || 1200} pts
+              </p>
             </div>
           </div>
         </div>
@@ -116,8 +143,13 @@ export default function Leaderboard() {
           </TabsTrigger>
         </TabsList>
 
-        {Object.entries(mockLeaderboard).map(([type, players]) => (
+        {Object.entries(leaderboard).map(([type, players]) => (
           <TabsContent key={type} value={type}>
+            {loading ? (
+              <div className="text-center py-12 text-gray-400">Chargement...</div>
+            ) : players.length === 0 ? (
+              <div className="text-center py-12 text-gray-400">Aucun classement disponible</div>
+            ) : (
             <div className="space-y-3">
               {/* Top 3 Podium */}
               <div className="grid grid-cols-3 gap-2 mb-6">
@@ -166,6 +198,7 @@ export default function Leaderboard() {
                 </div>
               ))}
             </div>
+            )}
           </TabsContent>
         ))}
       </Tabs>

@@ -44,6 +44,12 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
     }
   }, [initialBoardState]);
 
+  useEffect(() => {
+    if (gameStatus !== 'playing' && onGameEnd) {
+      onGameEnd(gameStatus);
+    }
+  }, [gameStatus, onGameEnd]);
+
   const isWhitePiece = (piece) => piece && piece === piece.toUpperCase();
   const isBlackPiece = (piece) => piece && piece === piece.toLowerCase();
   const isPieceOfColor = (piece, color) => 
