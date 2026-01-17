@@ -138,7 +138,7 @@ export default function RoomDetail() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-[#5D3A1A]/50 border border-[#D4A574]/30 rounded-lg p-6"
+              className="bg-[#5D3A1A]/50 backdrop-blur-lg border border-[#D4A574]/30 rounded-lg p-6 shadow-lg hover:border-[#D4A574]/50 transition-all"
             >
               <h2 className="text-xl font-bold mb-4">Informations</h2>
               <div className="space-y-2 text-[#D4A574]">

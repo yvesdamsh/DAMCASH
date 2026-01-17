@@ -55,7 +55,7 @@ export default function CreateRoomModal({ isOpen, onClose, user, onRoomCreated }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#2C1810] border border-[#D4A574]/30 text-[#F5E6D3]">
+      <DialogContent className="bg-[#2C1810]/80 backdrop-blur-xl border border-[#D4A574]/40 text-[#F5E6D3] shadow-2xl shadow-black/50">
         <DialogHeader>
           <DialogTitle>Créer un salon</DialogTitle>
         </DialogHeader>
