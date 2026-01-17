@@ -353,11 +353,13 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     if (selectedSquare) {
       const move = validMoves.find(m => m.row === row && m.col === col);
       if (move) {
+        const movedPiece = board[selectedSquare.row][selectedSquare.col];
         const result = makeMove(selectedSquare.row, selectedSquare.col, row, col, move.captured || []);
         if (!result.continueChain) {
-          if (isMultiplayer && onSaveMove) {
+          if (isMultiplayer && onSaveMove && movedPiece) {
             // Sauvegarder le coup pour l'adversaire
-            const nextColor = piece.color === 'white' ? 'black' : 'white';
+            const nextColor = movedPiece.color === 'white' ? 'black' : 'white';
+            console.log('Appel onSaveMove - Coup jouée:', { from: selectedSquare, to: { row, col }, nextColor });
             onSaveMove(result.board, nextColor);
           } else if (gameStatus === 'playing') {
             setTimeout(() => makeAIMove(result.board), 500);
