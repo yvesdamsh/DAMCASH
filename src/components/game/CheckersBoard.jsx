@@ -710,10 +710,10 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                                 position: 'absolute',
                                 inset: '45%',
                                 borderRadius: '50%',
-                                background: cell.color === 'white'
+                                background: piece.color === 'white'
                                   ? 'radial-gradient(circle, #c9c5bb 0%, #b0ada5 100%)'
                                   : 'radial-gradient(circle, #222222 0%, #0a0a0a 100%)',
-                                boxShadow: cell.color === 'white'
+                                boxShadow: piece.color === 'white'
                                   ? 'inset 0 1px 3px rgba(0,0,0,0.4)'
                                   : 'inset 0 1px 2px rgba(80,80,80,0.4)'
                               }}
