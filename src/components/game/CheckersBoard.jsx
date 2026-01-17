@@ -427,11 +427,11 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       alignItems: 'center',
       justifyContent: 'center',
       width: '100%',
-      height: '100vh',
+      flex: 1,
       backgroundColor: '#1a1a1a',
       margin: 0,
-      padding: 0,
-      overflow: 'hidden'
+      padding: '16px',
+      overflow: 'auto'
     }}>
       <VictoryParticles 
         show={gameStatus !== 'playing'} 
@@ -478,12 +478,14 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
 
       {/* Wooden frame with board */}
       <div style={{ 
-        width: 'max(95vw, 800px)', 
-        height: 'max(95vw, 800px)',
+        width: 'min(90vw, calc(100vh - 200px))',
+        height: 'min(90vw, calc(100vh - 200px))',
         padding: '20px',
         borderRadius: '8px',
         backgroundColor: '#3D2314',
-        boxShadow: 'inset 0 0 25px rgba(0,0,0,0.9), inset 0 0 8px rgba(139, 90, 43, 0.6), 0 15px 40px rgba(0,0,0,0.95)'
+        boxShadow: 'inset 0 0 25px rgba(0,0,0,0.9), inset 0 0 8px rgba(139, 90, 43, 0.6), 0 15px 40px rgba(0,0,0,0.95)',
+        aspectRatio: '1/1',
+        flexShrink: 0
       }}>
         {/* Inner board container */}
         <div style={{ 
