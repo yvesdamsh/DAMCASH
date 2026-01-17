@@ -753,15 +753,15 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                               }}
                             />
 
-                            {cell.isKing && (
+                            {piece.isKing && (
                               <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
                                 <span 
                                   style={{
                                     fontSize: '70%',
                                     fontWeight: 'bold',
-                                    color: cell.color === 'white' ? '#c97a00' : '#fbbf24',
+                                    color: piece.color === 'white' ? '#c97a00' : '#fbbf24',
                                     filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.6))',
-                                    textShadow: cell.color === 'white'
+                                    textShadow: piece.color === 'white'
                                       ? '0 0.5px 1px rgba(255,255,255,0.6)'
                                       : '0 0.5px 1px rgba(0,0,0,0.9)',
                                     lineHeight: 1
