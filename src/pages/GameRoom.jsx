@@ -91,14 +91,20 @@ export default function GameRoom() {
       if (sessions.length > 0) {
         let sess = sessions[0];
         
-        // Si l'utilisateur courant n'est pas player1, c'est player2
-        // Ajouter l'utilisateur comme player2 s'il n'existe pas
-        if (sess.player1_id !== currentUser.id && !sess.player2_id) {
+        // Si l'utilisateur courant n'est pas player1 et player2_email est vide
+        // Alors c'est player2 qui rejoint - mettre à jour immédiatement
+        if (sess.player1_id !== currentUser.id && !sess.player2_email) {
           await base44.entities.GameSession.update(sess.id, {
             player2_id: currentUser.id,
+            player2_email: currentUser.email,
+            player2_name: currentUser.full_name,
             status: 'in_progress'
           });
-          sess = { ...sess, player2_id: currentUser.id, status: 'in_progress' };
+          // Recharger la session après update
+          const updatedSessions = await base44.entities.GameSession.filter({
+            room_id: roomId
+          });
+          sess = updatedSessions[0];
         }
         
         setSession(sess);
@@ -127,8 +133,8 @@ export default function GameRoom() {
           }
         }
 
-        // Vérifier si le jeu a démarré: player2_id existe
-        if (sess.player2_id) {
+        // Vérifier si le jeu a démarré: player2_email existe
+        if (sess.player2_email) {
           setGameStarted(true);
         }
       }
