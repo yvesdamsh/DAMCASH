@@ -1,6 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { RotateCcw, Plus, Flag } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import VictoryParticles from '../effects/VictoryParticles';
 
 const PIECES = {
   K: '♔', Q: '♕', R: '♖', B: '♗', N: '♘', P: '♙',
@@ -360,6 +362,10 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
 
   return (
     <div className="flex flex-col items-center gap-4">
+      <VictoryParticles 
+        show={gameStatus !== 'playing'} 
+        winner={gameStatus === 'whiteWins' ? 'white' : 'black'}
+      />
       <div className="flex items-center justify-between w-full max-w-md px-2">
         <div className={`px-4 py-2 rounded-lg ${currentTurn === playerColor ? 'bg-amber-500/20 border border-amber-500' : 'bg-white/5'}`}>
           <span className="text-sm font-medium">
@@ -405,9 +411,11 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
                    (lastMove.to.row === actualRow && lastMove.to.col === actualCol));
 
                 return (
-                  <div
+                  <motion.div
                     key={`${rowIndex}-${colIndex}`}
                     onClick={() => handleSquareClick(actualRow, actualCol)}
+                    whileHover={{ scale: isSelected || isValidMove ? 1.05 : 1 }}
+                    whileTap={{ scale: 0.95 }}
                     className={`
                       w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer
                       transition-all duration-150 relative
@@ -416,18 +424,35 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
                       ${isLastMove ? 'bg-amber-400/30' : ''}
                     `}
                   >
-                    {piece && (
-                      <span className={`text-2xl sm:text-3xl select-none ${isWhitePiece(piece) ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]' : 'text-gray-900'}`}>
-                        {PIECES[piece]}
-                      </span>
-                    )}
+                    <AnimatePresence mode="wait">
+                      {piece && (
+                        <motion.span
+                          key={`${actualRow}-${actualCol}-${piece}`}
+                          initial={{ scale: 0, rotate: -180 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          exit={{ scale: 0, rotate: 180 }}
+                          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                          className={`text-2xl sm:text-3xl select-none ${isWhitePiece(piece) ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]' : 'text-gray-900'}`}
+                        >
+                          {PIECES[piece]}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                     {isValidMove && !piece && (
-                      <div className="absolute w-3 h-3 rounded-full bg-amber-500/50"></div>
+                      <motion.div 
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute w-3 h-3 rounded-full bg-amber-500/50"
+                      />
                     )}
                     {isValidMove && isCapture && (
-                      <div className="absolute inset-0 border-4 border-red-500/50 rounded-sm"></div>
+                      <motion.div 
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute inset-0 border-4 border-red-500/50 rounded-sm"
+                      />
                     )}
-                  </div>
+                  </motion.div>
                 );
               })
             ))}

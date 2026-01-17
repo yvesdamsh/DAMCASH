@@ -12,6 +12,7 @@ import Clubs from './pages/Clubs';
 import Puzzles from './pages/Puzzles';
 import Leaderboard from './pages/Leaderboard';
 import Spectate from './pages/Spectate';
+import Notifications from './pages/Notifications';
 import __Layout from './Layout.jsx';
 
 
@@ -30,6 +31,7 @@ export const PAGES = {
     "Puzzles": Puzzles,
     "Leaderboard": Leaderboard,
     "Spectate": Spectate,
+    "Notifications": Notifications,
 }
 
 export const pagesConfig = {

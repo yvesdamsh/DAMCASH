@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { RotateCcw, Plus } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import VictoryParticles from '../effects/VictoryParticles';
 
 const createInitialBoard = () => {
   const board = Array(10).fill(null).map(() => Array(10).fill(null));
@@ -421,6 +423,10 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
 
   return (
     <div className="flex flex-col items-center gap-4">
+      <VictoryParticles 
+        show={gameStatus !== 'playing'} 
+        winner={gameStatus === 'whiteWins' ? 'white' : 'black'}
+      />
       <div className="flex items-center justify-between w-full max-w-md px-2">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-800">
@@ -473,9 +479,11 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                   const isMustCapture = mustCapture.some(c => c.row === actualRow && c.col === actualCol);
 
                   return (
-                    <div
+                    <motion.div
                       key={`${rowIndex}-${colIndex}`}
                       onClick={() => isDark && handleSquareClick(actualRow, actualCol)}
+                      whileHover={isDark ? { scale: 1.05 } : {}}
+                      whileTap={isDark ? { scale: 0.95 } : {}}
                       className={`
                         w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center relative
                         ${isDark ? 'bg-[#4a2f1f] cursor-pointer' : 'bg-[#f5e6d3]'}
@@ -489,8 +497,17 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                         </span>
                       )}
                       
-                      {cell && (
-                        <div className="relative w-5 h-5 sm:w-7 sm:h-7" style={{ transform: 'translateZ(0)' }}>
+                      <AnimatePresence mode="wait">
+                        {cell && (
+                          <motion.div 
+                            key={`${actualRow}-${actualCol}-${cell.color}-${cell.isKing}`}
+                            initial={{ scale: 0, y: -20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0, y: 20 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                            className="relative w-5 h-5 sm:w-7 sm:h-7" 
+                            style={{ transform: 'translateZ(0)' }}
+                          >
                           {/* Main pion with 3D effect */}
                           <div 
                             className={`
@@ -602,16 +619,25 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                               </div>
                             )}
                           </div>
-                        </div>
-                      )}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                       
                       {isValidMove && !cell && (
-                        <div className="absolute w-2.5 h-2.5 rounded-full bg-amber-500/60 shadow-md"></div>
+                        <motion.div 
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute w-2.5 h-2.5 rounded-full bg-amber-500/60 shadow-md"
+                        />
                       )}
                       {isValidMove && isCapture && (
-                        <div className="absolute inset-0 border-3 border-red-500/60 rounded-sm"></div>
+                        <motion.div 
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute inset-0 border-3 border-red-500/60 rounded-sm"
+                        />
                       )}
-                    </div>
+                    </motion.div>
                   );
                 })
               ))}

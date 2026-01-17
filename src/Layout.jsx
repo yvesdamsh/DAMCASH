@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
-import { Home, Search, Gamepad2, Mail, Trophy, Gem, User, LogOut, Menu, X } from 'lucide-react';
+import { Home, Search, Gamepad2, Mail, Trophy, Gem, User, LogOut, Menu, X, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { motion, AnimatePresence } from 'framer-motion';
+import NotificationBadge from './components/notifications/NotificationBadge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,7 +68,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Accueil', icon: Home, page: 'Home' },
     { name: 'Recherche', icon: Search, page: 'Search' },
     { name: 'Jouer', icon: Gamepad2, page: 'Play' },
-    { name: 'Invitations', icon: Mail, page: 'Invitations' },
+    { name: 'Invitations', icon: Mail, page: 'Invitations', showBadge: true },
     { name: 'Tournois', icon: Trophy, page: 'Tournaments' },
   ];
 
@@ -143,6 +145,12 @@ export default function Layout({ children, currentPageName }) {
                       <Link to={createPageUrl('Profile')} className="flex items-center gap-2 cursor-pointer">
                         <User className="w-4 h-4" />
                         Profil
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to={createPageUrl('Notifications')} className="flex items-center gap-2 cursor-pointer">
+                        <Bell className="w-4 h-4" />
+                        Notifications
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>

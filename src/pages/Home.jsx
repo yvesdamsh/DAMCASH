@@ -5,6 +5,7 @@ import { createPageUrl } from '../utils';
 import GameCard from '../components/game/GameCard';
 import QuickAccessButton from '../components/game/QuickAccessButton';
 import { Crown, Users, ShoppingBag, UserPlus, Building, Puzzle, Trophy, TrendingUp, Eye, Swords } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -73,7 +74,12 @@ export default function Home() {
   ];
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-2xl mx-auto px-4 py-6"
+    >
       {/* Challenge Banner */}
       <Link 
         to={createPageUrl('Leaderboard')}
@@ -137,6 +143,6 @@ export default function Home() {
           <span className="text-lg font-bold text-white">Jouer maintenant</span>
         </div>
       </Link>
-    </div>
+    </motion.div>
   );
 }

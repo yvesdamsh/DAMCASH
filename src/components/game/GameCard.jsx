@@ -1,13 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../../utils';
+import { motion } from 'framer-motion';
 
 export default function GameCard({ title, subtitle, icon, image, page, gradient }) {
   return (
-    <Link 
-      to={createPageUrl(page)}
-      className="relative overflow-hidden rounded-2xl aspect-[4/3] group cursor-pointer"
+    <motion.div
+      whileHover={{ scale: 1.05, y: -5 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 300 }}
     >
+      <Link 
+        to={createPageUrl(page)}
+        className="relative overflow-hidden rounded-2xl aspect-[4/3] group cursor-pointer block"
+      >
       <div className={`absolute inset-0 ${gradient}`}></div>
       <div 
         className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-40 transition-opacity"
@@ -27,6 +33,7 @@ export default function GameCard({ title, subtitle, icon, image, page, gradient 
       </div>
       
       <div className="absolute inset-0 border border-white/10 rounded-2xl group-hover:border-amber-500/50 transition-colors"></div>
-    </Link>
+      </Link>
+    </motion.div>
   );
 }
