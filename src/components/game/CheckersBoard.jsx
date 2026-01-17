@@ -379,7 +379,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
 
     if (selectedMove.to.isCapture) {
       executeAIChainCapture(currentBoard, selectedMove.from.row, selectedMove.from.col, selectedMove.to.row, selectedMove.to.col, selectedMove.to.captured);
-    } else {
+    } else if (!isMultiplayer) {
       const newBoard = currentBoard.map(r => r.map(c => c ? { ...c } : null));
       const piece = { ...newBoard[selectedMove.from.row][selectedMove.from.col] };
 
