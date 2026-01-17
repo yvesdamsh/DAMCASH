@@ -4,6 +4,8 @@ import { base44 } from '@/api/base44Client';
 import CheckersBoard from '../components/game/CheckersBoard';
 import ChessBoard from '../components/game/ChessBoard';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { ArrowLeft, Clock } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -30,6 +32,9 @@ export default function GameRoom() {
   const [whiteTime, setWhiteTime] = useState(null);
   const [blackTime, setBlackTime] = useState(null);
   const [lastSync, setLastSync] = useState(Date.now());
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
   // Charger les données initiales
   useEffect(() => {
@@ -137,6 +142,59 @@ export default function GameRoom() {
       if (typeof unsubscribe === 'function') unsubscribe();
     };
   }, [roomId]);
+
+  // Chat: charger + realtime messages
+  useEffect(() => {
+    if (!roomId) return;
+
+    const loadMessages = async () => {
+      try {
+        setLoadingMessages(true);
+        const data = await base44.entities.GameChatMessage.filter(
+          { room_id: roomId },
+          'created_date'
+        );
+        setMessages(Array.isArray(data) ? data : []);
+      } catch (e) {
+        console.log('Erreur chargement chat:', e?.message || e);
+      } finally {
+        setLoadingMessages(false);
+      }
+    };
+
+    loadMessages();
+
+    const unsubscribe = base44.entities.GameChatMessage?.subscribe?.((event) => {
+      if (event?.type !== 'create') return;
+      if (!event?.data || event.data.room_id !== roomId) return;
+      setMessages(prev => {
+        const exists = prev.some(m => m.id === event.data.id);
+        if (exists) return prev;
+        return [...prev, event.data];
+      });
+    });
+
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
+  }, [roomId]);
+
+  const handleSendMessage = async () => {
+    const text = newMessage.trim();
+    if (!text || !user || !roomId) return;
+
+    try {
+      await base44.entities.GameChatMessage?.create?.({
+        room_id: roomId,
+        sender_id: user.id,
+        sender_name: user.full_name,
+        message: text
+      });
+      setNewMessage('');
+    } catch (e) {
+      console.log('Erreur envoi chat:', e?.message || e);
+    }
+  };
 
   // Timer qui décrémente chaque seconde pour le joueur dont c'est le tour
   useEffect(() => {
@@ -268,12 +326,10 @@ export default function GameRoom() {
 
   const handleSaveMove = async (newBoardState, nextTurn) => {
     if (!session || !user) return;
-
-    console.log('handleSaveMove appelé:', { roomId, userId: user.id, nextTurn });
-
+    
     try {
       const playerColor = user.id === session.player1_id ? 'white' : 'black';
-
+      
       // SAUVEGARDER: board_state + current_turn + timestamp + timer
       const updateData = {
         board_state: JSON.stringify(newBoardState),
@@ -290,23 +346,19 @@ export default function GameRoom() {
 
       // Envoyer à la base de données
       await base44.entities.GameSession.update(session.id, updateData);
-      console.log('GameSession mise à jour:', updateData);
 
       // Enregistrer le coup en realtime (best-effort)
       try {
-        const moveData = {
+        await base44.entities.GameMove?.create?.({
           room_id: roomId,
           player_id: user.id,
           board_state: JSON.stringify(newBoardState),
           next_turn: nextTurn,
           white_time: whiteTime,
           black_time: blackTime
-        };
-        console.log('Création GameMove:', moveData);
-        await base44.entities.GameMove?.create?.(moveData);
-        console.log('GameMove créé avec succès');
+        });
       } catch (moveError) {
-        console.log('Erreur GameMove.create():', moveError?.message || moveError);
+        console.log('Realtime move non disponible:', moveError?.message || moveError);
       }
       
       // Mettre à jour le state local
@@ -489,6 +541,50 @@ export default function GameRoom() {
             currentTurnOverride={session?.current_turn}
           />
         )}
+      </div>
+
+      {/* Chat */}
+      <div className="px-6 pb-4">
+        <div className="bg-[#2C1810] border border-[#D4A574]/30 rounded-xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-[#F5E6D3]">Chat</h3>
+            {loadingMessages && (
+              <span className="text-xs text-[#D4A574]">Chargement...</span>
+            )}
+          </div>
+          <ScrollArea className="h-40 w-full rounded-md bg-white/5 p-3">
+            <div className="space-y-2">
+              {messages.length === 0 ? (
+                <p className="text-xs text-[#D4A574]">Aucun message</p>
+              ) : (
+                messages.map((msg) => (
+                  <div key={msg.id} className="text-xs text-[#F5E6D3]">
+                    <span className="font-semibold">{msg.sender_name || 'Joueur'}:</span>{" "}
+                    <span className="text-[#D4A574]">{msg.message}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </ScrollArea>
+          <div className="flex gap-2 mt-3">
+            <Input
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSendMessage();
+              }}
+              placeholder="Écrire un message..."
+              className="bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+            />
+            <Button
+              onClick={handleSendMessage}
+              className="bg-amber-600 hover:bg-amber-700"
+              disabled={!newMessage.trim()}
+            >
+              Envoyer
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Barre Joueur Courant - EN BAS */}
