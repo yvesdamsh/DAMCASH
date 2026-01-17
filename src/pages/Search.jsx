@@ -8,6 +8,7 @@ import { Search as SearchIcon, UserPlus, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { createPageUrl } from '../utils';
+import InviteModal from '../components/game/InviteModal';
 
 export default function Search() {
   const navigate = useNavigate();
@@ -18,6 +19,8 @@ export default function Search() {
   const [sentInvitations, setSentInvitations] = useState(new Set());
   const [sentFriendRequests, setSentFriendRequests] = useState(new Set());
   const [loading, setLoading] = useState(new Set());
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOpponent, setSelectedOpponent] = useState(null);
 
   useEffect(() => {
     loadUser();
@@ -106,45 +109,55 @@ export default function Search() {
     }
   };
 
-  const handleInviteToPlay = async (opponent) => {
+  const handleOpenInviteModal = (opponent) => {
     if (!user) {
       console.log('Utilisateur non authentifié');
       base44.auth.redirectToLogin();
       return;
     }
+    setSelectedOpponent(opponent);
+    setIsModalOpen(true);
+  };
 
-    const playerId = opponent.user_id;
+  const handleSendInvite = async (config) => {
+    if (!user || !selectedOpponent) return;
+
+    const playerId = selectedOpponent.user_id;
     setLoading(prev => new Set(prev).add(playerId));
     
     try {
       const roomId = generateUUID();
-      console.log('Création invitation:', { 
+      console.log('Création invitation avec config:', { 
         sender_id: user.id, 
-        receiver_id: opponent.user_id, 
-        game_type: selectedGame,
-        room_id: roomId
+        receiver_id: selectedOpponent.user_id, 
+        game_type: config.game_type,
+        room_id: roomId,
+        time_control: config.time_control
       });
       
       await base44.entities.GameInvitation.create({
         sender_id: user.id,
-        receiver_id: opponent.user_id,
-        game_type: selectedGame,
+        receiver_id: selectedOpponent.user_id,
+        game_type: config.game_type,
         status: 'pending',
         room_id: roomId
       });
 
-      console.log('Création notification pour:', opponent.user_id);
+      console.log('Création notification pour:', selectedOpponent.user_id);
       await base44.entities.Notification.create({
-        user_email: opponent.user_id,
+        user_email: selectedOpponent.user_id,
         type: 'match_invitation',
-        title: `Invitation à jouer aux ${selectedGame === 'chess' ? 'Échecs' : 'Dames'}`,
-        message: `${user.full_name} vous invite à jouer aux ${selectedGame === 'chess' ? 'Échecs' : 'Dames'}`,
+        title: `Invitation à jouer aux ${config.game_type === 'chess' ? 'Échecs' : 'Dames'}`,
+        message: `${user.full_name} vous invite à jouer aux ${config.game_type === 'chess' ? 'Échecs' : 'Dames'}`,
         link: `/game-room/${roomId}`,
         from_user: user.email
       });
 
       setSentInvitations(prev => new Set(prev).add(playerId));
       console.log('Invitation et notification créées avec succès');
+      
+      // Rediriger l'expéditeur vers la game room en attente
+      navigate(createPageUrl('GameRoom') + `?roomId=${roomId}&waiting=true`);
       
       setTimeout(() => {
         setSentInvitations(prev => {
@@ -217,7 +230,7 @@ export default function Search() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleInviteToPlay(player)}
+                  onClick={() => handleOpenInviteModal(player)}
                   disabled={loading.has(player.user_id) || sentInvitations.has(player.user_id)}
                   className={`${
                     sentInvitations.has(player.user_id)
@@ -250,6 +263,13 @@ export default function Search() {
           <p>Aucun joueur trouvé</p>
         </div>
       )}
+
+      <InviteModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        opponent={selectedOpponent}
+        onSendInvite={handleSendInvite}
+      />
     </div>
   );
 }

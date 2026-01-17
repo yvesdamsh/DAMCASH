@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationBadge from './components/notifications/NotificationBadge';
+import InvitationBadge from './components/notifications/InvitationBadge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -73,7 +74,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Accueil', icon: Home, page: 'Home' },
     { name: 'Recherche', icon: Search, page: 'Search' },
     { name: 'Jouer', icon: Gamepad2, page: 'Play' },
-    { name: 'Invitations', icon: Mail, page: 'Invitations', showBadge: true },
+    { name: 'Invitations', icon: Mail, page: 'Invitations', showInvitationBadge: true },
     { name: 'Tournois', icon: Trophy, page: 'Tournaments' },
   ];
 
@@ -219,8 +220,8 @@ export default function Layout({ children, currentPageName }) {
                       isActive(item.page) ? 'text-[#D4A574]' : 'text-[#F5E6D3]/50'
                     }`} 
                   />
-                  {item.showBadge && user && (
-                    <NotificationBadge userEmail={user.email} />
+                  {item.showInvitationBadge && user && (
+                    <InvitationBadge userEmail={user.email} userId={user.id} />
                   )}
                 </motion.div>
                 <span className={`text-xs ${

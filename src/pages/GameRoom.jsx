@@ -1,21 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import CheckersBoard from '../components/game/CheckersBoard';
 import ChessBoard from '../components/game/ChessBoard';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Clock } from 'lucide-react';
 
 export default function GameRoom() {
-  const { roomId } = useParams();
   const navigate = useNavigate();
+  const urlParams = new URLSearchParams(window.location.search);
+  const roomId = urlParams.get('roomId');
+  const isWaiting = urlParams.get('waiting') === 'true';
+  
   const [invitation, setInvitation] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [gameStarted, setGameStarted] = useState(!isWaiting);
+  const [opponent, setOpponent] = useState(null);
 
   useEffect(() => {
-    loadData();
-  }, [roomId]);
+    if (roomId) {
+      loadData();
+      // Vérifier l'état du jeu toutes les 2 secondes si en attente
+      if (isWaiting) {
+        const interval = setInterval(loadData, 2000);
+        return () => clearInterval(interval);
+      }
+    }
+  }, [roomId, isWaiting]);
 
   const loadData = async () => {
     try {
@@ -27,7 +39,20 @@ export default function GameRoom() {
       });
 
       if (invitations.length > 0) {
-        setInvitation(invitations[0]);
+        const inv = invitations[0];
+        setInvitation(inv);
+        
+        // Charger les infos de l'adversaire
+        const senderId = inv.sender_id === currentUser.id ? inv.receiver_id : inv.sender_id;
+        const senderUsers = await base44.entities.User.filter({ id: senderId });
+        if (senderUsers.length > 0) {
+          setOpponent(senderUsers[0]);
+        }
+
+        // Si le jeu a commencé (invitation acceptée), démarrer le jeu
+        if (inv.status === 'accepted') {
+          setGameStarted(true);
+        }
       }
     } catch (error) {
       console.error('Error loading game room:', error);
@@ -59,8 +84,37 @@ export default function GameRoom() {
     );
   }
 
-  const isPlayerWhite = user.email === invitation.sender_email;
-  const gameType = invitation.game_type;
+  const isPlayerWhite = user && invitation && user.id === invitation.sender_id;
+  const gameType = invitation?.game_type;
+
+  // Écran d'attente
+  if (!gameStarted) {
+    return (
+      <div className="w-full min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] flex flex-col items-center justify-center gap-6 p-4">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-2">En attente...</h1>
+          <p className="text-lg text-[#D4A574] mb-4">
+            {opponent ? `Attente de ${opponent.full_name}` : 'Attente de l\'adversaire'}
+          </p>
+          <div className="flex items-center justify-center gap-2 text-[#D4A574]">
+            <Clock className="w-5 h-5 animate-spin" />
+            <span>La partie commencera une fois que l'adversaire accepte</span>
+          </div>
+        </div>
+        <div className="mt-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
+        </div>
+        <Button
+          onClick={() => navigate('/Search')}
+          variant="outline"
+          className="mt-8 border-[#D4A574]/30 text-[#F5E6D3] hover:bg-white/5"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Retour
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] flex flex-col">
