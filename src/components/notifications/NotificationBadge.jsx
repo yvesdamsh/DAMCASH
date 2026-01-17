@@ -21,8 +21,16 @@ export default function NotificationBadge({ userEmail }) {
     };
 
     loadUnreadCount();
+    const unsubscribe = base44.entities.Notification?.subscribe?.((event) => {
+      if (event?.data?.user_email === userEmail) {
+        loadUnreadCount();
+      }
+    });
     const interval = setInterval(loadUnreadCount, 30000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
   }, [userEmail]);
 
   if (unreadCount === 0) return null;

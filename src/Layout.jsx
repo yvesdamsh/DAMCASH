@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationBadge from './components/notifications/NotificationBadge.jsx';
+import { toast } from 'sonner';
 import InvitationBadge from './components/notifications/InvitationBadge.jsx';
 import Splash from './components/Splash.jsx';
 import {
@@ -52,6 +53,23 @@ export default function Layout({ children, currentPageName }) {
 
     return () => clearInterval(heartbeatInterval);
   }, [user]);
+
+  useEffect(() => {
+    if (!user?.email) return;
+
+    const unsubscribe = base44.entities.Notification?.subscribe?.((event) => {
+      if (event?.type !== 'create') return;
+      if (!event?.data || event.data.user_email !== user.email) return;
+
+      toast(event.data.title || 'Notification', {
+        description: event.data.message || ''
+      });
+    });
+
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
+  }, [user?.email]);
 
   const loadUser = async () => {
     try {
