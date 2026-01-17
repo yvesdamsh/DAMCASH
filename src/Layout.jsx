@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationBadge from './components/notifications/NotificationBadge.jsx';
 import InvitationBadge from './components/notifications/InvitationBadge.jsx';
+import Splash from './components/Splash.jsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
