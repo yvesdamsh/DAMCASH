@@ -145,13 +145,23 @@ export default function Search() {
         time_control: config.time_control
       });
       
-      // Créer GameSession avec player1 (Yves - blancs)
+      // Créer GameSession avec timers
+      const timeControl = config.time_control || 'classic';
+      const timeInSeconds = timeControl === 'bullet' ? 60 : 
+                           timeControl === 'blitz' ? 180 : 
+                           timeControl === 'rapid' ? 600 : 
+                           timeControl === 'classic' ? 1800 : null;
+
       await base44.entities.GameSession.create({
         room_id: roomId,
         player1_id: user.id,
         game_type: config.game_type,
         status: 'waiting',
-        current_turn: 'white'
+        current_turn: 'white',
+        time_control: timeControl,
+        white_time: timeInSeconds,
+        black_time: timeInSeconds,
+        moves: JSON.stringify([])
       });
 
       await base44.entities.GameInvitation.create({
