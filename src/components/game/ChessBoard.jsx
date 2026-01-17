@@ -39,6 +39,89 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
   const isPieceOfColor = (piece, color) => 
     color === 'white' ? isWhitePiece(piece) : isBlackPiece(piece);
 
+  const isSquareAttacked = (boardState, row, col, byColor) => {
+    const isByWhite = byColor === 'white';
+
+    // Pawns
+    const pawnDir = isByWhite ? -1 : 1;
+    const pawnRow = row + pawnDir;
+    if (pawnRow >= 0 && pawnRow < 8) {
+      const left = col - 1;
+      const right = col + 1;
+      if (left >= 0) {
+        const p = boardState[pawnRow][left];
+        if (p && (isByWhite ? p === 'P' : p === 'p')) return true;
+      }
+      if (right < 8) {
+        const p = boardState[pawnRow][right];
+        if (p && (isByWhite ? p === 'P' : p === 'p')) return true;
+      }
+    }
+
+    // Knights
+    const knightMoves = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+    for (const [dr, dc] of knightMoves) {
+      const r = row + dr;
+      const c = col + dc;
+      if (r >= 0 && r < 8 && c >= 0 && c < 8) {
+        const p = boardState[r][c];
+        if (p && (isByWhite ? p === 'N' : p === 'n')) return true;
+      }
+    }
+
+    // Sliding pieces
+    const directions = [
+      [-1, 0], [1, 0], [0, -1], [0, 1],
+      [-1, -1], [-1, 1], [1, -1], [1, 1]
+    ];
+    for (const [dr, dc] of directions) {
+      let r = row + dr;
+      let c = col + dc;
+      while (r >= 0 && r < 8 && c >= 0 && c < 8) {
+        const p = boardState[r][c];
+        if (p) {
+          const isWhite = isWhitePiece(p);
+          if (isWhite === isByWhite) {
+            const pt = p.toLowerCase();
+            if (
+              (pt === 'q') ||
+              (pt === 'r' && (dr === 0 || dc === 0)) ||
+              (pt === 'b' && (dr !== 0 && dc !== 0))
+            ) {
+              return true;
+            }
+          }
+          break;
+        }
+        r += dr;
+        c += dc;
+      }
+    }
+
+    // King adjacency
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) continue;
+        const r = row + dr;
+        const c = col + dc;
+        if (r >= 0 && r < 8 && c >= 0 && c < 8) {
+          const p = boardState[r][c];
+          if (p && (isByWhite ? p === 'K' : p === 'k')) return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
+  const choosePromotion = (isWhite) => {
+    const input = window.prompt("Promotion (q,r,b,n):", "q") || "q";
+    const choice = input.toLowerCase();
+    const map = { q: 'q', r: 'r', b: 'b', n: 'n' };
+    const piece = map[choice] || 'q';
+    return isWhite ? piece.toUpperCase() : piece;
+  };
+
   const getValidMoves = useCallback((row, col, boardState, checkForCheck = true) => {
     const piece = boardState[row][col];
     if (!piece) return [];
@@ -120,21 +203,33 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
         [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]].forEach(([dr, dc]) => {
           addMove(row + dr, col + dc);
         });
-        
-        if (isWhite && row === 7 && col === 4) {
-          if (castlingRights.whiteKingSide && !boardState[7][5] && !boardState[7][6] && boardState[7][7] === 'R') {
-            moves.push({ row: 7, col: 6, special: 'castleKing' });
+        if (checkForCheck) {
+          const enemy = isWhite ? 'black' : 'white';
+          const inCheck = isSquareAttacked(boardState, row, col, enemy);
+
+          if (!inCheck && isWhite && row === 7 && col === 4) {
+            if (castlingRights.whiteKingSide && !boardState[7][5] && !boardState[7][6] && boardState[7][7] === 'R') {
+              if (!isSquareAttacked(boardState, 7, 5, enemy) && !isSquareAttacked(boardState, 7, 6, enemy)) {
+                moves.push({ row: 7, col: 6, special: 'castleKing' });
+              }
+            }
+            if (castlingRights.whiteQueenSide && !boardState[7][1] && !boardState[7][2] && !boardState[7][3] && boardState[7][0] === 'R') {
+              if (!isSquareAttacked(boardState, 7, 3, enemy) && !isSquareAttacked(boardState, 7, 2, enemy)) {
+                moves.push({ row: 7, col: 2, special: 'castleQueen' });
+              }
+            }
           }
-          if (castlingRights.whiteQueenSide && !boardState[7][1] && !boardState[7][2] && !boardState[7][3] && boardState[7][0] === 'R') {
-            moves.push({ row: 7, col: 2, special: 'castleQueen' });
-          }
-        }
-        if (!isWhite && row === 0 && col === 4) {
-          if (castlingRights.blackKingSide && !boardState[0][5] && !boardState[0][6] && boardState[0][7] === 'r') {
-            moves.push({ row: 0, col: 6, special: 'castleKing' });
-          }
-          if (castlingRights.blackQueenSide && !boardState[0][1] && !boardState[0][2] && !boardState[0][3] && boardState[0][0] === 'r') {
-            moves.push({ row: 0, col: 2, special: 'castleQueen' });
+          if (!inCheck && !isWhite && row === 0 && col === 4) {
+            if (castlingRights.blackKingSide && !boardState[0][5] && !boardState[0][6] && boardState[0][7] === 'r') {
+              if (!isSquareAttacked(boardState, 0, 5, enemy) && !isSquareAttacked(boardState, 0, 6, enemy)) {
+                moves.push({ row: 0, col: 6, special: 'castleKing' });
+              }
+            }
+            if (castlingRights.blackQueenSide && !boardState[0][1] && !boardState[0][2] && !boardState[0][3] && boardState[0][0] === 'r') {
+              if (!isSquareAttacked(boardState, 0, 3, enemy) && !isSquareAttacked(boardState, 0, 2, enemy)) {
+                moves.push({ row: 0, col: 2, special: 'castleQueen' });
+              }
+            }
           }
         }
         break;
@@ -201,6 +296,7 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
     const newBoard = board.map(r => [...r]);
     const piece = newBoard[fromRow][fromCol];
     const isWhite = isWhitePiece(piece);
+    const targetPiece = newBoard[toRow][toCol];
 
     newBoard[toRow][toCol] = piece;
     newBoard[fromRow][fromCol] = null;
@@ -219,7 +315,7 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
     }
 
     if (piece.toLowerCase() === 'p' && (toRow === 0 || toRow === 7)) {
-      newBoard[toRow][toCol] = isWhite ? 'Q' : 'q';
+      newBoard[toRow][toCol] = choosePromotion(isWhite);
     }
 
     const newCastling = { ...castlingRights };
@@ -229,6 +325,10 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
     if (fromRow === 7 && fromCol === 7) newCastling.whiteKingSide = false;
     if (fromRow === 0 && fromCol === 0) newCastling.blackQueenSide = false;
     if (fromRow === 0 && fromCol === 7) newCastling.blackKingSide = false;
+    if (targetPiece === 'R' && toRow === 7 && toCol === 0) newCastling.whiteQueenSide = false;
+    if (targetPiece === 'R' && toRow === 7 && toCol === 7) newCastling.whiteKingSide = false;
+    if (targetPiece === 'r' && toRow === 0 && toCol === 0) newCastling.blackQueenSide = false;
+    if (targetPiece === 'r' && toRow === 0 && toCol === 7) newCastling.blackKingSide = false;
     setCastlingRights(newCastling);
 
     if (special === 'double') {

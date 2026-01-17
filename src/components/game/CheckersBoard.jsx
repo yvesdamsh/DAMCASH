@@ -31,6 +31,8 @@ const getSquareNumber = (row, col) => {
   return Math.floor(row * 5 + col / 2) + 1;
 };
 
+const cloneBoard = (board) => board.map(r => r.map(c => c ? { ...c } : null));
+
 export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium', onGameEnd, isMultiplayer = false, canMove = true, blockBoard = false, initialBoardState = null, onSaveMove = null }) {
   const [board, setBoard] = useState(() => initialBoardState ? initialBoardState : createInitialBoard());
   const [selectedSquare, setSelectedSquare] = useState(null);
@@ -106,6 +108,79 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     return moves;
   }, []);
 
+  const getCaptureSequences = useCallback((boardState, row, col, piece) => {
+    const sequences = [];
+    const captureMoves = getCaptureMoves(row, col, boardState, piece);
+
+    if (captureMoves.length === 0) {
+      return [[]];
+    }
+
+    captureMoves.forEach(move => {
+      const newBoard = cloneBoard(boardState);
+      const movingPiece = { ...newBoard[row][col] };
+
+      move.captured.forEach(({ row: cr, col: cc }) => {
+        newBoard[cr][cc] = null;
+      });
+
+      newBoard[move.row][move.col] = movingPiece;
+      newBoard[row][col] = null;
+
+      const nextSequences = getCaptureSequences(newBoard, move.row, move.col, movingPiece);
+      nextSequences.forEach(seq => {
+        sequences.push([move, ...seq]);
+      });
+    });
+
+    return sequences;
+  }, [getCaptureMoves]);
+
+  const getMaxCaptureMovesForPiece = useCallback((boardState, row, col, piece) => {
+    const sequences = getCaptureSequences(boardState, row, col, piece);
+    const counts = sequences.map(seq => seq.reduce((sum, m) => sum + (m.captured?.length || 0), 0));
+    const maxCaptures = Math.max(0, ...counts);
+    if (maxCaptures === 0) return { maxCaptures: 0, moves: [] };
+
+    const movesMap = new Map();
+    sequences.forEach((seq, idx) => {
+      if (counts[idx] === maxCaptures && seq.length > 0) {
+        const move = seq[0];
+        const key = `${move.row}-${move.col}-${JSON.stringify(move.captured)}`;
+        if (!movesMap.has(key)) {
+          movesMap.set(key, move);
+        }
+      }
+    });
+
+    return { maxCaptures, moves: Array.from(movesMap.values()) };
+  }, [getCaptureSequences]);
+
+  const getForcedCaptures = useCallback((boardState, color) => {
+    let maxCaptures = 0;
+    const captures = [];
+
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        const piece = boardState[r][c];
+        if (piece && piece.color === color) {
+          const result = getMaxCaptureMovesForPiece(boardState, r, c, piece);
+          if (result.maxCaptures > 0) {
+            if (result.maxCaptures > maxCaptures) {
+              maxCaptures = result.maxCaptures;
+              captures.length = 0;
+              captures.push({ row: r, col: c, moves: result.moves });
+            } else if (result.maxCaptures === maxCaptures) {
+              captures.push({ row: r, col: c, moves: result.moves });
+            }
+          }
+        }
+      }
+    }
+
+    return { maxCaptures, captures };
+  }, [getMaxCaptureMovesForPiece]);
+
   const getRegularMoves = useCallback((row, col, boardState, piece) => {
     const moves = [];
     const directions = piece.isKing 
@@ -142,34 +217,17 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     return moves;
   }, []);
 
-  const getAllCaptureMoves = useCallback((boardState, color) => {
-    const captures = [];
-    for (let r = 0; r < 10; r++) {
-      for (let c = 0; c < 10; c++) {
-        const piece = boardState[r][c];
-        if (piece && piece.color === color) {
-          const pieceMoves = getCaptureMoves(r, c, boardState, piece);
-          if (pieceMoves.length > 0) {
-            captures.push({ row: r, col: c, moves: pieceMoves });
-          }
-        }
-      }
-    }
-    return captures;
-  }, [getCaptureMoves]);
-
   const getValidMoves = useCallback((row, col, boardState) => {
     const piece = boardState[row][col];
     if (!piece) return [];
 
-    const captureMoves = getCaptureMoves(row, col, boardState, piece);
-    if (captureMoves.length > 0) return captureMoves;
-
-    const allCaptures = getAllCaptureMoves(boardState, piece.color);
-    if (allCaptures.length > 0) return [];
+    if (mustCapture.length > 0) {
+      const forced = mustCapture.find(c => c.row === row && c.col === col);
+      return forced ? forced.moves : [];
+    }
 
     return getRegularMoves(row, col, boardState, piece);
-  }, [getCaptureMoves, getRegularMoves, getAllCaptureMoves]);
+  }, [getRegularMoves, mustCapture]);
 
   const checkGameEnd = useCallback((boardState, nextColor) => {
     let hasValidMove = false;
@@ -223,11 +281,11 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     setValidMoves([]);
 
     if (capturedSquares.length > 0) {
-      const moreCapturesMoves = getCaptureMoves(toRow, toCol, newBoard, newBoard[toRow][toCol]);
-      if (moreCapturesMoves.length > 0) {
+      const nextCapture = getMaxCaptureMovesForPiece(newBoard, toRow, toCol, newBoard[toRow][toCol]);
+      if (nextCapture.moves.length > 0) {
         setChainCapture({ row: toRow, col: toCol });
         setSelectedSquare({ row: toRow, col: toCol });
-        setValidMoves(moreCapturesMoves);
+        setValidMoves(nextCapture.moves);
         return { board: newBoard, continueChain: true };
       }
     }
@@ -236,8 +294,8 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     setCurrentTurn(nextColor);
     setChainCapture(null);
 
-    const allCaptures = getAllCaptureMoves(newBoard, nextColor);
-    setMustCapture(allCaptures);
+    const forced = getForcedCaptures(newBoard, nextColor);
+    setMustCapture(forced.captures);
 
     const endStatus = checkGameEnd(newBoard, nextColor);
     if (endStatus) {
@@ -365,11 +423,11 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
         [piece.color]: prev[piece.color] + captured.length
       }));
 
-      const moreCapturesMoves = getCaptureMoves(toRow, toCol, newBoard, newBoard[toRow][toCol]);
-      if (moreCapturesMoves.length > 0) {
+      const nextCapture = getMaxCaptureMovesForPiece(newBoard, toRow, toCol, newBoard[toRow][toCol]);
+      if (nextCapture.moves.length > 0) {
         setTimeout(() => {
-          const nextCapture = moreCapturesMoves[0];
-          executeAIChainCapture(newBoard, toRow, toCol, nextCapture.row, nextCapture.col, nextCapture.captured);
+          const nextMove = nextCapture.moves[0];
+          executeAIChainCapture(newBoard, toRow, toCol, nextMove.row, nextMove.col, nextMove.captured);
         }, 300);
       } else {
         setCurrentTurn('white');
@@ -399,8 +457,8 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       setBoard(newBoard);
       setCurrentTurn('white');
 
-      const allCaptures = getAllCaptureMoves(newBoard, 'white');
-      setMustCapture(allCaptures);
+      const forced = getForcedCaptures(newBoard, 'white');
+      setMustCapture(forced.captures);
 
       const endStatus = checkGameEnd(newBoard, 'white');
       if (endStatus) {
@@ -423,9 +481,15 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     setCurrentTurn('white');
     setGameStatus('playing');
     setScore({ white: 0, black: 0 });
-    setMustCapture([]);
+    const forced = getForcedCaptures(createInitialBoard(), 'white');
+    setMustCapture(forced.captures);
     setChainCapture(null);
   };
+
+  useEffect(() => {
+    const forced = getForcedCaptures(board, currentTurn);
+    setMustCapture(forced.captures);
+  }, [board, currentTurn, getForcedCaptures]);
 
   const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
 
