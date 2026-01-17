@@ -193,14 +193,16 @@ export default function Layout({ children, currentPageName }) {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-[#D4A574]/30">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to={createPageUrl('Home')} className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg gold-gradient flex items-center justify-center shadow-lg shadow-amber-500/20">
-              <svg viewBox="0 0 24 24" className="w-6 h-6 text-[#1a0f0f]" fill="currentColor">
-                <path d="M5 20h14v2H5v-2zm7-18L4 8h3v8h4V8h2v8h4V8h3l-8-6z"/>
-              </svg>
-            </div>
+          <Link to={createPageUrl('Home')} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <motion.img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/696b1edfc85d95bdc82150cc/0218e90c0_ChatGPTImage17janv202613_34_32.png"
+              alt="DamCash"
+              className="w-12 h-12 drop-shadow-lg"
+              whileHover={{ scale: 1.05, rotate: 2 }}
+              whileTap={{ scale: 0.95 }}
+            />
             <span className="text-xl font-bold bg-gradient-to-r from-[#F5E6D3] to-[#D4A574] bg-clip-text text-transparent hidden sm:block">
-              Board Masters
+              DamCash
             </span>
           </Link>
 
