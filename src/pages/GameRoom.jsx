@@ -89,7 +89,18 @@ export default function GameRoom() {
       });
 
       if (sessions.length > 0) {
-        const sess = sessions[0];
+        let sess = sessions[0];
+        
+        // Si l'utilisateur courant n'est pas player1, c'est player2
+        // Ajouter l'utilisateur comme player2 s'il n'existe pas
+        if (sess.player1_id !== currentUser.id && !sess.player2_id) {
+          await base44.entities.GameSession.update(sess.id, {
+            player2_id: currentUser.id,
+            status: 'in_progress'
+          });
+          sess = { ...sess, player2_id: currentUser.id, status: 'in_progress' };
+        }
+        
         setSession(sess);
         
         // Charger le board state depuis GameSession
@@ -116,8 +127,8 @@ export default function GameRoom() {
           }
         }
 
-        // Vérifier si le jeu a démarré: player2 existe ET status est in_progress
-        if (sess.status === 'in_progress' && sess.player2_id) {
+        // Vérifier si le jeu a démarré: player2_id existe
+        if (sess.player2_id) {
           setGameStarted(true);
         }
       }
