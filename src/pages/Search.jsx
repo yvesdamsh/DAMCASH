@@ -15,6 +15,9 @@ export default function Search() {
   const [results, setResults] = useState([]);
   const [user, setUser] = useState(null);
   const [selectedGame, setSelectedGame] = useState('chess');
+  const [sentInvitations, setSentInvitations] = useState(new Set());
+  const [sentFriendRequests, setSentFriendRequests] = useState(new Set());
+  const [loading, setLoading] = useState(new Set());
 
   useEffect(() => {
     loadUser();
@@ -67,6 +70,9 @@ export default function Search() {
       base44.auth.redirectToLogin();
       return;
     }
+
+    const playerId = opponent.user_id;
+    setLoading(prev => new Set(prev).add(playerId));
     
     try {
       console.log('Envoi demande ami:', { sender_id: user.id, receiver_id: opponent.user_id });
@@ -77,11 +83,26 @@ export default function Search() {
         status: 'pending'
       });
       
+      setSentFriendRequests(prev => new Set(prev).add(playerId));
       console.log('Demande ami créée avec succès');
-      toast.success(`Demande envoyée à ${opponent.username} !`);
+      alert(`Demande d'ami envoyée à ${opponent.username} !`);
+      
+      setTimeout(() => {
+        setSentFriendRequests(prev => {
+          const updated = new Set(prev);
+          updated.delete(playerId);
+          return updated;
+        });
+      }, 3000);
     } catch (error) {
       console.error('Erreur ajout ami:', error);
-      toast.error('Erreur lors de l\'envoi de la demande');
+      alert(`Erreur: ${error.message}`);
+    } finally {
+      setLoading(prev => {
+        const updated = new Set(prev);
+        updated.delete(playerId);
+        return updated;
+      });
     }
   };
 
@@ -91,6 +112,9 @@ export default function Search() {
       base44.auth.redirectToLogin();
       return;
     }
+
+    const playerId = opponent.user_id;
+    setLoading(prev => new Set(prev).add(playerId));
     
     try {
       const roomId = generateUUID();
@@ -119,11 +143,25 @@ export default function Search() {
         from_user: user.email
       });
 
+      setSentInvitations(prev => new Set(prev).add(playerId));
       console.log('Invitation et notification créées avec succès');
-      toast.success(`Invitation envoyée à ${opponent.username} !`);
+      
+      setTimeout(() => {
+        setSentInvitations(prev => {
+          const updated = new Set(prev);
+          updated.delete(playerId);
+          return updated;
+        });
+      }, 3000);
     } catch (error) {
       console.error('Erreur invitation complète:', error);
-      toast.error('Erreur lors de l\'envoi de l\'invitation');
+      alert(`Erreur: ${error.message}`);
+    } finally {
+      setLoading(prev => {
+        const updated = new Set(prev);
+        updated.delete(playerId);
+        return updated;
+      });
     }
   };
 
@@ -180,17 +218,27 @@ export default function Search() {
                   variant="outline"
                   size="sm"
                   onClick={() => handleInviteToPlay(player)}
-                  className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
+                  disabled={loading.has(player.user_id) || sentInvitations.has(player.user_id)}
+                  className={`${
+                    sentInvitations.has(player.user_id)
+                      ? 'border-green-500/50 text-green-400 bg-green-500/10 hover:bg-green-500/10'
+                      : 'border-blue-500/50 text-blue-400 hover:bg-blue-500/10'
+                  }`}
                 >
-                  Inviter à jouer
+                  {sentInvitations.has(player.user_id) ? 'Invitation envoyée ✓' : 'Inviter à jouer'}
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleAddFriend(player)}
-                  className="border-amber-500/50 text-amber-400 hover:bg-amber-500/10"
+                  disabled={loading.has(player.user_id) || sentFriendRequests.has(player.user_id)}
+                  className={`${
+                    sentFriendRequests.has(player.user_id)
+                      ? 'border-green-500/50 text-green-400 bg-green-500/10 hover:bg-green-500/10'
+                      : 'border-amber-500/50 text-amber-400 hover:bg-amber-500/10'
+                  }`}
                 >
-                  <UserPlus className="w-4 h-4" />
+                  {sentFriendRequests.has(player.user_id) ? '✓' : <UserPlus className="w-4 h-4" />}
                 </Button>
               </div>
             </div>
