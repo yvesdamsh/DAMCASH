@@ -361,12 +361,12 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
   const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center justify-center w-full flex-1 gap-4 overflow-auto">
       <VictoryParticles 
         show={gameStatus !== 'playing'} 
         winner={gameStatus === 'whiteWins' ? 'white' : 'black'}
       />
-      <div className="flex items-center justify-between w-full max-w-md px-2">
+      <div className="flex items-center justify-between w-full max-w-lg px-2">
         <div className={`px-4 py-2 rounded-lg ${currentTurn === playerColor ? 'bg-amber-500/20 border border-amber-500' : 'bg-white/5'}`}>
           <span className="text-sm font-medium">
             {gameStatus === 'playing' 
@@ -389,15 +389,15 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
         </div>
       </div>
 
-      <div className="relative">
-        <div className="flex">
-          <div className="flex flex-col justify-around pr-1 text-xs text-gray-400">
+      <div className="relative w-full max-w-lg aspect-square flex items-center justify-center">
+        <div className="flex w-full h-full">
+          <div className="flex flex-col justify-around pr-1 text-xs text-gray-400 w-8">
             {(playerColor === 'black' ? [1,2,3,4,5,6,7,8] : [8,7,6,5,4,3,2,1]).map(n => (
-              <span key={n} className="h-8 sm:h-10 flex items-center">{n}</span>
+              <span key={n} className="flex items-center justify-center">{n}</span>
             ))}
           </div>
           
-          <div className="grid grid-cols-8 border-2 border-amber-900/50 rounded-lg overflow-hidden shadow-2xl">
+          <div className="grid grid-cols-8 flex-1 border-2 border-amber-900/50 rounded-lg overflow-hidden shadow-2xl">
             {displayBoard.map((row, rowIndex) => (
               row.map((piece, colIndex) => {
                 const actualRow = playerColor === 'black' ? 7 - rowIndex : rowIndex;
@@ -417,7 +417,7 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
                     whileHover={{ scale: isSelected || isValidMove ? 1.05 : 1 }}
                     whileTap={{ scale: 0.95 }}
                     className={`
-                      w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer
+                      aspect-square flex items-center justify-center cursor-pointer
                       transition-all duration-150 relative
                       ${isLight ? 'bg-[#F0D9B5]' : 'bg-[#B58863]'}
                       ${isSelected ? 'ring-2 ring-amber-400 ring-inset' : ''}
@@ -435,16 +435,16 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
                           className={`text-2xl sm:text-3xl select-none ${isWhitePiece(piece) ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]' : 'text-gray-900'}`}
                         >
                           {PIECES[piece]}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                    {isValidMove && !piece && (
-                      <motion.div 
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute w-3 h-3 rounded-full bg-amber-500/50"
-                      />
-                    )}
+                            </motion.span>
+                          )}
+                          </AnimatePresence>
+                          {isValidMove && !piece && (
+                          <motion.div 
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="absolute w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-amber-500/50"
+                          />
+                          )}
                     {isValidMove && isCapture && (
                       <motion.div 
                         initial={{ scale: 0 }}
@@ -459,9 +459,9 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
           </div>
         </div>
         
-        <div className="flex justify-around pl-5 pt-1 text-xs text-gray-400">
+        <div className="flex justify-around pl-5 pt-1 text-xs text-gray-400 w-full">
           {(playerColor === 'black' ? [...columns].reverse() : columns).map(c => (
-            <span key={c} className="w-8 sm:w-10 text-center">{c}</span>
+            <span key={c} className="flex-1 text-center">{c}</span>
           ))}
         </div>
       </div>
