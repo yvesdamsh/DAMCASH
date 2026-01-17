@@ -38,11 +38,91 @@ export default function GameRoom() {
     }
   }, [roomId]);
 
-  // Recharger toutes les 2 secondes CONTINUELLEMENT pour synchroniser
+  // Fallback: recharger périodiquement si le realtime se coupe
   useEffect(() => {
     if (!roomId) return;
-    const interval = setInterval(() => loadData(), 2000);
+    const interval = setInterval(() => loadData(), 15000);
     return () => clearInterval(interval);
+  }, [roomId]);
+
+  // Realtime: écouter les changements de GameSession pour cette room
+  useEffect(() => {
+    if (!roomId) return;
+
+    const unsubscribe = base44.entities.GameSession.subscribe(async (event) => {
+      if (!event?.data || event.data.room_id !== roomId) return;
+      const sess = event.data;
+
+      setSession(prev => ({ ...prev, ...sess }));
+
+      if (sess.board_state) {
+        try {
+          setBoardState(JSON.parse(sess.board_state));
+        } catch (e) {
+          console.log('Erreur parsing board_state');
+        }
+      }
+
+      if (typeof sess.white_time !== 'undefined') {
+        setWhiteTime(sess.white_time);
+      }
+      if (typeof sess.black_time !== 'undefined') {
+        setBlackTime(sess.black_time);
+      }
+
+      setGameStarted(!!sess.player2_id);
+
+      // Rafraîchir l'adversaire si nécessaire
+      const opponentId = user?.id === sess.player1_id ? sess.player2_id : sess.player1_id;
+      if (opponentId && opponent?.id !== opponentId) {
+        const opponentUsers = await base44.entities.User.filter({ id: opponentId });
+        if (opponentUsers.length > 0) {
+          setOpponent(opponentUsers[0]);
+        }
+      }
+    });
+
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
+  }, [roomId, user?.id, opponent?.id]);
+
+  // Realtime dédié aux coups: écouter les créations de GameMove
+  useEffect(() => {
+    if (!roomId) return;
+
+    const unsubscribe = base44.entities.GameMove?.subscribe?.((event) => {
+      if (event?.type !== 'create') return;
+      if (!event?.data || event.data.room_id !== roomId) return;
+
+      const move = event.data;
+
+      if (move.board_state) {
+        try {
+          setBoardState(JSON.parse(move.board_state));
+        } catch (e) {
+          console.log('Erreur parsing board_state (move)');
+        }
+      }
+
+      if (typeof move.white_time !== 'undefined') {
+        setWhiteTime(move.white_time);
+      }
+      if (typeof move.black_time !== 'undefined') {
+        setBlackTime(move.black_time);
+      }
+
+      if (move.next_turn) {
+        setSession(prev => ({ ...prev, current_turn: move.next_turn }));
+      }
+      if (move.created_date || move.created_at) {
+        setSession(prev => ({ ...prev, last_move_timestamp: move.created_date || move.created_at }));
+      }
+    });
+
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
   }, [roomId]);
 
   // Timer qui décrémente chaque seconde pour le joueur dont c'est le tour
@@ -133,9 +213,9 @@ export default function GameRoom() {
           }
         }
 
-        // Vérifier si le jeu a démarré: player2_email existe
-        // Dès que player2_email est rempli, le jeu commence pour les deux joueurs
-        setGameStarted(!!sess.player2_email);
+        // Vérifier si le jeu a démarré: player2_id existe
+        // Dès que player2_id est rempli, le jeu commence pour les deux joueurs
+        setGameStarted(!!sess.player2_id);
       }
     } catch (error) {
       console.error('Error loading game room:', error);
@@ -166,6 +246,20 @@ export default function GameRoom() {
 
       // Envoyer à la base de données
       await base44.entities.GameSession.update(session.id, updateData);
+
+      // Enregistrer le coup en realtime (best-effort)
+      try {
+        await base44.entities.GameMove?.create?.({
+          room_id: roomId,
+          player_id: user.id,
+          board_state: JSON.stringify(newBoardState),
+          next_turn: nextTurn,
+          white_time: whiteTime,
+          black_time: blackTime
+        });
+      } catch (moveError) {
+        console.log('Realtime move non disponible:', moveError?.message || moveError);
+      }
       
       // Mettre à jour le state local
       setBoardState(newBoardState);

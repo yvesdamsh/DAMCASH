@@ -175,14 +175,18 @@ export default function Search() {
       });
 
       console.log('Création notification pour:', selectedOpponent.user_id);
-      await base44.entities.Notification.create({
-        user_email: selectedOpponent.user_id,
-        type: 'match_invitation',
-        title: `Invitation à jouer aux ${config.game_type === 'chess' ? 'Échecs' : 'Dames'}`,
-        message: `${user.full_name} vous invite à jouer aux ${config.game_type === 'chess' ? 'Échecs' : 'Dames'}`,
-        link: `/game-room/${roomId}`,
-        from_user: user.email
-      });
+      const opponentUsers = await base44.entities.User.filter({ id: selectedOpponent.user_id });
+      const opponentEmail = opponentUsers?.[0]?.email;
+      if (opponentEmail) {
+        await base44.entities.Notification.create({
+          user_email: opponentEmail,
+          type: 'match_invitation',
+          title: `Invitation à jouer aux ${config.game_type === 'chess' ? 'Échecs' : 'Dames'}`,
+          message: `${user.full_name} vous invite à jouer aux ${config.game_type === 'chess' ? 'Échecs' : 'Dames'}`,
+          link: `GameRoom?roomId=${roomId}`,
+          from_user: user.email
+        });
+      }
 
       setSentInvitations(prev => new Set(prev).add(playerId));
       console.log('GameSession et invitation créées avec succès');

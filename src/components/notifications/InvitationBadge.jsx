@@ -6,9 +6,25 @@ export default function InvitationBadge({ userId }) {
 
   useEffect(() => {
     loadInvitationCount();
-    // Rafraîchir toutes les 10 secondes
-    const interval = setInterval(loadInvitationCount, 10000);
-    return () => clearInterval(interval);
+    const unsubscribeInvites = base44.entities.GameInvitation.subscribe((event) => {
+      if (event?.data?.receiver_id === userId) {
+        loadInvitationCount();
+      }
+    });
+    const unsubscribeFriends = base44.entities.FriendRequest.subscribe((event) => {
+      if (event?.data?.receiver_id === userId) {
+        loadInvitationCount();
+      }
+    });
+
+    // Fallback si le realtime est interrompu
+    const interval = setInterval(loadInvitationCount, 30000);
+
+    return () => {
+      clearInterval(interval);
+      if (typeof unsubscribeInvites === 'function') unsubscribeInvites();
+      if (typeof unsubscribeFriends === 'function') unsubscribeFriends();
+    };
   }, [userId]);
 
   const loadInvitationCount = async () => {

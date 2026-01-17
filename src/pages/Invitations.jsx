@@ -34,13 +34,31 @@ export default function Invitations() {
   };
 
   useEffect(() => {
-    if (user) {
-      loadInvitations();
-      // Rafraîchir toutes les 5 secondes
-      const interval = setInterval(loadInvitations, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [user]);
+    if (!user) return;
+
+    loadInvitations();
+
+    const unsubscribeInvites = base44.entities.GameInvitation.subscribe((event) => {
+      if (event?.data?.receiver_id === user.id) {
+        loadInvitations();
+      }
+    });
+
+    const unsubscribeFriends = base44.entities.FriendRequest.subscribe((event) => {
+      if (event?.data?.receiver_id === user.id) {
+        loadInvitations();
+      }
+    });
+
+    // Fallback si le realtime est interrompu
+    const interval = setInterval(loadInvitations, 15000);
+
+    return () => {
+      clearInterval(interval);
+      if (typeof unsubscribeInvites === 'function') unsubscribeInvites();
+      if (typeof unsubscribeFriends === 'function') unsubscribeFriends();
+    };
+  }, [user?.id]);
 
   const loadInvitations = async () => {
     if (!user) return;
@@ -95,12 +113,14 @@ export default function Invitations() {
     try {
       console.log('Acceptation invitation:', invitation.id);
       
-      // Mettre à jour GameSession avec player2 (Madina - noirs) et démarrer
+      // Mettre à jour GameSession avec player2 et démarrer
       await base44.entities.GameSession.filter({ room_id: invitation.room_id }).then(sessions => {
         if (sessions.length > 0) {
           const session = sessions[0];
           return base44.entities.GameSession.update(session.id, {
             player2_id: user.id,
+            player2_email: user.email,
+            player2_name: user.full_name,
             status: 'in_progress'
           });
         }
