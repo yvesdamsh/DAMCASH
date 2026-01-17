@@ -196,26 +196,28 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     const directions = piece.isKing 
       ? [[-1, -1], [-1, 1], [1, -1], [1, 1]]
       : piece.color === 'white' 
-        ? [[-1, -1], [-1, 1]]
-        : [[1, -1], [1, 1]];
+        ? [[-1, -1], [-1, 1]]  // Blancs avancent vers haut (row décroit)
+        : [[1, -1], [1, 1]];    // Noirs avancent vers bas (row croit)
 
     if (piece.isKing) {
+      // Dame: peut se déplacer sur plusieurs cases en diagonale
       directions.forEach(([dr, dc]) => {
         for (let i = 1; i < 10; i++) {
           const newRow = row + dr * i;
           const newCol = col + dc * i;
-          
+
           if (newRow < 0 || newRow >= 10 || newCol < 0 || newCol >= 10) break;
           if (boardState[newRow][newCol]) break;
-          
+
           moves.push({ row: newRow, col: newCol, isCapture: false });
         }
       });
     } else {
+      // Pion: se déplace d'une case en diagonale (seulement vers l'avant)
       directions.forEach(([dr, dc]) => {
         const newRow = row + dr;
         const newCol = col + dc;
-        
+
         if (newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10) {
           if (!boardState[newRow][newCol]) {
             moves.push({ row: newRow, col: newCol, isCapture: false });
