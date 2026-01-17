@@ -55,25 +55,22 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
 
   const getCaptureMoves = useCallback((row, col, boardState, piece) => {
     const moves = [];
-    const directions = piece.isKing 
-      ? [[-1, -1], [-1, 1], [1, -1], [1, 1]]
-      : piece.color === 'white' 
-        ? [[-1, -1], [-1, 1]]
-        : [[1, -1], [1, 1]];
+    const allDirections = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
 
     if (piece.isKing) {
-      directions.forEach(([dr, dc]) => {
+      // Dame: peut capturer en diagonale sur plusieurs cases
+      allDirections.forEach(([dr, dc]) => {
         let foundOpponent = null;
         let foundPos = null;
-        
+
         for (let i = 1; i < 10; i++) {
           const checkRow = row + dr * i;
           const checkCol = col + dc * i;
-          
+
           if (checkRow < 0 || checkRow >= 10 || checkCol < 0 || checkCol >= 10) break;
-          
+
           const checkPiece = boardState[checkRow][checkCol];
-          
+
           if (!checkPiece) {
             if (foundOpponent) {
               moves.push({
@@ -87,12 +84,13 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
             foundOpponent = checkPiece;
             foundPos = { row: checkRow, col: checkCol };
           } else {
+            // Bloqué par un pion ami
             break;
           }
         }
       });
     } else {
-      const allDirections = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+      // Pion: saute par-dessus un adversaire (capture obligatoire dans toutes les directions)
       allDirections.forEach(([dr, dc]) => {
         const midRow = row + dr;
         const midCol = col + dc;
@@ -103,6 +101,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
           const midPiece = boardState[midRow]?.[midCol];
           const targetPiece = boardState[targetRow]?.[targetCol];
 
+          // Capture: doit avoir un pion adverse à côté et une case vide après
           if (midPiece && midPiece.color !== piece.color && !targetPiece) {
             moves.push({
               row: targetRow,
