@@ -678,11 +678,11 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                                 position: 'absolute',
                                 inset: '10%',
                                 borderRadius: '50%',
-                                border: cell.color === 'white' ? '1px solid rgba(100, 100, 100, 0.3)' : '1px solid rgba(80, 80, 80, 0.4)',
-                                background: cell.color === 'white'
+                                border: piece.color === 'white' ? '1px solid rgba(100, 100, 100, 0.3)' : '1px solid rgba(80, 80, 80, 0.4)',
+                                background: piece.color === 'white'
                                   ? 'radial-gradient(circle, #f5f3f0 0%, #e0ddd5 100%)'
                                   : 'radial-gradient(circle, #383838 0%, #1f1f1f 100%)',
-                                boxShadow: cell.color === 'white'
+                                boxShadow: piece.color === 'white'
                                   ? 'inset 0 1px 2px rgba(0,0,0,0.1)'
                                   : 'inset 0 1px 1px rgba(120,120,120,0.3)'
                               }}
