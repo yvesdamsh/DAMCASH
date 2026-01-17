@@ -490,44 +490,118 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                       )}
                       
                       {cell && (
-                        <div className={`
-                          w-5 h-5 sm:w-7 sm:h-7 rounded-full relative
-                          ${cell.color === 'white' 
-                            ? 'bg-gradient-to-br from-gray-50 via-gray-200 to-gray-300' 
-                            : 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700'
-                          }
-                          shadow-lg
-                        `}
-                        style={{
-                          boxShadow: cell.color === 'white' 
-                            ? '0 3px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.8), inset 0 -1px 2px rgba(0,0,0,0.2)'
-                            : '0 3px 8px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.2), inset 0 -1px 2px rgba(0,0,0,0.4)'
-                        }}>
-                          {/* Concentric circles for 3D effect */}
-                          <div className={`absolute inset-[15%] rounded-full ${
-                            cell.color === 'white' ? 'bg-gray-100' : 'bg-gray-800'
-                          }`}></div>
-                          <div className={`absolute inset-[30%] rounded-full ${
-                            cell.color === 'white' ? 'bg-gray-200' : 'bg-gray-700'
-                          }`}></div>
-                          <div className={`absolute inset-[42%] rounded-full ${
-                            cell.color === 'white' ? 'bg-gray-300' : 'bg-gray-600'
-                          }`}></div>
-                          
-                          {/* Highlight on top */}
-                          <div className={`absolute top-[20%] left-[30%] w-[25%] h-[25%] rounded-full ${
-                            cell.color === 'white' ? 'bg-white/60' : 'bg-white/10'
-                          } blur-sm`}></div>
-                          
-                          {cell.isKing && (
-                            <div className="absolute inset-0 flex items-center justify-center z-10">
-                              <span className={`text-xs sm:text-sm font-bold drop-shadow-md ${
-                                cell.color === 'white' ? 'text-amber-600' : 'text-amber-400'
-                              }`}>
-                                ♔
-                              </span>
-                            </div>
-                          )}
+                        <div className="relative w-5 h-5 sm:w-7 sm:h-7" style={{ transform: 'translateZ(0)' }}>
+                          {/* Main pion with 3D effect */}
+                          <div 
+                            className={`
+                              absolute inset-0 rounded-full
+                              ${cell.color === 'white' 
+                                ? 'bg-gradient-to-br from-[#faf8f5] via-[#e8e6e0] to-[#d0cdc5]' 
+                                : 'bg-gradient-to-br from-[#2a2a2a] via-[#1a1a1a] to-[#0a0a0a]'
+                              }
+                            `}
+                            style={{
+                              boxShadow: cell.color === 'white'
+                                ? '0 4px 10px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -2px 4px rgba(0,0,0,0.15)'
+                                : '0 4px 10px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.5)'
+                            }}
+                          >
+                            {/* First concentric ring */}
+                            <div 
+                              className={`absolute inset-[12%] rounded-full border ${
+                                cell.color === 'white' 
+                                  ? 'border-gray-400/40 bg-gradient-to-br from-[#f0ede8] to-[#ddd9d0]' 
+                                  : 'border-gray-600/40 bg-gradient-to-br from-[#252525] to-[#151515]'
+                              }`}
+                              style={{
+                                boxShadow: cell.color === 'white'
+                                  ? 'inset 0 1px 2px rgba(0,0,0,0.1)'
+                                  : 'inset 0 1px 2px rgba(255,255,255,0.1)'
+                              }}
+                            />
+                            
+                            {/* Second concentric ring */}
+                            <div 
+                              className={`absolute inset-[25%] rounded-full border ${
+                                cell.color === 'white' 
+                                  ? 'border-gray-400/50 bg-gradient-to-br from-[#e5e2dd] to-[#d0ccc3]' 
+                                  : 'border-gray-600/50 bg-gradient-to-br from-[#202020] to-[#101010]'
+                              }`}
+                              style={{
+                                boxShadow: cell.color === 'white'
+                                  ? 'inset 0 1px 2px rgba(0,0,0,0.15)'
+                                  : 'inset 0 1px 2px rgba(255,255,255,0.08)'
+                              }}
+                            />
+                            
+                            {/* Third concentric ring */}
+                            <div 
+                              className={`absolute inset-[38%] rounded-full border ${
+                                cell.color === 'white' 
+                                  ? 'border-gray-400/60 bg-gradient-to-br from-[#dbd8d3] to-[#c5c1b8]' 
+                                  : 'border-gray-600/60 bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d]'
+                              }`}
+                              style={{
+                                boxShadow: cell.color === 'white'
+                                  ? 'inset 0 1px 2px rgba(0,0,0,0.2)'
+                                  : 'inset 0 1px 2px rgba(255,255,255,0.05)'
+                              }}
+                            />
+                            
+                            {/* Central point */}
+                            <div 
+                              className={`absolute inset-[47%] rounded-full ${
+                                cell.color === 'white' 
+                                  ? 'bg-gradient-to-br from-[#bbb8b0] to-[#a8a59d]' 
+                                  : 'bg-gradient-to-br from-[#151515] to-[#050505]'
+                              }`}
+                              style={{
+                                boxShadow: cell.color === 'white'
+                                  ? 'inset 0 1px 3px rgba(0,0,0,0.3)'
+                                  : 'inset 0 1px 3px rgba(0,0,0,0.6)'
+                              }}
+                            />
+                            
+                            {/* Glossy highlight - plastic shine effect */}
+                            <div 
+                              className="absolute top-[15%] left-[25%] w-[35%] h-[30%] rounded-full"
+                              style={{
+                                background: cell.color === 'white'
+                                  ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 40%, transparent 70%)'
+                                  : 'radial-gradient(ellipse at center, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 40%, transparent 70%)',
+                                filter: 'blur(1px)'
+                              }}
+                            />
+                            
+                            {/* Secondary reflection */}
+                            <div 
+                              className="absolute top-[25%] right-[20%] w-[20%] h-[15%] rounded-full"
+                              style={{
+                                background: cell.color === 'white'
+                                  ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.6) 0%, transparent 60%)'
+                                  : 'radial-gradient(ellipse at center, rgba(255,255,255,0.15) 0%, transparent 60%)',
+                                filter: 'blur(1.5px)'
+                              }}
+                            />
+                            
+                            {cell.isKing && (
+                              <div className="absolute inset-0 flex items-center justify-center z-10">
+                                <span 
+                                  className={`text-xs sm:text-sm font-bold ${
+                                    cell.color === 'white' ? 'text-amber-600' : 'text-amber-400'
+                                  }`}
+                                  style={{
+                                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.5))',
+                                    textShadow: cell.color === 'white'
+                                      ? '0 1px 1px rgba(255,255,255,0.5)'
+                                      : '0 1px 1px rgba(0,0,0,0.8)'
+                                  }}
+                                >
+                                  ♔
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       )}
                       
