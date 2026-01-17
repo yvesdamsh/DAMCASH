@@ -239,6 +239,19 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     return getRegularMoves(row, col, boardState, piece);
   }, [getRegularMoves, mustCapture]);
 
+  const getValidMovesForColor = useCallback((row, col, boardState, color) => {
+    const piece = boardState[row][col];
+    if (!piece || piece.color !== color) return [];
+
+    const forced = getForcedCaptures(boardState, color);
+    if (forced.captures.length > 0) {
+      const entry = forced.captures.find(c => c.row === row && c.col === col);
+      return entry ? entry.moves : [];
+    }
+
+    return getRegularMoves(row, col, boardState, piece);
+  }, [getForcedCaptures, getRegularMoves]);
+
   const checkGameEnd = useCallback((boardState, nextColor) => {
     let hasValidMove = false;
     let hasPieces = false;
@@ -248,7 +261,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
         const piece = boardState[r][c];
         if (piece && piece.color === nextColor) {
           hasPieces = true;
-          const moves = getValidMoves(r, c, boardState);
+          const moves = getValidMovesForColor(r, c, boardState, nextColor);
           if (moves.length > 0) {
             hasValidMove = true;
             break;
@@ -262,14 +275,13 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       return nextColor === 'white' ? 'blackWins' : 'whiteWins';
     }
     return null;
-  }, [getValidMoves]);
+  }, [getValidMovesForColor]);
 
   const makeMove = (fromRow, fromCol, toRow, toCol, capturedSquares = []) => {
-      const newBoard = board.map(r => r.map(c => c ? { ...c } : null));
-      const piece = newBoard[fromRow][fromCol];
-      if (!piece) return { board: newBoard, continueChain: false };
+    const newBoard = board.map(r => r.map(c => c ? { ...c } : null));
+    const piece = { ...newBoard[fromRow][fromCol] };
 
-      capturedSquares.forEach(({ row, col }) => {
+    capturedSquares.forEach(({ row, col }) => {
       newBoard[row][col] = null;
     });
 
@@ -277,7 +289,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       piece.isKing = true;
     }
 
-    newBoard[toRow][toCol] = { ...piece };
+    newBoard[toRow][toCol] = piece;
     newBoard[fromRow][fromCol] = null;
 
     if (capturedSquares.length > 0) {
@@ -342,13 +354,11 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       const move = validMoves.find(m => m.row === row && m.col === col);
       if (move) {
         const result = makeMove(selectedSquare.row, selectedSquare.col, row, col, move.captured || []);
-              if (!result.continueChain) {
-                if (isMultiplayer && onSaveMove) {
-                  // Sauvegarder le coup pour l'adversaire
-                  const piece = board[selectedSquare.row][selectedSquare.col];
-                  const nextColor = piece && piece.color === 'white' ? 'black' : 'white';
-                  console.log('Appel onSaveMove - Coup jouée:', { from: selectedSquare, to: { row, col }, nextColor });
-                  onSaveMove(result.board, nextColor);
+        if (!result.continueChain) {
+          if (isMultiplayer && onSaveMove) {
+            // Sauvegarder le coup pour l'adversaire
+            const nextColor = piece.color === 'white' ? 'black' : 'white';
+            onSaveMove(result.board, nextColor);
           } else if (gameStatus === 'playing') {
             setTimeout(() => makeAIMove(result.board), 500);
           }
