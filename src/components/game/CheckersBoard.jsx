@@ -257,6 +257,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
   }, [getForcedCaptures, getRegularMoves]);
 
   const checkGameEnd = useCallback((boardState, nextColor) => {
+    // Victoire si l'adversaire n'a plus de pions OU ne peut plus bouger
     let hasValidMove = false;
     let hasPieces = false;
 
@@ -275,6 +276,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       if (hasValidMove) break;
     }
 
+    // Fin de partie: si aucun pion ou aucun coup possible
     if (!hasPieces || !hasValidMove) {
       return nextColor === 'white' ? 'blackWins' : 'whiteWins';
     }
