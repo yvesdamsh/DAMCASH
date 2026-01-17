@@ -167,7 +167,8 @@ export default function GameRoom() {
 
     loadMessages();
 
-    const unsubscribe = base44.entities.GameChatMessage?.subscribe?.((event) => {
+    // Subscription realtime ACTIVE pour chaque nouveau message
+    const unsubscribe = base44.entities.GameChatMessage.subscribe((event) => {
       if (event?.type !== 'create') return;
       if (!event?.data || event.data.room_id !== roomId) return;
       setMessages(prev => {
@@ -188,7 +189,8 @@ export default function GameRoom() {
     if (isSpectator) return;
 
     try {
-      await base44.entities.GameChatMessage?.create?.({
+      // Créer le message - le realtime subscription le récupérera automatiquement
+      await base44.entities.GameChatMessage.create({
         room_id: roomId,
         sender_id: user.id,
         sender_name: user.full_name,
