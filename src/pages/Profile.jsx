@@ -18,6 +18,8 @@ import { fr } from 'date-fns/locale';
 
 export default function Profile() {
   const [user, setUser] = useState(null);
+  const [playerStats, setPlayerStats] = useState(null);
+  const [recentResults, setRecentResults] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState('');
   const [loading, setLoading] = useState(true);
@@ -83,9 +85,30 @@ export default function Profile() {
 
 
 
+  useEffect(() => {
+    const loadStats = async () => {
+      if (!user?.id) return;
+      try {
+        const statsList = await base44.entities.PlayerStats.filter({ user_id: user.id });
+        setPlayerStats(statsList?.[0] || null);
+      } catch (e) {
+        console.log('Erreur stats joueur:', e?.message || e);
+      }
+      try {
+        const results = await base44.entities.GameResult.list('-created_date', 20);
+        const filtered = (results || []).filter(r => r.player1_id === user.id || r.player2_id === user.id);
+        setRecentResults(filtered);
+      } catch (e) {
+        console.log('Erreur historique:', e?.message || e);
+      }
+    };
+    loadStats();
+  }, [user?.id]);
+
   const calculateWinRate = () => {
-    if (!user?.games_played || user.games_played === 0) return 0;
-    return Math.round((user.games_won / user.games_played) * 100);
+    const stats = playerStats || user;
+    if (!stats?.games_played || stats.games_played === 0) return 0;
+    return Math.round((stats.games_won / stats.games_played) * 100);
   };
 
   const calculateLevelProgress = () => {
@@ -94,22 +117,32 @@ export default function Profile() {
     return Math.round((user.xp / xpNeeded) * 100);
   };
 
-  // Mock data for achievements and history
+  const stats = playerStats || user;
+
+  // Achievements
   const achievements = [
     { id: 1, name: 'Premier Sang', description: 'Gagner votre première partie', icon: '🎯', unlocked: true },
     { id: 2, name: 'Série de Victoires', description: 'Gagner 5 parties consécutives', icon: '🔥', unlocked: true },
-    { id: 3, name: 'Maître Stratège', description: 'Atteindre 1500 de classement', icon: '🧠', unlocked: user?.chess_rating >= 1500 },
+    { id: 3, name: 'Maître Stratège', description: 'Atteindre 1500 de classement', icon: '🧠', unlocked: (stats?.chess_rating || 1200) >= 1500 },
     { id: 4, name: 'Champion Légendaire', description: 'Gagner un tournoi', icon: '👑', unlocked: false },
     { id: 5, name: 'Collectionneur', description: 'Posséder 10 thèmes', icon: '💎', unlocked: false },
     { id: 6, name: 'Social', description: 'Avoir 20 amis', icon: '👥', unlocked: false },
   ];
 
-  const matchHistory = [
-    { id: 1, game: 'Échecs', result: 'Victoire', opponent: 'Jean Dupont', date: new Date(Date.now() - 3600000), rating_change: +25 },
-    { id: 2, game: 'Dames', result: 'Défaite', opponent: 'Marie Martin', date: new Date(Date.now() - 7200000), rating_change: -15 },
-    { id: 3, game: 'Échecs', result: 'Victoire', opponent: 'Pierre Durand', date: new Date(Date.now() - 86400000), rating_change: +30 },
-    { id: 4, game: 'Échecs', result: 'Égalité', opponent: 'Sophie Bernard', date: new Date(Date.now() - 172800000), rating_change: 0 },
-  ];
+  const matchHistory = recentResults.map((r) => {
+    const isPlayer1 = r.player1_id === user.id;
+    const opponent = isPlayer1 ? r.player2_name : r.player1_name;
+    const isDraw = r.result === 'draw';
+    const didWin = !isDraw && ((r.result === 'white' && isPlayer1) || (r.result === 'black' && !isPlayer1));
+    return {
+      id: r.id,
+      game: r.game_type === 'chess' ? 'Échecs' : 'Dames',
+      result: isDraw ? 'Égalité' : (didWin ? 'Victoire' : 'Défaite'),
+      opponent: opponent || 'Joueur',
+      date: new Date(r.created_date || Date.now()),
+      rating_change: 0
+    };
+  });
 
   if (loading) {
     return (

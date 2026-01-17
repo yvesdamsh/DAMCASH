@@ -142,7 +142,8 @@ export default function Search() {
         receiver_id: selectedOpponent.user_id, 
         game_type: config.game_type,
         room_id: roomId,
-        time_control: config.time_control
+        time_control: config.time_control,
+        ranked: !!config.ranked
       });
       
       // Créer GameSession avec timers
@@ -160,6 +161,7 @@ export default function Search() {
         invited_player_id: selectedOpponent.user_id,
         invited_player_name: selectedOpponent.username,
         game_type: config.game_type,
+        ranked: !!config.ranked,
         status: 'waiting',
         current_turn: 'white',
         time_control: timeControl,
@@ -174,6 +176,7 @@ export default function Search() {
         receiver_id: selectedOpponent.user_id,
         game_type: config.game_type,
         status: 'pending',
+        ranked: !!config.ranked,
         room_id: roomId
       });
 

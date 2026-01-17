@@ -3,11 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 
 export default function InviteModal({ isOpen, onClose, opponent, onSendInvite }) {
   const [gameType, setGameType] = useState('chess');
   const [timeControl, setTimeControl] = useState('blitz');
   const [playerColor, setPlayerColor] = useState('random');
+  const [ranked, setRanked] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSendInvite = async () => {
@@ -16,7 +18,8 @@ export default function InviteModal({ isOpen, onClose, opponent, onSendInvite })
       await onSendInvite({
         game_type: gameType,
         time_control: timeControl,
-        player_color: playerColor
+        player_color: playerColor,
+        ranked
       });
       handleClose();
     } catch (error) {
@@ -31,6 +34,7 @@ export default function InviteModal({ isOpen, onClose, opponent, onSendInvite })
     setGameType('chess');
     setTimeControl('blitz');
     setPlayerColor('random');
+    setRanked(false);
     onClose();
   };
 
@@ -88,6 +92,15 @@ export default function InviteModal({ isOpen, onClose, opponent, onSendInvite })
                 <SelectItem value="random">🎲 Aléatoire</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Partie classée */}
+          <div className="flex items-center justify-between rounded-lg bg-[#2C1810] border border-[#D4A574]/30 px-3 py-2">
+            <div>
+              <p className="text-sm font-medium text-[#F5E6D3]">Partie classée</p>
+              <p className="text-xs text-[#D4A574]/70">Impacte le classement</p>
+            </div>
+            <Switch checked={ranked} onCheckedChange={setRanked} />
           </div>
         </div>
 
