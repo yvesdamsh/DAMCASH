@@ -43,6 +43,15 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
   const [mustCapture, setMustCapture] = useState([]);
   const [chainCapture, setChainCapture] = useState(null);
 
+  useEffect(() => {
+    if (initialBoardState) {
+      setBoard(initialBoardState);
+      setSelectedSquare(null);
+      setValidMoves([]);
+      setChainCapture(null);
+    }
+  }, [initialBoardState]);
+
   const getCaptureMoves = useCallback((row, col, boardState, piece) => {
     const moves = [];
     const directions = piece.isKing 
@@ -403,9 +412,8 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     }
 
     const executeAIChainCapture = (currentB, fromRow, fromCol, toRow, toCol, captured) => {
-       const newBoard = currentB.map(r => r.map(c => c ? { ...c } : null));
-       const piece = newBoard[fromRow][fromCol];
-       if (!piece) return;
+      const newBoard = currentB.map(r => r.map(c => c ? { ...c } : null));
+      const piece = { ...newBoard[fromRow][fromCol] };
 
       captured.forEach(({ row, col }) => {
         newBoard[row][col] = null;
@@ -446,8 +454,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       executeAIChainCapture(currentBoard, selectedMove.from.row, selectedMove.from.col, selectedMove.to.row, selectedMove.to.col, selectedMove.to.captured);
     } else if (!isMultiplayer) {
       const newBoard = currentBoard.map(r => r.map(c => c ? { ...c } : null));
-      const piece = newBoard[selectedMove.from.row][selectedMove.from.col];
-      if (!piece) return;
+      const piece = { ...newBoard[selectedMove.from.row][selectedMove.from.col] };
 
       if ((piece.color === 'white' && selectedMove.to.row === 0) || (piece.color === 'black' && selectedMove.to.row === 9)) {
         piece.isKing = true;

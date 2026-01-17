@@ -34,6 +34,15 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
   const [enPassantTarget, setEnPassantTarget] = useState(null);
   const [lastMove, setLastMove] = useState(null);
 
+  useEffect(() => {
+    if (initialBoardState) {
+      setBoard(initialBoardState);
+      setSelectedSquare(null);
+      setValidMoves([]);
+      setLastMove(null);
+    }
+  }, [initialBoardState]);
+
   const isWhitePiece = (piece) => piece && piece === piece.toUpperCase();
   const isBlackPiece = (piece) => piece && piece === piece.toLowerCase();
   const isPieceOfColor = (piece, color) => 
