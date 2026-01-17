@@ -264,10 +264,11 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
   }, [getValidMoves]);
 
   const makeMove = (fromRow, fromCol, toRow, toCol, capturedSquares = []) => {
-    const newBoard = board.map(r => r.map(c => c ? { ...c } : null));
-    const piece = { ...newBoard[fromRow][fromCol] };
+      const newBoard = board.map(r => r.map(c => c ? { ...c } : null));
+      const piece = newBoard[fromRow][fromCol];
+      if (!piece) return { board: newBoard, continueChain: false };
 
-    capturedSquares.forEach(({ row, col }) => {
+      capturedSquares.forEach(({ row, col }) => {
       newBoard[row][col] = null;
     });
 
