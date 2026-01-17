@@ -61,10 +61,6 @@ export default function Home() {
             await base44.entities.OnlineUser.delete(u.id);
           }
         }
-
-        // Compter les utilisateurs actuellement en ligne
-        const activeUsers = await base44.entities.OnlineUser.list();
-        setOnlineCount(activeUsers.length);
       } catch (error) {
         console.error('Erreur mise à jour présence:', error);
       }
@@ -78,6 +74,26 @@ export default function Home() {
 
     return () => clearInterval(interval);
   }, [user]);
+
+  // Rafraîchir le compteur toutes les 10 secondes
+  useEffect(() => {
+    const fetchOnlineCount = async () => {
+      try {
+        const activeUsers = await base44.entities.OnlineUser.list();
+        setOnlineCount(activeUsers.length);
+      } catch (error) {
+        console.error('Erreur récupération compteur:', error);
+      }
+    };
+
+    // Première récupération
+    fetchOnlineCount();
+
+    // Rafraîchir toutes les 10 secondes
+    const interval = setInterval(fetchOnlineCount, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const games = [
     {
