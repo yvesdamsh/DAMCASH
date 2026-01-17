@@ -6,8 +6,8 @@ import { Home, Search, Gamepad2, Mail, Trophy, Gem, User, LogOut, Menu, X, Bell 
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { motion, AnimatePresence } from 'framer-motion';
-import NotificationBadge from './components/notifications/NotificationBadge';
-import InvitationBadge from './components/notifications/InvitationBadge';
+import NotificationBadge from './components/notifications/NotificationBadge.jsx';
+import InvitationBadge from './components/notifications/InvitationBadge.jsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
