@@ -9,14 +9,10 @@ import { motion } from 'framer-motion';
 
 export default function Home() {
   const [user, setUser] = useState(null);
-  const [onlineCount, setOnlineCount] = useState(1247);
+  const [onlineCount, setOnlineCount] = useState(0);
 
   useEffect(() => {
     loadUser();
-    const interval = setInterval(() => {
-      setOnlineCount(prev => prev + Math.floor(Math.random() * 20) - 10);
-    }, 5000);
-    return () => clearInterval(interval);
   }, []);
 
   const loadUser = async () => {
@@ -30,6 +26,58 @@ export default function Home() {
       console.log('User not authenticated');
     }
   };
+
+  // Système de présence en ligne en temps réel
+  useEffect(() => {
+    if (!user) return;
+
+    const updatePresence = async () => {
+      try {
+        // Chercher si l'utilisateur existe déjà
+        const existing = await base44.entities.OnlineUser.filter({ user_id: user.id });
+        
+        if (existing.length > 0) {
+          // Mettre à jour
+          await base44.entities.OnlineUser.update(existing[0].id, {
+            last_seen: new Date().toISOString(),
+            status: 'online',
+            username: user.full_name
+          });
+        } else {
+          // Créer nouvelle entrée
+          await base44.entities.OnlineUser.create({
+            user_id: user.id,
+            username: user.full_name,
+            last_seen: new Date().toISOString(),
+            status: 'online'
+          });
+        }
+
+        // Nettoyer les utilisateurs inactifs (plus de 2 minutes)
+        const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+        const allUsers = await base44.entities.OnlineUser.list();
+        for (const u of allUsers) {
+          if (u.last_seen < twoMinutesAgo) {
+            await base44.entities.OnlineUser.delete(u.id);
+          }
+        }
+
+        // Compter les utilisateurs actuellement en ligne
+        const activeUsers = await base44.entities.OnlineUser.list();
+        setOnlineCount(activeUsers.length);
+      } catch (error) {
+        console.error('Erreur mise à jour présence:', error);
+      }
+    };
+
+    // Mise à jour initiale
+    updatePresence();
+
+    // Mise à jour toutes les 30 secondes
+    const interval = setInterval(updatePresence, 30000);
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   const games = [
     {
@@ -110,8 +158,11 @@ export default function Home() {
             <span>Niveau {user?.level || 1}</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-            <span>{onlineCount.toLocaleString()} joueurs en ligne</span>
+            <div className="relative">
+              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+              <div className="absolute inset-0 w-2 h-2 rounded-full bg-green-500 animate-ping"></div>
+            </div>
+            <span>{onlineCount} joueurs en ligne</span>
           </div>
         </div>
       </div>
