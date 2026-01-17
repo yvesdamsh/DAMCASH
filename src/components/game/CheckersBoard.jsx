@@ -776,7 +776,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                         )}
                       </AnimatePresence>
                       
-                      {isValidMove && !cell && (
+                      {isValidMove && !piece && (
                         <motion.div 
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
