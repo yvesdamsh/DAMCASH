@@ -26,6 +26,32 @@ export default function Layout({ children, currentPageName }) {
     loadUser();
   }, []);
 
+  useEffect(() => {
+    if (!user) return;
+
+    // Heartbeat: mettre à jour le status online toutes les 30 secondes
+    const heartbeatInterval = setInterval(async () => {
+      try {
+        await base44.entities.OnlineUser.filter(
+          { user_id: user.id },
+          '-updated_date',
+          1
+        ).then(async (results) => {
+          if (results.length > 0) {
+            await base44.entities.OnlineUser.update(results[0].id, {
+              status: 'online',
+              last_seen: new Date().toISOString()
+            });
+          }
+        });
+      } catch (error) {
+        console.log('Erreur heartbeat:', error);
+      }
+    }, 30000);
+
+    return () => clearInterval(heartbeatInterval);
+  }, [user]);
+
   const loadUser = async () => {
     try {
       const isAuth = await base44.auth.isAuthenticated();
