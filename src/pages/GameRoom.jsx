@@ -53,36 +53,24 @@ export default function GameRoom() {
     return () => clearInterval(interval);
   }, [roomId]);
 
-  // Realtime: écouter les changements de GameSession pour cette room
+  // Realtime: écouter les changements de GameSession pour les jointures de joueur
   useEffect(() => {
     if (!roomId) return;
 
     const unsubscribe = base44.entities.GameSession.subscribe(async (event) => {
-      const matchesRoom = event?.data?.room_id === roomId;
-      const matchesSession = event?.id && session?.id && event.id === session.id;
-      if (!matchesRoom && !matchesSession) return;
+      if (!event?.data) return;
+      const matchesRoom = event.data.room_id === roomId;
+      if (!matchesRoom) return;
+
       const sess = event.data;
 
+      // Mettre à jour la session
       setSession(prev => ({ ...prev, ...sess }));
 
-      if (sess.board_state) {
-        try {
-          setBoardState(JSON.parse(sess.board_state));
-        } catch (e) {
-          console.log('Erreur parsing board_state');
-        }
-      }
-
-      if (typeof sess.white_time !== 'undefined') {
-        setWhiteTime(sess.white_time);
-      }
-      if (typeof sess.black_time !== 'undefined') {
-        setBlackTime(sess.black_time);
-      }
-
+      // Démarrer la partie quand player2_id est présent
       setGameStarted(!!sess.player2_id || sess.status === 'in_progress');
 
-      // Rafraîchir l'adversaire si nécessaire (sans accès User)
+      // Rafraîchir l'adversaire si nécessaire
       const opponentId = user?.id === sess.player1_id ? sess.player2_id : sess.player1_id;
       if (opponentId && opponent?.id !== opponentId) {
         const onlineUsers = await base44.entities.OnlineUser.filter({ user_id: opponentId });
@@ -105,7 +93,7 @@ export default function GameRoom() {
     return () => {
       if (typeof unsubscribe === 'function') unsubscribe();
     };
-  }, [roomId, user?.id, opponent?.id, session?.id]);
+  }, [roomId, user?.id, opponent?.id]);
 
   // Realtime dédié aux coups: écouter les changements de GameSession pour la synchro board
   useEffect(() => {
