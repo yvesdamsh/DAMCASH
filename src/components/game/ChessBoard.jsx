@@ -20,8 +20,8 @@ const initialBoard = [
   ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
 ];
 
-export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', onGameEnd, isMultiplayer = false, canMove = true, blockBoard = false }) {
-  const [board, setBoard] = useState(initialBoard);
+export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', onGameEnd, isMultiplayer = false, canMove = true, blockBoard = false, initialBoardState = null, onSaveMove = null }) {
+  const [board, setBoard] = useState(() => initialBoardState ? initialBoardState : initialBoard);
   const [selectedSquare, setSelectedSquare] = useState(null);
   const [currentTurn, setCurrentTurn] = useState('white');
   const [validMoves, setValidMoves] = useState([]);
