@@ -177,12 +177,12 @@ export default function RoomLobby() {
             {filteredRooms.length > 0 ? (
               filteredRooms.map((room) => (
                 <motion.div
-                  key={room.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="bg-[#5D3A1A]/50 border border-[#D4A574]/30 rounded-lg p-4 hover:bg-[#5D3A1A]/70 transition-all"
-                >
+                   key={room.id}
+                   initial={{ opacity: 0, y: 20 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   exit={{ opacity: 0, y: -20 }}
+                   className="bg-[#5D3A1A]/50 backdrop-blur-lg border border-[#D4A574]/30 rounded-lg p-4 hover:bg-[#5D3A1A]/70 hover:border-[#D4A574]/50 transition-all shadow-lg hover:shadow-xl"
+                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
