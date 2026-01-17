@@ -270,9 +270,10 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
         setSelectedSquare(null);
         setValidMoves([]);
         
-        if (gameStatus === 'playing' && isMultiplayer) {
-          // Multijoueur: ne pas faire bouger l'IA
-          return;
+        const nextColor = isWhitePiece(piece) ? 'black' : 'white';
+        if (isMultiplayer && onSaveMove) {
+          // Sauvegarder le coup pour l'adversaire
+          onSaveMove(newBoard, nextColor);
         } else if (gameStatus === 'playing') {
           setTimeout(() => makeAIMove(newBoard), 500);
         }
