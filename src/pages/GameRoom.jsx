@@ -92,11 +92,16 @@ export default function GameRoom() {
         const sess = sessions[0];
         setSession(sess);
         
+        // Charger le board state depuis GameSession
         if (sess.board_state) {
-          setBoardState(JSON.parse(sess.board_state));
+          try {
+            setBoardState(JSON.parse(sess.board_state));
+          } catch (e) {
+            console.log('Erreur parsing board_state');
+          }
         }
 
-        // Initialiser les timers à la première charge
+        // Initialiser les timers à la première charge seulement
         if (whiteTime === null && sess.white_time !== undefined) {
           setWhiteTime(sess.white_time);
           setBlackTime(sess.black_time);
@@ -111,7 +116,7 @@ export default function GameRoom() {
           }
         }
 
-        // Vérifier si le jeu a démarré (player2 connecté et game in_progress)
+        // Vérifier si le jeu a démarré: player2 existe ET status est in_progress
         if (sess.status === 'in_progress' && sess.player2_id) {
           setGameStarted(true);
         }
