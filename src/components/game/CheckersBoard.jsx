@@ -166,6 +166,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
   }, [getCaptureSequences]);
 
   const getForcedCaptures = useCallback((boardState, color) => {
+    // Trouver tous les pions qui peuvent capturer et le max de captures possible
     let maxCaptures = 0;
     const captures = [];
 
@@ -176,10 +177,12 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
           const result = getMaxCaptureMovesForPiece(boardState, r, c, piece);
           if (result.maxCaptures > 0) {
             if (result.maxCaptures > maxCaptures) {
+              // Nouveau max trouvé, réinitialiser la liste
               maxCaptures = result.maxCaptures;
               captures.length = 0;
               captures.push({ row: r, col: c, moves: result.moves });
             } else if (result.maxCaptures === maxCaptures) {
+              // Même max, ajouter ce pion aux options
               captures.push({ row: r, col: c, moves: result.moves });
             }
           }
