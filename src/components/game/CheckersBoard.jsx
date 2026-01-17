@@ -476,33 +476,20 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
         }
       </div>
 
-      {/* Wooden frame with board */}
+      {/* Board without frame */}
       <div style={{ 
         width: 'min(90vw, calc(100vh - 200px))',
         height: 'min(90vw, calc(100vh - 200px))',
-        padding: '20px',
-        borderRadius: '8px',
-        backgroundColor: '#3D2314',
-        boxShadow: 'inset 0 0 25px rgba(0,0,0,0.9), inset 0 0 8px rgba(139, 90, 43, 0.6), 0 15px 40px rgba(0,0,0,0.95)',
         aspectRatio: '1/1',
         flexShrink: 0
       }}>
-        {/* Inner board container */}
-        <div style={{ 
-          width: '100%', 
-          height: '100%',
-          borderRadius: '4px',
-          padding: 0,
-          backgroundColor: '#2a1810'
-        }}>
-          {/* Game board grid */}
+        {/* Game board grid */}
           <div style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(10, 1fr)',
             gridTemplateRows: 'repeat(10, 1fr)',
             width: '100%', 
             height: '100%', 
-            borderRadius: '4px', 
             overflow: 'hidden',
             gap: 0,
             border: 'none'
@@ -705,9 +692,8 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                   );
                 })
               ))}
-            </div>
-            </div>
-            </div>
-            </div>
-            );
+              </div>
+              </div>
+              </div>
+              );
             }
