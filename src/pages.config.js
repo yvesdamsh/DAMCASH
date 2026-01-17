@@ -13,6 +13,7 @@ import Search from './pages/Search';
 import Shop from './pages/Shop';
 import Spectate from './pages/Spectate';
 import Tournaments from './pages/Tournaments';
+import GameRoom from './pages/GameRoom';
 import __Layout from './Layout.jsx';
 
 
@@ -32,6 +33,7 @@ export const PAGES = {
     "Shop": Shop,
     "Spectate": Spectate,
     "Tournaments": Tournaments,
+    "GameRoom": GameRoom,
 }
 
 export const pagesConfig = {
