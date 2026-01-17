@@ -276,7 +276,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       piece.isKing = true;
     }
 
-    newBoard[toRow][toCol] = piece;
+    newBoard[toRow][toCol] = { ...piece };
     newBoard[fromRow][fromCol] = null;
 
     if (capturedSquares.length > 0) {
