@@ -403,8 +403,9 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     }
 
     const executeAIChainCapture = (currentB, fromRow, fromCol, toRow, toCol, captured) => {
-      const newBoard = currentB.map(r => r.map(c => c ? { ...c } : null));
-      const piece = { ...newBoard[fromRow][fromCol] };
+       const newBoard = currentB.map(r => r.map(c => c ? { ...c } : null));
+       const piece = newBoard[fromRow][fromCol];
+       if (!piece) return;
 
       captured.forEach(({ row, col }) => {
         newBoard[row][col] = null;
