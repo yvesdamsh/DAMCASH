@@ -422,34 +422,50 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
   const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-2" style={{ minHeight: '100vh' }}>
+    <div style={{ 
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100%',
+      height: '100vh',
+      backgroundColor: '#1a1a1a',
+      margin: 0,
+      padding: 0,
+      overflow: 'hidden'
+    }}>
       <VictoryParticles 
         show={gameStatus !== 'playing'} 
         winner={gameStatus === 'whiteWins' ? 'white' : 'black'}
       />
       
-      <div className="absolute top-4 left-4 flex items-center gap-2">
-        <div className="flex items-center gap-1 px-2 py-1 rounded bg-gray-800 text-xs">
-          <div className="w-3 h-3 rounded-full bg-gray-900 border border-gray-600"></div>
-          <span>{score.black}</span>
+      {/* Score (top-left corner) */}
+      <div style={{ position: 'fixed', top: '12px', left: '12px', display: 'flex', gap: '8px', zIndex: 10 }}>
+        <div style={{ display: 'flex', gap: '4px', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#333' }}>
+          <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#222', border: '1px solid #555' }}></div>
+          <span style={{ fontSize: '11px', color: '#fff' }}>{score.black}</span>
         </div>
-        <span className="text-gray-500 text-xs">-</span>
-        <div className="flex items-center gap-1 px-2 py-1 rounded bg-gray-800 text-xs">
-          <div className="w-3 h-3 rounded-full bg-white border border-gray-300"></div>
-          <span>{score.white}</span>
+        <span style={{ color: '#666', fontSize: '11px' }}>-</span>
+        <div style={{ display: 'flex', gap: '4px', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#333' }}>
+          <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#fff', border: '1px solid #ccc' }}></div>
+          <span style={{ fontSize: '11px', color: '#fff' }}>{score.white}</span>
         </div>
       </div>
 
-      <div className="absolute top-4 right-4 flex gap-1">
-        <Button variant="outline" size="sm" onClick={resetGame} className="h-7 px-2 text-xs bg-white/5 border-white/20 hover:bg-white/10">
-          <RotateCcw className="w-3 h-3" />
-        </Button>
-        <Button variant="outline" size="sm" onClick={resetGame} className="h-7 px-2 text-xs bg-white/5 border-white/20 hover:bg-white/10">
-          <Plus className="w-3 h-3" />
-        </Button>
-      </div>
-
-      <div className={`absolute bottom-4 px-3 py-1.5 rounded-lg text-xs font-medium ${currentTurn === playerColor ? 'bg-amber-500/20 border border-amber-500' : 'bg-white/5'}`}>
+      {/* Game status (bottom-center) */}
+      <div style={{ 
+        position: 'fixed', 
+        bottom: '12px', 
+        left: '50%', 
+        transform: 'translateX(-50%)',
+        padding: '8px 16px',
+        borderRadius: '8px',
+        fontSize: '12px',
+        fontWeight: '500',
+        backgroundColor: currentTurn === playerColor ? 'rgba(217, 119, 6, 0.2)' : 'rgba(255,255,255,0.05)',
+        border: currentTurn === playerColor ? '1px solid #d97706' : 'none',
+        color: '#fff',
+        zIndex: 10
+      }}>
         {gameStatus === 'playing' 
           ? (currentTurn === playerColor 
               ? `Votre tour (${playerColor === 'white' ? 'Blancs' : 'Noirs'})`
@@ -460,11 +476,35 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
         }
       </div>
 
-      <div className="relative flex justify-center items-center w-full h-full">
-         {/* Wooden frame */}
-         <div className="p-2 rounded-2xl bg-gradient-to-br from-amber-900 via-amber-800 to-amber-900 shadow-2xl" style={{ width: 'min(90vw, 700px)', height: 'min(90vw, 700px)' }}>
-           <div className="p-1 bg-gradient-to-br from-amber-950 to-amber-900 rounded-xl w-full h-full">
-             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', width: '100%', height: '100%', borderRadius: '0.5rem', overflow: 'hidden', boxShadow: 'inset 0 4px 6px rgba(0,0,0,0.5)' }}>
+      {/* Wooden frame with board */}
+      <div style={{ 
+        width: 'max(95vw, 800px)', 
+        height: 'max(95vw, 800px)',
+        padding: '15px',
+        borderRadius: '8px',
+        backgroundColor: '#3D2314',
+        boxShadow: 'inset 0 0 20px rgba(0,0,0,0.8), inset 0 0 5px rgba(139, 90, 43, 0.5), 0 10px 30px rgba(0,0,0,0.9)'
+      }}>
+        {/* Inner board container */}
+        <div style={{ 
+          width: '100%', 
+          height: '100%',
+          borderRadius: '4px',
+          padding: 0,
+          backgroundColor: '#2a1810'
+        }}>
+          {/* Game board grid */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(10, 1fr)',
+            gridTemplateRows: 'repeat(10, 1fr)',
+            width: '100%', 
+            height: '100%', 
+            borderRadius: '4px', 
+            overflow: 'hidden',
+            gap: 0,
+            border: 'none'
+          }}>
                {displayBoard.map((row, rowIndex) => (
                  row.map((cell, colIndex) => {
                    const actualRow = playerColor === 'black' ? 9 - rowIndex : rowIndex;
@@ -476,30 +516,37 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                    const isCapture = validMoves.find(m => m.row === actualRow && m.col === actualCol)?.isCapture;
                    const isMustCapture = mustCapture.some(c => c.row === actualRow && c.col === actualCol);
 
+                   const baseStyles = {
+                     display: 'flex',
+                     alignItems: 'center',
+                     justifyContent: 'center',
+                     position: 'relative',
+                     backgroundColor: isDark ? '#5D3A1A' : '#F5E6D3',
+                     cursor: isDark ? 'pointer' : 'default',
+                     aspectRatio: '1/1',
+                     border: 'none'
+                   };
+
+                   if (isSelected) {
+                     baseStyles.boxShadow = 'inset 0 0 0 4px #facc15, 0 0 25px rgba(250, 204, 21, 0.8)';
+                   } else if (isValidMove && isCapture) {
+                     baseStyles.boxShadow = 'inset 0 0 0 3px #ef4444';
+                   } else if (isValidMove && !isCapture) {
+                     baseStyles.boxShadow = 'inset 0 0 0 3px #22c55e';
+                   } else if (isMustCapture) {
+                     baseStyles.boxShadow = 'inset 0 0 0 3px #fb923c';
+                   }
+
                    return (
                      <motion.div
                        key={`${rowIndex}-${colIndex}`}
                        onClick={() => isDark && handleSquareClick(actualRow, actualCol)}
-                       whileHover={isDark ? { scale: 0.98 } : {}}
-                       whileTap={isDark ? { scale: 0.95 } : {}}
-                       style={{
-                         display: 'flex',
-                         alignItems: 'center',
-                         justifyContent: 'center',
-                         position: 'relative',
-                         backgroundColor: isDark ? '#4a2f1f' : '#f5e6d3',
-                         cursor: isDark ? 'pointer' : 'default',
-                         boxShadow: 
-                           isSelected ? 'inset 0 0 0 4px #facc15, 0 0 20px rgba(250, 204, 21, 0.6)' :
-                           isValidMove && isCapture ? 'inset 0 0 0 2px #ef4444' :
-                           isValidMove && !isCapture ? 'inset 0 0 0 2px #22c55e' :
-                           isMustCapture ? 'inset 0 0 0 2px #fb923c' :
-                           'none'
-                       }}
-                       className={`${isDark ? 'hover:opacity-90' : ''}`}
+                       whileHover={isDark ? { backgroundColor: isDark ? '#6d4a2a' : '#F5E6D3' } : {}}
+                       whileTap={isDark ? { scale: 0.98 } : {}}
+                       style={baseStyles}
                      >
                       {isDark && squareNum && (
-                         <span style={{ position: 'absolute', top: '4px', left: '4px', fontSize: '9px', fontWeight: 'bold', color: 'rgba(251, 191, 36, 0.4)', userSelect: 'none' }}>
+                         <span style={{ position: 'absolute', top: '6px', left: '6px', fontSize: '10px', fontWeight: 'bold', color: 'rgba(212, 165, 116, 0.5)', userSelect: 'none', fontFamily: 'monospace' }}>
                            {squareNum}
                          </span>
                        )}
@@ -508,117 +555,124 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                         {cell && (
                           <motion.div 
                             key={`${actualRow}-${actualCol}-${cell.color}-${cell.isKing}`}
-                            initial={{ scale: 0, y: -20 }}
-                            animate={{ scale: 1, y: 0 }}
-                            exit={{ scale: 0, y: 20 }}
-                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                            className="relative w-5 h-5 sm:w-7 sm:h-7" 
-                            style={{ transform: 'translateZ(0)' }}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                            style={{ 
+                              position: 'relative',
+                              width: '80%',
+                              height: '80%',
+                              borderRadius: '50%'
+                            }}
                           >
                           {/* Main pion with 3D effect */}
                           <div 
-                            className={`
-                              absolute inset-0 rounded-full
-                              ${cell.color === 'white' 
-                                ? 'bg-gradient-to-br from-[#faf8f5] via-[#e8e6e0] to-[#d0cdc5]' 
-                                : 'bg-gradient-to-br from-[#2a2a2a] via-[#1a1a1a] to-[#0a0a0a]'
-                              }
-                            `}
                             style={{
+                              position: 'absolute',
+                              inset: 0,
+                              borderRadius: '50%',
+                              background: cell.color === 'white' 
+                                ? 'radial-gradient(circle at 30% 30%, #ffffff 0%, #e8e6e0 20%, #d0cdc5 100%)' 
+                                : 'radial-gradient(circle at 30% 30%, #3a3a3a 0%, #1a1a1a 50%, #000000 100%)',
                               boxShadow: cell.color === 'white'
-                                ? '0 4px 10px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -2px 4px rgba(0,0,0,0.15)'
-                                : '0 4px 10px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.5)'
+                                ? '0 6px 16px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3), inset -1px -1px 3px rgba(0,0,0,0.2), inset 2px 2px 4px rgba(255,255,255,0.8)' 
+                                : '0 6px 16px rgba(0,0,0,0.8), 0 2px 6px rgba(0,0,0,0.6), inset -1px -1px 3px rgba(0,0,0,0.5), inset 2px 2px 4px rgba(255,255,255,0.2)'
                             }}
                           >
-                            {/* First concentric ring */}
+                            {/* Concentric ring 1 */}
                             <div 
-                              className={`absolute inset-[12%] rounded-full border ${
-                                cell.color === 'white' 
-                                  ? 'border-gray-400/40 bg-gradient-to-br from-[#f0ede8] to-[#ddd9d0]' 
-                                  : 'border-gray-600/40 bg-gradient-to-br from-[#252525] to-[#151515]'
-                              }`}
                               style={{
+                                position: 'absolute',
+                                inset: '10%',
+                                borderRadius: '50%',
+                                border: cell.color === 'white' ? '1px solid rgba(100, 100, 100, 0.3)' : '1px solid rgba(255, 255, 255, 0.15)',
+                                background: cell.color === 'white'
+                                  ? 'radial-gradient(circle, #f5f3f0 0%, #e0ddd5 100%)'
+                                  : 'radial-gradient(circle, #252525 0%, #141414 100%)',
                                 boxShadow: cell.color === 'white'
                                   ? 'inset 0 1px 2px rgba(0,0,0,0.1)'
-                                  : 'inset 0 1px 2px rgba(255,255,255,0.1)'
-                              }}
-                            />
-                            
-                            {/* Second concentric ring */}
-                            <div 
-                              className={`absolute inset-[25%] rounded-full border ${
-                                cell.color === 'white' 
-                                  ? 'border-gray-400/50 bg-gradient-to-br from-[#e5e2dd] to-[#d0ccc3]' 
-                                  : 'border-gray-600/50 bg-gradient-to-br from-[#202020] to-[#101010]'
-                              }`}
-                              style={{
-                                boxShadow: cell.color === 'white'
-                                  ? 'inset 0 1px 2px rgba(0,0,0,0.15)'
                                   : 'inset 0 1px 2px rgba(255,255,255,0.08)'
                               }}
                             />
-                            
-                            {/* Third concentric ring */}
+
+                            {/* Concentric ring 2 */}
                             <div 
-                              className={`absolute inset-[38%] rounded-full border ${
-                                cell.color === 'white' 
-                                  ? 'border-gray-400/60 bg-gradient-to-br from-[#dbd8d3] to-[#c5c1b8]' 
-                                  : 'border-gray-600/60 bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d]'
-                              }`}
                               style={{
+                                position: 'absolute',
+                                inset: '22%',
+                                borderRadius: '50%',
+                                border: cell.color === 'white' ? '1px solid rgba(80, 80, 80, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
+                                background: cell.color === 'white'
+                                  ? 'radial-gradient(circle, #ece9e4 0%, #ddd9d0 100%)'
+                                  : 'radial-gradient(circle, #202020 0%, #0f0f0f 100%)',
                                 boxShadow: cell.color === 'white'
-                                  ? 'inset 0 1px 2px rgba(0,0,0,0.2)'
+                                  ? 'inset 0 1px 2px rgba(0,0,0,0.15)'
                                   : 'inset 0 1px 2px rgba(255,255,255,0.05)'
                               }}
                             />
-                            
-                            {/* Central point */}
+
+                            {/* Center point */}
                             <div 
-                              className={`absolute inset-[47%] rounded-full ${
-                                cell.color === 'white' 
-                                  ? 'bg-gradient-to-br from-[#bbb8b0] to-[#a8a59d]' 
-                                  : 'bg-gradient-to-br from-[#151515] to-[#050505]'
-                              }`}
                               style={{
+                                position: 'absolute',
+                                inset: '45%',
+                                borderRadius: '50%',
+                                background: cell.color === 'white'
+                                  ? 'radial-gradient(circle, #c9c5bb 0%, #b0ada5 100%)'
+                                  : 'radial-gradient(circle, #1a1a1a 0%, #050505 100%)',
                                 boxShadow: cell.color === 'white'
-                                  ? 'inset 0 1px 3px rgba(0,0,0,0.3)'
-                                  : 'inset 0 1px 3px rgba(0,0,0,0.6)'
+                                  ? 'inset 0 1px 3px rgba(0,0,0,0.4)'
+                                  : 'inset 0 1px 3px rgba(0,0,0,0.7)'
                               }}
                             />
-                            
-                            {/* Glossy highlight - plastic shine effect */}
+
+                            {/* Glossy highlight */}
                             <div 
-                              className="absolute top-[15%] left-[25%] w-[35%] h-[30%] rounded-full"
                               style={{
+                                position: 'absolute',
+                                top: '12%',
+                                left: '20%',
+                                width: '40%',
+                                height: '25%',
+                                borderRadius: '50%',
                                 background: cell.color === 'white'
-                                  ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 40%, transparent 70%)'
-                                  : 'radial-gradient(ellipse at center, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 40%, transparent 70%)',
-                                filter: 'blur(1px)'
+                                  ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.5) 50%, transparent 70%)'
+                                  : 'radial-gradient(ellipse at center, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 50%, transparent 70%)',
+                                filter: 'blur(0.5px)',
+                                pointerEvents: 'none'
                               }}
                             />
-                            
-                            {/* Secondary reflection */}
+
+                            {/* Secondary shine */}
                             <div 
-                              className="absolute top-[25%] right-[20%] w-[20%] h-[15%] rounded-full"
                               style={{
+                                position: 'absolute',
+                                bottom: '15%',
+                                right: '15%',
+                                width: '18%',
+                                height: '18%',
+                                borderRadius: '50%',
                                 background: cell.color === 'white'
-                                  ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.6) 0%, transparent 60%)'
-                                  : 'radial-gradient(ellipse at center, rgba(255,255,255,0.15) 0%, transparent 60%)',
-                                filter: 'blur(1.5px)'
+                                  ? 'radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%)'
+                                  : 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
+                                filter: 'blur(1px)',
+                                pointerEvents: 'none'
                               }}
                             />
-                            
+
                             {cell.isKing && (
-                              <div className="absolute inset-0 flex items-center justify-center z-10">
+                              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
                                 <span 
-                                  className={`text-xs sm:text-sm font-bold ${
-                                    cell.color === 'white' ? 'text-amber-600' : 'text-amber-400'
-                                  }`}
                                   style={{
-                                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.5))',
+                                    fontSize: '70%',
+                                    fontWeight: 'bold',
+                                    color: cell.color === 'white' ? '#c97a00' : '#fbbf24',
+                                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.6))',
                                     textShadow: cell.color === 'white'
-                                      ? '0 1px 1px rgba(255,255,255,0.5)'
-                                      : '0 1px 1px rgba(0,0,0,0.8)'
+                                      ? '0 0.5px 1px rgba(255,255,255,0.6)'
+                                      : '0 0.5px 1px rgba(0,0,0,0.9)',
+                                    lineHeight: 1
                                   }}
                                 >
                                   ♔
@@ -649,9 +703,8 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                 })
               ))}
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+            </div>
+            </div>
+            </div>
+            );
+            }
