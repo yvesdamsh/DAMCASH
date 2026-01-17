@@ -107,44 +107,51 @@ export default function GameRoom() {
     };
   }, [roomId, user?.id, opponent?.id, session?.id]);
 
-  // Realtime dédié aux coups: écouter les créations de GameMove
+  // Realtime dédié aux coups: écouter les changements de GameSession pour la synchro board
   useEffect(() => {
-    if (!roomId) return;
+    if (!roomId || !session?.id) return;
 
-    const unsubscribe = base44.entities.GameMove?.subscribe?.((event) => {
-      if (event?.type !== 'create') return;
-      const matchesRoom = event?.data?.room_id === roomId;
-      if (!matchesRoom) return;
+    // Subscription realtime ACTIVE sur GameSession pour synchroniser le board_state
+    const unsubscribe = base44.entities.GameSession.subscribe((event) => {
+      if (!event?.data) return;
 
-      const move = event.data;
+      // Vérifier que c'est bien notre session
+      const isOurSession = event.data.id === session.id || event.data.room_id === roomId;
+      if (!isOurSession) return;
 
-      if (move.board_state) {
+      const updatedSession = event.data;
+
+      // Synchroniser le board_state immédiatement
+      if (updatedSession.board_state) {
         try {
-          setBoardState(JSON.parse(move.board_state));
+          setBoardState(JSON.parse(updatedSession.board_state));
         } catch (e) {
-          console.log('Erreur parsing board_state (move)');
+          console.log('Erreur parsing board_state');
         }
       }
 
-      if (typeof move.white_time !== 'undefined') {
-        setWhiteTime(move.white_time);
+      // Synchroniser les timers
+      if (typeof updatedSession.white_time !== 'undefined') {
+        setWhiteTime(updatedSession.white_time);
       }
-      if (typeof move.black_time !== 'undefined') {
-        setBlackTime(move.black_time);
+      if (typeof updatedSession.black_time !== 'undefined') {
+        setBlackTime(updatedSession.black_time);
       }
 
-      if (move.next_turn) {
-        setSession(prev => ({ ...prev, current_turn: move.next_turn }));
-      }
-      if (move.created_date || move.created_at) {
-        setSession(prev => ({ ...prev, last_move_timestamp: move.created_date || move.created_at }));
+      // Synchroniser le tour et le statut
+      if (updatedSession.current_turn) {
+        setSession(prev => ({ 
+          ...prev, 
+          current_turn: updatedSession.current_turn,
+          last_move_timestamp: updatedSession.last_move_timestamp
+        }));
       }
     });
 
     return () => {
       if (typeof unsubscribe === 'function') unsubscribe();
     };
-  }, [roomId]);
+  }, [roomId, session?.id]);
 
   // Chat: charger + realtime messages
   useEffect(() => {
