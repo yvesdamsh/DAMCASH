@@ -480,10 +480,10 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       <div style={{ 
         width: 'max(95vw, 800px)', 
         height: 'max(95vw, 800px)',
-        padding: '15px',
+        padding: '20px',
         borderRadius: '8px',
         backgroundColor: '#3D2314',
-        boxShadow: 'inset 0 0 20px rgba(0,0,0,0.8), inset 0 0 5px rgba(139, 90, 43, 0.5), 0 10px 30px rgba(0,0,0,0.9)'
+        boxShadow: 'inset 0 0 25px rgba(0,0,0,0.9), inset 0 0 8px rgba(139, 90, 43, 0.6), 0 15px 40px rgba(0,0,0,0.95)'
       }}>
         {/* Inner board container */}
         <div style={{ 
@@ -561,9 +561,10 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                             transition={{ type: "spring", stiffness: 400, damping: 30 }}
                             style={{ 
                               position: 'relative',
-                              width: '80%',
-                              height: '80%',
-                              borderRadius: '50%'
+                              width: '85%',
+                              height: '85%',
+                              borderRadius: '50%',
+                              filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.6))'
                             }}
                           >
                           {/* Main pion with 3D effect */}
@@ -574,10 +575,10 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                               borderRadius: '50%',
                               background: cell.color === 'white' 
                                 ? 'radial-gradient(circle at 30% 30%, #ffffff 0%, #e8e6e0 20%, #d0cdc5 100%)' 
-                                : 'radial-gradient(circle at 30% 30%, #3a3a3a 0%, #1a1a1a 50%, #000000 100%)',
+                                : 'radial-gradient(circle at 35% 35%, #4a4a4a 0%, #2a2a2a 30%, #0a0a0a 100%)',
                               boxShadow: cell.color === 'white'
-                                ? '0 6px 16px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3), inset -1px -1px 3px rgba(0,0,0,0.2), inset 2px 2px 4px rgba(255,255,255,0.8)' 
-                                : '0 6px 16px rgba(0,0,0,0.8), 0 2px 6px rgba(0,0,0,0.6), inset -1px -1px 3px rgba(0,0,0,0.5), inset 2px 2px 4px rgba(255,255,255,0.2)'
+                                ? '0 4px 10px rgba(0,0,0,0.4), inset -1px -1px 2px rgba(0,0,0,0.2), inset 1px 1px 3px rgba(255,255,255,0.7)' 
+                                : '0 4px 10px rgba(0,0,0,0.7), inset -1px -1px 2px rgba(0,0,0,0.6), inset 1px 1px 2px rgba(100,100,100,0.3)'
                             }}
                           >
                             {/* Concentric ring 1 */}
@@ -586,13 +587,13 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                                 position: 'absolute',
                                 inset: '10%',
                                 borderRadius: '50%',
-                                border: cell.color === 'white' ? '1px solid rgba(100, 100, 100, 0.3)' : '1px solid rgba(255, 255, 255, 0.15)',
+                                border: cell.color === 'white' ? '1px solid rgba(100, 100, 100, 0.3)' : '1px solid rgba(80, 80, 80, 0.4)',
                                 background: cell.color === 'white'
                                   ? 'radial-gradient(circle, #f5f3f0 0%, #e0ddd5 100%)'
-                                  : 'radial-gradient(circle, #252525 0%, #141414 100%)',
+                                  : 'radial-gradient(circle, #383838 0%, #1f1f1f 100%)',
                                 boxShadow: cell.color === 'white'
                                   ? 'inset 0 1px 2px rgba(0,0,0,0.1)'
-                                  : 'inset 0 1px 2px rgba(255,255,255,0.08)'
+                                  : 'inset 0 1px 1px rgba(120,120,120,0.3)'
                               }}
                             />
 
@@ -602,13 +603,13 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                                 position: 'absolute',
                                 inset: '22%',
                                 borderRadius: '50%',
-                                border: cell.color === 'white' ? '1px solid rgba(80, 80, 80, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
+                                border: cell.color === 'white' ? '1px solid rgba(80, 80, 80, 0.4)' : '1px solid rgba(60, 60, 60, 0.5)',
                                 background: cell.color === 'white'
                                   ? 'radial-gradient(circle, #ece9e4 0%, #ddd9d0 100%)'
-                                  : 'radial-gradient(circle, #202020 0%, #0f0f0f 100%)',
+                                  : 'radial-gradient(circle, #2d2d2d 0%, #161616 100%)',
                                 boxShadow: cell.color === 'white'
                                   ? 'inset 0 1px 2px rgba(0,0,0,0.15)'
-                                  : 'inset 0 1px 2px rgba(255,255,255,0.05)'
+                                  : 'inset 0 1px 1px rgba(100,100,100,0.2)'
                               }}
                             />
 
@@ -620,10 +621,10 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                                 borderRadius: '50%',
                                 background: cell.color === 'white'
                                   ? 'radial-gradient(circle, #c9c5bb 0%, #b0ada5 100%)'
-                                  : 'radial-gradient(circle, #1a1a1a 0%, #050505 100%)',
+                                  : 'radial-gradient(circle, #222222 0%, #0a0a0a 100%)',
                                 boxShadow: cell.color === 'white'
                                   ? 'inset 0 1px 3px rgba(0,0,0,0.4)'
-                                  : 'inset 0 1px 3px rgba(0,0,0,0.7)'
+                                  : 'inset 0 1px 2px rgba(80,80,80,0.4)'
                               }}
                             />
 
