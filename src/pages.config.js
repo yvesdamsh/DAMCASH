@@ -2,6 +2,7 @@ import Checkers from './pages/Checkers';
 import Chess from './pages/Chess';
 import Clubs from './pages/Clubs';
 import Friends from './pages/Friends';
+import GameRoom from './pages/GameRoom';
 import Home from './pages/Home';
 import Invitations from './pages/Invitations';
 import Leaderboard from './pages/Leaderboard';
@@ -13,7 +14,6 @@ import Search from './pages/Search';
 import Shop from './pages/Shop';
 import Spectate from './pages/Spectate';
 import Tournaments from './pages/Tournaments';
-import GameRoom from './pages/GameRoom';
 import __Layout from './Layout.jsx';
 
 
@@ -22,6 +22,7 @@ export const PAGES = {
     "Chess": Chess,
     "Clubs": Clubs,
     "Friends": Friends,
+    "GameRoom": GameRoom,
     "Home": Home,
     "Invitations": Invitations,
     "Leaderboard": Leaderboard,
@@ -33,7 +34,6 @@ export const PAGES = {
     "Shop": Shop,
     "Spectate": Spectate,
     "Tournaments": Tournaments,
-    "GameRoom": GameRoom,
 }
 
 export const pagesConfig = {
