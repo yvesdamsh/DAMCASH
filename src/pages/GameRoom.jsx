@@ -171,9 +171,9 @@ export default function GameRoom() {
       if (sessions.length > 0) {
         let sess = sessions[0];
         
-        // Si l'utilisateur courant n'est pas player1 et player2_email est vide
+        // Si l'utilisateur courant n'est pas player1 et player2_id est vide
         // Alors c'est player2 qui rejoint - mettre à jour immédiatement
-        if (sess.player1_id !== currentUser.id && !sess.player2_email) {
+        if (sess.player1_id !== currentUser.id && !sess.player2_id) {
           await base44.entities.GameSession.update(sess.id, {
             player2_id: currentUser.id,
             player2_email: currentUser.email,
