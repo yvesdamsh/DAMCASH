@@ -361,55 +361,69 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
 
     const piece = board[row][col];
 
+    // Cas 1: Chaînage de captures (rafle obligatoire)
     if (chainCapture) {
       if (row === chainCapture.row && col === chainCapture.col) {
-        return;
+        return; // Clic sur la pièce elle-même, ignorer
       }
       const move = validMoves.find(m => m.row === row && m.col === col);
       if (move) {
+        const movedPiece = board[chainCapture.row][chainCapture.col];
         const result = makeMove(chainCapture.row, chainCapture.col, row, col, move.captured);
-        if (!result.continueChain && currentTurn !== playerColor) {
-          setTimeout(() => makeAIMove(result.board), 500);
+        if (!result.continueChain) {
+          if (isMultiplayer && onSaveMove && movedPiece) {
+            const nextColor = movedPiece.color === 'white' ? 'black' : 'white';
+            onSaveMove(result.board, nextColor);
+          } else if (gameStatus === 'playing') {
+            setTimeout(() => makeAIMove(result.board), 500);
+          }
         }
       }
       return;
     }
 
+    // Cas 2: Pièce déjà sélectionnée - clic sur une destination
     if (selectedSquare) {
+      // Clic sur la même pièce: désélectionner
+      if (row === selectedSquare.row && col === selectedSquare.col) {
+        setSelectedSquare(null);
+        setValidMoves([]);
+        return;
+      }
+
+      // Clic sur une case valide: faire le coup
       const move = validMoves.find(m => m.row === row && m.col === col);
       if (move) {
         const movedPiece = board[selectedSquare.row][selectedSquare.col];
         const result = makeMove(selectedSquare.row, selectedSquare.col, row, col, move.captured || []);
         if (!result.continueChain) {
           if (isMultiplayer && onSaveMove && movedPiece) {
-            // Sauvegarder le coup pour l'adversaire
             const nextColor = movedPiece.color === 'white' ? 'black' : 'white';
-            console.log('Appel onSaveMove - Coup jouée:', { from: selectedSquare, to: { row, col }, nextColor });
-            onSaveMove(result.board, nextColor);
+            oSaveMove(result.board, nextColor);
           } else if (gameStatus === 'playing') {
             setTimeout(() => makeAIMove(result.board), 500);
           }
         }
-      } else if (piece && piece.color === playerColor) {
-        if (mustCapture.length > 0) {
-          const canCapture = mustCapture.some(c => c.row === row && c.col === col);
-          if (!canCapture) return;
-        }
-        setSelectedSquare({ row, col });
-        setValidMoves(getValidMoves(row, col, board));
-      } else {
-        setSelectedSquare(null);
-        setValidMoves([]);
+        return;
       }
-    } else {
+
+      // Clic sur une autre pièce du joueur: resélectionner
       if (piece && piece.color === playerColor) {
-        if (mustCapture.length > 0) {
-          const canCapture = mustCapture.some(c => c.row === row && c.col === col);
-          if (!canCapture) return;
-        }
         setSelectedSquare({ row, col });
         setValidMoves(getValidMoves(row, col, board));
+        return;
       }
+
+      // Clic sur une case invalide: désélectionner
+      setSelectedSquare(null);
+      setValidMoves([]);
+      return;
+    }
+
+    // Cas 3: Aucune pièce sélectionnée - clic sur une pièce du joueur
+    if (piece && piece.color === playerColor) {
+      setSelectedSquare({ row, col });
+      setValidMoves(getValidMoves(row, col, board));
     }
   };
 
