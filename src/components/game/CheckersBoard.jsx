@@ -431,8 +431,8 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
         }, 300);
       } else {
         setCurrentTurn('white');
-        const allCaptures = getAllCaptureMoves(newBoard, 'white');
-        setMustCapture(allCaptures);
+        const forced = getForcedCaptures(newBoard, 'white');
+        setMustCapture(forced.captures);
         
         const endStatus = checkGameEnd(newBoard, 'white');
         if (endStatus) {
