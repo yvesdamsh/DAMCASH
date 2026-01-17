@@ -15,7 +15,7 @@ export default function GameRoom() {
   const [invitation, setInvitation] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [gameStarted, setGameStarted] = useState(!isWaiting);
+  const [gameStarted, setGameStarted] = useState(isWaiting !== 'true');
   const [opponent, setOpponent] = useState(null);
 
   useEffect(() => {

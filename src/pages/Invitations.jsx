@@ -96,7 +96,7 @@ export default function Invitations() {
       console.log('Acceptation invitation:', invitation.id);
       await base44.entities.GameInvitation.update(invitation.id, { status: 'accepted' });
       console.log('Redirection vers room:', invitation.room_id);
-      navigate(`/game-room/${invitation.room_id}`);
+      navigate(`/GameRoom?roomId=${invitation.room_id}`);
     } catch (error) {
       console.error('Erreur acceptation invitation:', error);
       alert('Erreur lors de l\'acceptation de l\'invitation');
