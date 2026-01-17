@@ -358,10 +358,11 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
   };
 
   const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+  const rows = [8, 7, 6, 5, 4, 3, 2, 1];
   const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
 
   return (
-    <div className="flex flex-col items-center justify-center w-full flex-1 gap-4 overflow-auto">
+    <div className="flex flex-col items-center justify-center w-full flex-1 gap-4 overflow-auto p-4">
       <VictoryParticles 
         show={gameStatus !== 'playing'} 
         winner={gameStatus === 'whiteWins' ? 'white' : 'black'}
@@ -389,80 +390,167 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
         </div>
       </div>
 
-      <div className="relative w-full max-w-lg aspect-square flex items-center justify-center">
-        <div className="flex w-full h-full">
-          <div className="flex flex-col justify-around pr-1 text-xs text-gray-400 w-8">
-            {(playerColor === 'black' ? [1,2,3,4,5,6,7,8] : [8,7,6,5,4,3,2,1]).map(n => (
-              <span key={n} className="flex items-center justify-center">{n}</span>
+      {/* Plateau d'échecs */}
+      <div 
+        style={{
+          width: 'min(90vw, calc(100vh - 150px))',
+          height: 'min(90vw, calc(100vh - 150px))',
+          aspectRatio: '1/1',
+          display: 'flex',
+          position: 'relative'
+        }}
+      >
+        {/* Cadre bois */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            padding: '15px',
+            backgroundColor: '#5D4037',
+            border: '3px solid #3E2723',
+            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+        >
+          {/* Coordonnées haut */}
+          <div style={{
+            display: 'flex',
+            height: '20px',
+            marginBottom: '5px',
+            justifyContent: 'space-around',
+            paddingX: '10px'
+          }}>
+            {(playerColor === 'black' ? [...columns].reverse() : columns).map(c => (
+              <div key={`top-${c}`} style={{
+                flex: 1,
+                textAlign: 'center',
+                color: '#F5E6D3',
+                fontSize: '12px',
+                fontWeight: 'bold'
+              }}>
+                {c}
+              </div>
             ))}
           </div>
-          
-          <div className="grid grid-cols-8 flex-1 border-2 border-amber-900/50 rounded-lg overflow-hidden shadow-2xl">
-            {displayBoard.map((row, rowIndex) => (
-              row.map((piece, colIndex) => {
-                const actualRow = playerColor === 'black' ? 7 - rowIndex : rowIndex;
-                const actualCol = playerColor === 'black' ? 7 - colIndex : colIndex;
-                const isLight = (rowIndex + colIndex) % 2 === 0;
-                const isSelected = selectedSquare?.row === actualRow && selectedSquare?.col === actualCol;
-                const isValidMove = validMoves.some(m => m.row === actualRow && m.col === actualCol);
-                const isCapture = validMoves.find(m => m.row === actualRow && m.col === actualCol)?.isCapture;
-                const isLastMove = lastMove && 
-                  ((lastMove.from.row === actualRow && lastMove.from.col === actualCol) ||
-                   (lastMove.to.row === actualRow && lastMove.to.col === actualCol));
 
-                return (
-                  <motion.div
-                    key={`${rowIndex}-${colIndex}`}
-                    onClick={() => handleSquareClick(actualRow, actualCol)}
-                    whileHover={{ scale: isSelected || isValidMove ? 1.05 : 1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`
-                      aspect-square flex items-center justify-center cursor-pointer
-                      transition-all duration-150 relative
-                      ${isLight ? 'bg-[#F0D9B5]' : 'bg-[#B58863]'}
-                      ${isSelected ? 'ring-2 ring-amber-400 ring-inset' : ''}
-                      ${isLastMove ? 'bg-amber-400/30' : ''}
-                    `}
-                  >
-                    <AnimatePresence mode="wait">
-                      {piece && (
-                        <motion.span
-                          key={`${actualRow}-${actualCol}-${piece}`}
-                          initial={{ scale: 0, rotate: -180 }}
-                          animate={{ scale: 1, rotate: 0 }}
-                          exit={{ scale: 0, rotate: 180 }}
-                          transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                          className={`text-2xl sm:text-3xl select-none ${isWhitePiece(piece) ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]' : 'text-gray-900'}`}
-                        >
-                          {PIECES[piece]}
-                            </motion.span>
-                          )}
-                          </AnimatePresence>
-                          {isValidMove && !piece && (
-                          <motion.div 
+          {/* Grille + coordonnées latérales */}
+          <div style={{ display: 'flex', flex: 1, gap: '5px' }}>
+            {/* Coordonnées gauche */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: '20px',
+              justifyContent: 'space-around',
+              textAlign: 'center',
+              color: '#F5E6D3',
+              fontSize: '12px',
+              fontWeight: 'bold'
+            }}>
+              {(playerColor === 'black' ? [1,2,3,4,5,6,7,8] : [8,7,6,5,4,3,2,1]).map(n => (
+                <div key={`left-${n}`}>{n}</div>
+              ))}
+            </div>
+
+            {/* Plateau 8x8 */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(8, 1fr)',
+              gridTemplateRows: 'repeat(8, 1fr)',
+              flex: 1,
+              gap: 0,
+              border: '1px solid #3E2723'
+            }}>
+              {displayBoard.map((row, rowIndex) => (
+                row.map((piece, colIndex) => {
+                  const actualRow = playerColor === 'black' ? 7 - rowIndex : rowIndex;
+                  const actualCol = playerColor === 'black' ? 7 - colIndex : colIndex;
+                  const isLight = (actualRow + actualCol) % 2 === 0;
+                  const isSelected = selectedSquare?.row === actualRow && selectedSquare?.col === actualCol;
+                  const isValidMove = validMoves.some(m => m.row === actualRow && m.col === actualCol);
+                  const isCapture = validMoves.find(m => m.row === actualRow && m.col === actualCol)?.isCapture;
+                  const isLastMove = lastMove && 
+                    ((lastMove.from.row === actualRow && lastMove.from.col === actualCol) ||
+                     (lastMove.to.row === actualRow && lastMove.to.col === actualCol));
+
+                  return (
+                    <motion.div
+                      key={`${rowIndex}-${colIndex}`}
+                      onClick={() => handleSquareClick(actualRow, actualCol)}
+                      whileTap={{ scale: 0.95 }}
+                      style={{
+                        backgroundColor: isLight ? '#F5E6D3' : '#B58863',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: 'relative',
+                        border: isSelected ? '3px solid #FFD700' : isLastMove ? '2px solid #FFA500' : 'none',
+                        boxShadow: isValidMove && !piece ? 'inset 0 0 0 2px #22C55E' : isCapture ? 'inset 0 0 0 2px #EF4444' : 'none'
+                      }}
+                    >
+                      <AnimatePresence mode="wait">
+                        {piece && (
+                          <motion.span
+                            key={`${actualRow}-${actualCol}-${piece}`}
                             initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="absolute w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-amber-500/50"
-                          />
-                          )}
-                    {isValidMove && isCapture && (
-                      <motion.div 
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute inset-0 border-4 border-red-500/50 rounded-sm"
-                      />
-                    )}
-                  </motion.div>
-                );
-              })
+                            animate={{ scale: 0.9 }}
+                            exit={{ scale: 0 }}
+                            style={{
+                              fontSize: '90%',
+                              lineHeight: '1',
+                              color: isWhitePiece(piece) ? '#FFFFFF' : '#1A1A1A',
+                              textShadow: isWhitePiece(piece) ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.3)',
+                              userSelect: 'none'
+                            }}
+                          >
+                            {PIECES[piece]}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  );
+                })
+              ))}
+            </div>
+
+            {/* Coordonnées droite */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: '20px',
+              justifyContent: 'space-around',
+              textAlign: 'center',
+              color: '#F5E6D3',
+              fontSize: '12px',
+              fontWeight: 'bold'
+            }}>
+              {(playerColor === 'black' ? [8,7,6,5,4,3,2,1] : [1,2,3,4,5,6,7,8]).map(n => (
+                <div key={`right-${n}`}>{n}</div>
+              ))}
+            </div>
+          </div>
+
+          {/* Coordonnées bas */}
+          <div style={{
+            display: 'flex',
+            height: '20px',
+            marginTop: '5px',
+            justifyContent: 'space-around',
+            paddingX: '10px'
+          }}>
+            {(playerColor === 'black' ? columns : [...columns].reverse()).map(c => (
+              <div key={`bottom-${c}`} style={{
+                flex: 1,
+                textAlign: 'center',
+                color: '#F5E6D3',
+                fontSize: '12px',
+                fontWeight: 'bold'
+              }}>
+                {c}
+              </div>
             ))}
           </div>
-        </div>
-        
-        <div className="flex justify-around pl-5 pt-1 text-xs text-gray-400 w-full">
-          {(playerColor === 'black' ? [...columns].reverse() : columns).map(c => (
-            <span key={c} className="flex-1 text-center">{c}</span>
-          ))}
         </div>
       </div>
     </div>
