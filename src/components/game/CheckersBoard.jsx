@@ -694,11 +694,11 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                                 position: 'absolute',
                                 inset: '22%',
                                 borderRadius: '50%',
-                                border: cell.color === 'white' ? '1px solid rgba(80, 80, 80, 0.4)' : '1px solid rgba(60, 60, 60, 0.5)',
-                                background: cell.color === 'white'
+                                border: piece.color === 'white' ? '1px solid rgba(80, 80, 80, 0.4)' : '1px solid rgba(60, 60, 60, 0.5)',
+                                background: piece.color === 'white'
                                   ? 'radial-gradient(circle, #ece9e4 0%, #ddd9d0 100%)'
                                   : 'radial-gradient(circle, #2d2d2d 0%, #161616 100%)',
-                                boxShadow: cell.color === 'white'
+                                boxShadow: piece.color === 'white'
                                   ? 'inset 0 1px 2px rgba(0,0,0,0.15)'
                                   : 'inset 0 1px 1px rgba(100,100,100,0.2)'
                               }}
