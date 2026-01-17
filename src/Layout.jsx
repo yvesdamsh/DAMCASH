@@ -114,7 +114,26 @@ export default function Layout({ children, currentPageName }) {
     base44.auth.redirectToLogin();
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      // Marquer comme offline avant déconnexion
+      if (user) {
+        const existingOnlineUser = await base44.entities.OnlineUser.filter(
+          { user_id: user.id },
+          '-updated_date',
+          1
+        );
+        if (existingOnlineUser.length > 0) {
+          await base44.entities.OnlineUser.update(existingOnlineUser[0].id, {
+            status: 'offline',
+            last_seen: new Date().toISOString()
+          });
+        }
+      }
+    } catch (error) {
+      console.log('Erreur logout:', error);
+    }
+
     try {
       if (typeof base44 !== 'undefined' && base44.auth) {
         base44.auth.logout();
