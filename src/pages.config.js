@@ -8,6 +8,10 @@ import Invitations from './pages/Invitations';
 import Profile from './pages/Profile';
 import Shop from './pages/Shop';
 import Friends from './pages/Friends';
+import Clubs from './pages/Clubs';
+import Puzzles from './pages/Puzzles';
+import Leaderboard from './pages/Leaderboard';
+import Spectate from './pages/Spectate';
 import __Layout from './Layout.jsx';
 
 
@@ -22,6 +26,10 @@ export const PAGES = {
     "Profile": Profile,
     "Shop": Shop,
     "Friends": Friends,
+    "Clubs": Clubs,
+    "Puzzles": Puzzles,
+    "Leaderboard": Leaderboard,
+    "Spectate": Spectate,
 }
 
 export const pagesConfig = {
