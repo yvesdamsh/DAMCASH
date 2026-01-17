@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -6,11 +7,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search as SearchIcon, UserPlus, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { createPageUrl } from '../utils';
 
 export default function Search() {
+  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [user, setUser] = useState(null);
+  const [selectedGame, setSelectedGame] = useState('chess');
 
   useEffect(() => {
     loadUser();
@@ -67,21 +71,33 @@ export default function Search() {
     }
   };
 
-  const handleInviteToPlay = async (opponentId, opponentName) => {
+  const handleInviteToPlay = async (opponent) => {
     if (!user) {
       base44.auth.redirectToLogin();
       return;
     }
     
     try {
-      await base44.entities.Invitation.create({
-        from_user: user.email,
-        to_user: opponentId,
-        game_type: 'chess',
-        time_control: 'blitz',
-        status: 'pending'
+      const roomId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
+      await base44.entities.GameInvitation.create({
+        sender_email: user.email,
+        receiver_email: opponent.user_id,
+        game_type: selectedGame,
+        status: 'pending',
+        room_id: roomId
       });
-      toast.success(`Invitation envoyée à ${opponentName} !`);
+
+      await base44.entities.Notification.create({
+        user_email: opponent.user_id,
+        type: 'game_invitation',
+        title: `Invitation à jouer aux ${selectedGame === 'chess' ? 'Échecs' : 'Dames'}`,
+        message: `${user.full_name} vous invite à jouer aux ${selectedGame === 'chess' ? 'Échecs' : 'Dames'}`,
+        link: `/game-room/${roomId}`,
+        from_user: user.email
+      });
+
+      toast.success(`Invitation envoyée à ${opponent.username} !`);
     } catch (error) {
       console.error('Erreur invitation:', error);
       toast.error('Erreur lors de l\'envoi de l\'invitation');
@@ -91,6 +107,21 @@ export default function Search() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold text-white mb-6">Rechercher des joueurs</h1>
+
+      <div className="flex gap-2 mb-6">
+        <Button
+          onClick={() => setSelectedGame('chess')}
+          className={`flex-1 ${selectedGame === 'chess' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-white/10 hover:bg-white/20'}`}
+        >
+          ♔ Échecs
+        </Button>
+        <Button
+          onClick={() => setSelectedGame('checkers')}
+          className={`flex-1 ${selectedGame === 'checkers' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-white/10 hover:bg-white/20'}`}
+        >
+          ⚫ Dames
+        </Button>
+      </div>
 
       <div className="relative mb-6">
         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -125,10 +156,10 @@ export default function Search() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleInviteToPlay(player.user_id, player.username)}
+                  onClick={() => handleInviteToPlay(player)}
                   className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
                 >
-                  Inviter
+                  Inviter à jouer
                 </Button>
                 <Button
                   variant="outline"
