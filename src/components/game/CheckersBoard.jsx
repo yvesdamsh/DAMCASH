@@ -422,51 +422,49 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
   const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center justify-center w-full h-full p-2" style={{ minHeight: '100vh' }}>
       <VictoryParticles 
         show={gameStatus !== 'playing'} 
         winner={gameStatus === 'whiteWins' ? 'white' : 'black'}
       />
-      <div className="flex items-center justify-between w-full max-w-md px-2">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-800">
-            <div className="w-4 h-4 rounded-full bg-gray-900 border-2 border-gray-600"></div>
-            <span className="font-bold">{score.black}</span>
-          </div>
-          <span className="text-gray-500">-</span>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-800">
-            <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-300"></div>
-            <span className="font-bold">{score.white}</span>
-          </div>
+      
+      <div className="absolute top-4 left-4 flex items-center gap-2">
+        <div className="flex items-center gap-1 px-2 py-1 rounded bg-gray-800 text-xs">
+          <div className="w-3 h-3 rounded-full bg-gray-900 border border-gray-600"></div>
+          <span>{score.black}</span>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={resetGame} className="bg-white/5 border-white/20 hover:bg-white/10">
-            <RotateCcw className="w-4 h-4 mr-1" /> Retour
-          </Button>
-          <Button variant="outline" size="sm" onClick={resetGame} className="bg-white/5 border-white/20 hover:bg-white/10">
-            <Plus className="w-4 h-4 mr-1" /> Nouvelle
-          </Button>
+        <span className="text-gray-500 text-xs">-</span>
+        <div className="flex items-center gap-1 px-2 py-1 rounded bg-gray-800 text-xs">
+          <div className="w-3 h-3 rounded-full bg-white border border-gray-300"></div>
+          <span>{score.white}</span>
         </div>
       </div>
 
-      <div className={`px-4 py-2 rounded-lg ${currentTurn === playerColor ? 'bg-amber-500/20 border border-amber-500' : 'bg-white/5'}`}>
-        <span className="text-sm font-medium">
-          {gameStatus === 'playing' 
-            ? (currentTurn === playerColor 
-                ? `Votre tour (${playerColor === 'white' ? 'Blancs' : 'Noirs'})`
-                : 'Tour de l\'IA')
-            : gameStatus === 'whiteWins' 
-              ? '⚪ Blancs gagnent !'
-              : '⚫ Noirs gagnent !'
-          }
-        </span>
+      <div className="absolute top-4 right-4 flex gap-1">
+        <Button variant="outline" size="sm" onClick={resetGame} className="h-7 px-2 text-xs bg-white/5 border-white/20 hover:bg-white/10">
+          <RotateCcw className="w-3 h-3" />
+        </Button>
+        <Button variant="outline" size="sm" onClick={resetGame} className="h-7 px-2 text-xs bg-white/5 border-white/20 hover:bg-white/10">
+          <Plus className="w-3 h-3" />
+        </Button>
       </div>
 
-      <div className="relative w-full flex justify-center">
+      <div className={`absolute bottom-4 px-3 py-1.5 rounded-lg text-xs font-medium ${currentTurn === playerColor ? 'bg-amber-500/20 border border-amber-500' : 'bg-white/5'}`}>
+        {gameStatus === 'playing' 
+          ? (currentTurn === playerColor 
+              ? `Votre tour (${playerColor === 'white' ? 'Blancs' : 'Noirs'})`
+              : 'Tour de l\'IA')
+          : gameStatus === 'whiteWins' 
+            ? '⚪ Blancs gagnent !'
+            : '⚫ Noirs gagnent !'
+        }
+      </div>
+
+      <div className="relative flex justify-center items-center w-full h-full">
          {/* Wooden frame */}
-         <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-amber-900 via-amber-800 to-amber-900 shadow-2xl" style={{ minWidth: '400px', width: 'min(100%, 600px)' }}>
-           <div className="p-1 bg-gradient-to-br from-amber-950 to-amber-900 rounded-xl">
-             <div className="grid grid-cols-10 rounded-lg overflow-hidden shadow-inner" style={{ aspectRatio: '1' }}>
+         <div className="p-2 rounded-2xl bg-gradient-to-br from-amber-900 via-amber-800 to-amber-900 shadow-2xl" style={{ width: 'min(90vw, 700px)', height: 'min(90vw, 700px)' }}>
+           <div className="p-1 bg-gradient-to-br from-amber-950 to-amber-900 rounded-xl w-full h-full">
+             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', width: '100%', height: '100%', borderRadius: '0.5rem', overflow: 'hidden', boxShadow: 'inset 0 4px 6px rgba(0,0,0,0.5)' }}>
                {displayBoard.map((row, rowIndex) => (
                  row.map((cell, colIndex) => {
                    const actualRow = playerColor === 'black' ? 9 - rowIndex : rowIndex;
@@ -482,19 +480,26 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                      <motion.div
                        key={`${rowIndex}-${colIndex}`}
                        onClick={() => isDark && handleSquareClick(actualRow, actualCol)}
-                       whileHover={isDark ? { scale: 1.05 } : {}}
+                       whileHover={isDark ? { scale: 0.98 } : {}}
                        whileTap={isDark ? { scale: 0.95 } : {}}
-                       className={`
-                         flex items-center justify-center relative
-                         ${isDark ? 'bg-[#4a2f1f] cursor-pointer' : 'bg-[#f5e6d3]'}
-                         ${isSelected ? 'ring-4 ring-yellow-400 ring-inset shadow-lg shadow-yellow-400/50' : ''}
-                         ${isValidMove && !isCapture && !isSelected ? 'bg-green-500/40 ring-2 ring-green-400 ring-inset' : ''}
-                         ${isValidMove && isCapture && !isSelected ? 'bg-red-500/40 ring-2 ring-red-500 ring-inset' : ''}
-                         ${isMustCapture && !isSelected ? 'ring-2 ring-orange-400 ring-inset' : ''}
-                       `}
+                       style={{
+                         display: 'flex',
+                         alignItems: 'center',
+                         justifyContent: 'center',
+                         position: 'relative',
+                         backgroundColor: isDark ? '#4a2f1f' : '#f5e6d3',
+                         cursor: isDark ? 'pointer' : 'default',
+                         boxShadow: 
+                           isSelected ? 'inset 0 0 0 4px #facc15, 0 0 20px rgba(250, 204, 21, 0.6)' :
+                           isValidMove && isCapture ? 'inset 0 0 0 2px #ef4444' :
+                           isValidMove && !isCapture ? 'inset 0 0 0 2px #22c55e' :
+                           isMustCapture ? 'inset 0 0 0 2px #fb923c' :
+                           'none'
+                       }}
+                       className={`${isDark ? 'hover:opacity-90' : ''}`}
                      >
                       {isDark && squareNum && (
-                         <span className="absolute top-1 left-1 text-[10px] sm:text-xs font-bold text-amber-200/50 select-none">
+                         <span style={{ position: 'absolute', top: '4px', left: '4px', fontSize: '9px', fontWeight: 'bold', color: 'rgba(251, 191, 36, 0.4)', userSelect: 'none' }}>
                            {squareNum}
                          </span>
                        )}
@@ -629,8 +634,14 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                         <motion.div 
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
-                          className="absolute w-1/3 h-1/3 rounded-full bg-green-400 shadow-lg shadow-green-400/70"
-                          style={{ boxShadow: '0 0 12px rgba(34, 197, 94, 0.8)' }}
+                          style={{ 
+                            position: 'absolute', 
+                            width: '30%', 
+                            height: '30%', 
+                            borderRadius: '50%',
+                            backgroundColor: '#22c55e',
+                            boxShadow: '0 0 15px rgba(34, 197, 94, 0.9)'
+                          }}
                         />
                       )}
                     </motion.div>
