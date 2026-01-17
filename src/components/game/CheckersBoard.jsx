@@ -550,10 +550,11 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     setChainCapture(null);
   };
 
+  // Mettre à jour les captures forcées au début de chaque tour
   useEffect(() => {
-    const forced = getForcedCaptures(board, currentTurn);
-    setMustCapture(forced.captures);
-  }, [board, currentTurn, getForcedCaptures]);
+     const forced = getForcedCaptures(board, effectiveTurn);
+     setMustCapture(forced.captures);
+   }, [board, effectiveTurn, getForcedCaptures]);
 
   const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
 
