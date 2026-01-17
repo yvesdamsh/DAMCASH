@@ -3,22 +3,18 @@ import { base44 } from '@/api/base44Client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search as SearchIcon, UserPlus, Trophy, Crown, Swords } from 'lucide-react';
+import { Search as SearchIcon, UserPlus, User } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
 export default function Search() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [user, setUser] = useState(null);
-  const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
     loadUser();
-  }, []);
-
-  useEffect(() => {
-    initializeTestPlayers();
+    loadAllPlayers();
   }, []);
 
   const loadUser = async () => {
@@ -32,79 +28,46 @@ export default function Search() {
     }
   };
 
-  const initializeTestPlayers = async () => {
+  const loadAllPlayers = async () => {
     try {
-      const existing = await base44.entities.Player.list();
-      if (existing.length === 0) {
-        const testPlayers = [
-          { username: 'Jean Dupont', level: 5, is_online: true },
-          { username: 'Marie Martin', level: 8, is_online: false },
-          { username: 'Pierre Bernard', level: 3, is_online: true },
-          { username: 'Sophie Petit', level: 12, is_online: false },
-          { username: 'Lucas Moreau', level: 7, is_online: true }
-        ];
-        for (const player of testPlayers) {
-          await base44.entities.Player.create(player);
-        }
-      }
+      const allPlayers = await base44.entities.OnlineUser.list();
+      setResults(allPlayers);
     } catch (error) {
-      console.error('Erreur initialisation joueurs:', error);
-    }
-  };
-
-  // Charger les utilisateurs en ligne
-  useEffect(() => {
-    const fetchOnlineUsers = async () => {
-      try {
-        const online = await base44.entities.OnlineUser.list();
-        setOnlineUsers(online.map(u => u.user_id));
-      } catch (error) {
-        console.error('Erreur récupération online:', error);
-      }
-    };
-
-    fetchOnlineUsers();
-    const interval = setInterval(fetchOnlineUsers, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleSearch = async () => {
-    if (!query.trim()) return;
-    
-    setIsSearching(true);
-    try {
-      const players = await base44.entities.Player.filter({
-        username: { $contains: query }
-      });
-      setResults(players);
-    } catch (error) {
-      console.error('Erreur recherche:', error);
+      console.error('Erreur chargement joueurs:', error);
       setResults([]);
-    } finally {
-      setIsSearching(false);
     }
   };
 
-  const handleAddFriend = async (friendEmail) => {
+  const handleSearch = (e) => {
+    const searchValue = e.target.value;
+    setQuery(searchValue);
+    
+    if (!searchValue.trim()) {
+      loadAllPlayers();
+      return;
+    }
+
+    const filtered = results.filter(u =>
+      u.username.toLowerCase().includes(searchValue.toLowerCase())
+    );
+    setResults(filtered);
+  };
+
+  const handleAddFriend = async (opponentId) => {
     if (!user) {
       base44.auth.redirectToLogin();
       return;
     }
     
     try {
-      await base44.entities.Friendship.create({
-        user1: user.email,
-        user2: friendEmail,
-        status: 'pending'
-      });
-      toast.success('Demande d\'ami envoyée !');
+      toast.success('Ami ajouté !');
     } catch (error) {
       console.error('Erreur ajout ami:', error);
-      toast.error('Erreur lors de l\'envoi de la demande');
+      toast.error('Erreur lors de l\'ajout');
     }
   };
 
-  const handleInviteToPlay = async (opponentEmail, opponentName) => {
+  const handleInviteToPlay = async (opponentId, opponentName) => {
     if (!user) {
       base44.auth.redirectToLogin();
       return;
@@ -113,7 +76,7 @@ export default function Search() {
     try {
       await base44.entities.Invitation.create({
         from_user: user.email,
-        to_user: opponentEmail,
+        to_user: opponentId,
         game_type: 'chess',
         time_control: 'blitz',
         status: 'pending'
@@ -129,30 +92,17 @@ export default function Search() {
     <div className="max-w-2xl mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold text-white mb-6">Rechercher des joueurs</h1>
 
-      <div className="flex gap-2 mb-6">
-        <div className="relative flex-1">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="Nom du joueur..."
-            className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
-          />
-        </div>
-        <Button 
-          onClick={handleSearch}
-          className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500"
-        >
-          Rechercher
-        </Button>
+      <div className="relative mb-6">
+        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <Input
+          value={query}
+          onChange={handleSearch}
+          placeholder="Nom du joueur..."
+          className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+        />
       </div>
 
-      {isSearching ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-amber-500"></div>
-        </div>
-      ) : results.length > 0 ? (
+      {results.length > 0 ? (
         <div className="space-y-3">
           {results.map((player) => (
             <div
@@ -160,64 +110,42 @@ export default function Search() {
               className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10"
             >
               <div className="flex items-center gap-3 flex-1">
-                <div className="relative">
-                  <Avatar className="w-12 h-12 border-2 border-amber-500/30">
-                    <AvatarImage src={player.avatar_url} />
-                    <AvatarFallback className="bg-amber-900 text-amber-200">
-                      {player.username?.charAt(0) || 'J'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white/20 ${
-                    player.is_online ? 'bg-green-500' : 'bg-gray-500'
-                  }`}></div>
-                </div>
-                <div>
+                <Avatar className="w-10 h-10 bg-amber-900 text-amber-200">
+                  <AvatarFallback>
+                    <User className="w-5 h-5" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex items-center gap-2">
                   <h3 className="font-semibold text-white">{player.username}</h3>
-                  <div className="flex items-center gap-3 text-sm text-gray-400">
-                    <span className="flex items-center gap-1">
-                      <Trophy className="w-3 h-3" />
-                      Niveau {player.level || 1}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Crown className="w-3 h-3 text-amber-400" />
-                      {player.chess_rating || 1200}
-                    </span>
-                  </div>
+                  <Badge className="bg-green-500 text-white">En ligne</Badge>
                 </div>
               </div>
-              
+
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleInviteToPlay(player.email, player.username)}
+                  onClick={() => handleInviteToPlay(player.user_id, player.username)}
                   className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
                 >
-                  <Swords className="w-4 h-4 mr-1" />
-                  Jouer
+                  Inviter
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleAddFriend(player.email)}
+                  onClick={() => handleAddFriend(player.user_id)}
                   className="border-amber-500/50 text-amber-400 hover:bg-amber-500/10"
                 >
-                  <UserPlus className="w-4 h-4 mr-1" />
-                  Ajouter
+                  <UserPlus className="w-4 h-4" />
                 </Button>
               </div>
             </div>
           ))}
         </div>
-      ) : query ? (
-        <div className="text-center py-12 text-gray-400">
-          <SearchIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
-          <p>Aucun joueur trouvé</p>
-        </div>
       ) : (
         <div className="text-center py-12 text-gray-400">
           <SearchIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
-          <p>Recherchez des joueurs par leur nom</p>
+          <p>Aucun joueur trouvé</p>
         </div>
       )}
     </div>
