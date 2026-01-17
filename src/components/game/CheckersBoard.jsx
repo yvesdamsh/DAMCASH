@@ -399,7 +399,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
         if (!result.continueChain) {
           if (isMultiplayer && onSaveMove && movedPiece) {
             const nextColor = movedPiece.color === 'white' ? 'black' : 'white';
-            oSaveMove(result.board, nextColor);
+            onSaveMove(result.board, nextColor);
           } else if (gameStatus === 'playing') {
             setTimeout(() => makeAIMove(result.board), 500);
           }
