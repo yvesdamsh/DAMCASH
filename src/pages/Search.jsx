@@ -24,8 +24,13 @@ export default function Search() {
 
   useEffect(() => {
     loadUser();
-    loadAllPlayers();
   }, []);
+
+  useEffect(() => {
+    if (user?.id) {
+      loadAllPlayers();
+    }
+  }, [user]);
 
   const loadUser = async () => {
     try {
