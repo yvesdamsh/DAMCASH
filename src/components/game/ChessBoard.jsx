@@ -256,7 +256,9 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
   };
 
   const handleSquareClick = (row, col) => {
+    if (blockBoard) return;
     if (gameStatus !== 'playing') return;
+    if (!canMove) return;
     if (currentTurn !== playerColor) return;
 
     const piece = board[row][col];
@@ -268,7 +270,10 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
         setSelectedSquare(null);
         setValidMoves([]);
         
-        if (gameStatus === 'playing') {
+        if (gameStatus === 'playing' && isMultiplayer) {
+          // Multijoueur: ne pas faire bouger l'IA
+          return;
+        } else if (gameStatus === 'playing') {
           setTimeout(() => makeAIMove(newBoard), 500);
         }
       } else if (piece && isPieceOfColor(piece, playerColor)) {
