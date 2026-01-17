@@ -198,11 +198,20 @@ export default function Layout({ children, currentPageName }) {
                     : 'hover:bg-white/5'
                 }`}
               >
-                <item.icon 
-                  className={`w-5 h-5 ${
-                    isActive(item.page) ? 'text-amber-400' : 'text-gray-400'
-                  }`} 
-                />
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative"
+                >
+                  <item.icon 
+                    className={`w-5 h-5 ${
+                      isActive(item.page) ? 'text-amber-400' : 'text-gray-400'
+                    }`} 
+                  />
+                  {item.showBadge && user && (
+                    <NotificationBadge userEmail={user.email} />
+                  )}
+                </motion.div>
                 <span className={`text-xs ${
                   isActive(item.page) ? 'text-amber-400' : 'text-gray-400'
                 }`}>
