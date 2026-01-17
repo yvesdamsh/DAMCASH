@@ -70,7 +70,7 @@ export default function GameRoom() {
         setBlackTime(sess.black_time);
       }
 
-      setGameStarted(!!sess.player2_id);
+      setGameStarted(!!sess.player2_id || sess.status === 'in_progress');
 
       // Rafraîchir l'adversaire si nécessaire (sans accès User)
       const opponentId = user?.id === sess.player1_id ? sess.player2_id : sess.player1_id;
@@ -190,6 +190,19 @@ export default function GameRoom() {
             player2_name: currentUser.full_name,
             status: 'in_progress'
           });
+          // Marquer l'invitation comme acceptée si elle existe
+          try {
+            const invites = await base44.entities.GameInvitation.filter({
+              room_id: roomId,
+              receiver_id: currentUser.id,
+              status: 'pending'
+            });
+            if (invites.length > 0) {
+              await base44.entities.GameInvitation.update(invites[0].id, { status: 'accepted' });
+            }
+          } catch (e) {
+            console.log('Invitation update failed:', e?.message || e);
+          }
           // Recharger la session après update
           const updatedSessions = await base44.entities.GameSession.filter({
             room_id: roomId
@@ -241,7 +254,7 @@ export default function GameRoom() {
 
         // Vérifier si le jeu a démarré: player2_id existe
         // Dès que player2_id est rempli, le jeu commence pour les deux joueurs
-        setGameStarted(!!sess.player2_id);
+        setGameStarted(!!sess.player2_id || sess.status === 'in_progress');
       }
     } catch (error) {
       console.error('Error loading game room:', error);
