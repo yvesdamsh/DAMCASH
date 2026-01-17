@@ -195,7 +195,7 @@ export default function Layout({ children, currentPageName }) {
       `}</style>
 
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-[#D4A574]/30">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#2C1810]/70 backdrop-blur-xl border-b border-[#D4A574]/20 shadow-lg shadow-black/50">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to={createPageUrl('Home')} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <motion.img 
@@ -275,7 +275,7 @@ export default function Layout({ children, currentPageName }) {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-[#D4A574]/30">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#2C1810]/70 backdrop-blur-xl border-t border-[#D4A574]/20 shadow-lg shadow-black/50">
         <div className="max-w-lg mx-auto px-2 py-2">
           <div className="flex items-center justify-around">
             {navItems.map((item) => (

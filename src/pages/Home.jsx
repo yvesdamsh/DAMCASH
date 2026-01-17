@@ -145,10 +145,10 @@ export default function Home() {
       className="max-w-2xl mx-auto px-4 py-6"
     >
       {/* Challenge Banner */}
-      <Link 
-        to={createPageUrl('Leaderboard')}
-        className="block mb-6 p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 via-amber-600/10 to-amber-500/20 border border-amber-500/30 hover:border-amber-500/50 transition-all group"
-      >
+       <Link 
+         to={createPageUrl('Leaderboard')}
+         className="block mb-6 p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 via-amber-600/10 to-amber-500/20 border border-amber-500/30 hover:border-amber-500/50 transition-all group backdrop-blur-lg shadow-lg shadow-amber-500/10"
+       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
@@ -201,10 +201,10 @@ export default function Home() {
       </div>
 
       {/* Quick Play Button */}
-      <Link
-        to={createPageUrl('Play')}
-        className="block w-full p-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 transition-all shadow-lg shadow-amber-500/25"
-      >
+       <Link
+         to={createPageUrl('Play')}
+         className="block w-full p-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 transition-all shadow-2xl shadow-amber-500/40 backdrop-blur-lg hover:scale-[1.02] transform"
+       >
         <div className="flex items-center justify-center gap-3">
           <Swords className="w-6 h-6 text-white" />
           <span className="text-lg font-bold text-white">Jouer maintenant</span>

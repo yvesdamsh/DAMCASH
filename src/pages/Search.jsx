@@ -234,22 +234,22 @@ export default function Search() {
       </div>
 
       <div className="relative mb-6">
-        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-        <Input
-          value={query}
-          onChange={handleSearch}
-          placeholder="Nom du joueur..."
-          className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
-        />
-      </div>
+         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+         <Input
+           value={query}
+           onChange={handleSearch}
+           placeholder="Nom du joueur..."
+           className="pl-10 bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder:text-gray-500 shadow-lg focus:bg-white/15 transition-all"
+         />
+       </div>
 
       {results.length > 0 ? (
         <div className="space-y-3">
           {results.map((player) => (
             <div
-              key={player.id}
-              className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10"
-            >
+               key={player.id}
+               className="flex items-center justify-between p-4 rounded-xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg hover:bg-white/15 hover:border-white/30 transition-all"
+             >
               <div className="flex items-center gap-3 flex-1">
                 <Avatar className="w-10 h-10 bg-amber-900 text-amber-200">
                   <AvatarFallback>
