@@ -46,8 +46,11 @@ export default function Search() {
   const loadAllPlayers = async () => {
     try {
       const allPlayers = await base44.entities.OnlineUser.list();
-      // Exclure l'utilisateur actuellement connecté
-      const filtered = allPlayers.filter(player => player.user_id !== user?.id);
+      // Exclure l'utilisateur actuellement connecté (par user_id)
+      const currentUserId = user?.id;
+      const filtered = allPlayers.filter(player => {
+        return player.user_id && currentUserId && player.user_id !== currentUserId;
+      });
       setResults(filtered);
     } catch (error) {
       console.error('Erreur chargement joueurs:', error);
