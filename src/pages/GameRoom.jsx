@@ -268,10 +268,12 @@ export default function GameRoom() {
 
   const handleSaveMove = async (newBoardState, nextTurn) => {
     if (!session || !user) return;
-    
+
+    console.log('handleSaveMove appelé:', { roomId, userId: user.id, nextTurn });
+
     try {
       const playerColor = user.id === session.player1_id ? 'white' : 'black';
-      
+
       // SAUVEGARDER: board_state + current_turn + timestamp + timer
       const updateData = {
         board_state: JSON.stringify(newBoardState),
@@ -288,19 +290,23 @@ export default function GameRoom() {
 
       // Envoyer à la base de données
       await base44.entities.GameSession.update(session.id, updateData);
+      console.log('GameSession mise à jour:', updateData);
 
       // Enregistrer le coup en realtime (best-effort)
       try {
-        await base44.entities.GameMove?.create?.({
+        const moveData = {
           room_id: roomId,
           player_id: user.id,
           board_state: JSON.stringify(newBoardState),
           next_turn: nextTurn,
           white_time: whiteTime,
           black_time: blackTime
-        });
+        };
+        console.log('Création GameMove:', moveData);
+        await base44.entities.GameMove?.create?.(moveData);
+        console.log('GameMove créé avec succès');
       } catch (moveError) {
-        console.log('Realtime move non disponible:', moveError?.message || moveError);
+        console.log('Erreur GameMove.create():', moveError?.message || moveError);
       }
       
       // Mettre à jour le state local
