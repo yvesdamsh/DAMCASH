@@ -57,49 +57,72 @@ export default function Search() {
     setResults(filtered);
   };
 
-  const handleAddFriend = async (opponentId) => {
+  const generateUUID = () => {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  };
+
+  const handleAddFriend = async (opponent) => {
     if (!user) {
+      console.log('Utilisateur non authentifié');
       base44.auth.redirectToLogin();
       return;
     }
     
     try {
-      toast.success('Ami ajouté !');
+      console.log('Envoi demande ami:', { sender_id: user.id, receiver_id: opponent.user_id });
+      
+      await base44.entities.FriendRequest.create({
+        sender_id: user.id,
+        receiver_id: opponent.user_id,
+        status: 'pending'
+      });
+      
+      console.log('Demande ami créée avec succès');
+      toast.success(`Demande envoyée à ${opponent.username} !`);
     } catch (error) {
       console.error('Erreur ajout ami:', error);
-      toast.error('Erreur lors de l\'ajout');
+      toast.error('Erreur lors de l\'envoi de la demande');
     }
   };
 
   const handleInviteToPlay = async (opponent) => {
     if (!user) {
+      console.log('Utilisateur non authentifié');
       base44.auth.redirectToLogin();
       return;
     }
     
     try {
-      const roomId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const roomId = generateUUID();
+      console.log('Création invitation:', { 
+        sender_id: user.id, 
+        receiver_id: opponent.user_id, 
+        game_type: selectedGame,
+        room_id: roomId
+      });
       
       await base44.entities.GameInvitation.create({
-        sender_email: user.email,
-        receiver_email: opponent.user_id,
+        sender_id: user.id,
+        receiver_id: opponent.user_id,
         game_type: selectedGame,
         status: 'pending',
         room_id: roomId
       });
 
+      console.log('Création notification pour:', opponent.user_id);
       await base44.entities.Notification.create({
         user_email: opponent.user_id,
-        type: 'game_invitation',
+        type: 'match_invitation',
         title: `Invitation à jouer aux ${selectedGame === 'chess' ? 'Échecs' : 'Dames'}`,
         message: `${user.full_name} vous invite à jouer aux ${selectedGame === 'chess' ? 'Échecs' : 'Dames'}`,
         link: `/game-room/${roomId}`,
         from_user: user.email
       });
 
+      console.log('Invitation et notification créées avec succès');
       toast.success(`Invitation envoyée à ${opponent.username} !`);
     } catch (error) {
-      console.error('Erreur invitation:', error);
+      console.error('Erreur invitation complète:', error);
       toast.error('Erreur lors de l\'envoi de l\'invitation');
     }
   };
@@ -164,7 +187,7 @@ export default function Search() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleAddFriend(player.user_id)}
+                  onClick={() => handleAddFriend(player)}
                   className="border-amber-500/50 text-amber-400 hover:bg-amber-500/10"
                 >
                   <UserPlus className="w-4 h-4" />
