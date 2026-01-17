@@ -447,7 +447,7 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
               fontSize: '12px',
               fontWeight: 'bold'
             }}>
-              {(playerColor === 'black' ? [1,2,3,4,5,6,7,8] : [8,7,6,5,4,3,2,1]).map(n => (
+              {(playerColor === 'black' ? [8,7,6,5,4,3,2,1] : [8,7,6,5,4,3,2,1]).map(n => (
                 <div key={`left-${n}`}>{n}</div>
               ))}
             </div>
@@ -494,14 +494,17 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
                           <motion.span
                             key={`${actualRow}-${actualCol}-${piece}`}
                             initial={{ scale: 0 }}
-                            animate={{ scale: 0.9 }}
+                            animate={{ scale: 1 }}
                             exit={{ scale: 0 }}
                             style={{
-                              fontSize: '90%',
-                              lineHeight: '1',
+                              fontSize: 'clamp(36px, 80%, 80px)',
+                              lineHeight: '0.8',
                               color: isWhitePiece(piece) ? '#FFFFFF' : '#1A1A1A',
-                              textShadow: isWhitePiece(piece) ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.3)',
-                              userSelect: 'none'
+                              textShadow: isWhitePiece(piece) ? '0 2px 4px rgba(0,0,0,0.8)' : '0 1px 2px rgba(255,255,255,0.4)',
+                              userSelect: 'none',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
                             }}
                           >
                             {PIECES[piece]}
@@ -525,7 +528,7 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
               fontSize: '12px',
               fontWeight: 'bold'
             }}>
-              {(playerColor === 'black' ? [8,7,6,5,4,3,2,1] : [1,2,3,4,5,6,7,8]).map(n => (
+              {(playerColor === 'black' ? [1,2,3,4,5,6,7,8] : [1,2,3,4,5,6,7,8]).map(n => (
                 <div key={`right-${n}`}>{n}</div>
               ))}
             </div>
