@@ -72,9 +72,7 @@ export default function Profile() {
     }
   };
 
-  const handleLogout = () => {
-    base44.auth.logout();
-  };
+
 
   const calculateWinRate = () => {
     if (!user?.games_played || user.games_played === 0) return 0;
@@ -420,7 +418,7 @@ export default function Profile() {
               Compte
             </h3>
             <Button
-              onClick={handleLogout}
+              onClick={() => { window.location.href = '/login'; }}
               className="w-full bg-red-600 hover:bg-red-700 text-white"
             >
               <LogOut className="w-4 h-4 mr-2" />

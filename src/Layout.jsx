@@ -56,10 +56,6 @@ export default function Layout({ children, currentPageName }) {
     }
   };
 
-  const handleLogout = () => {
-    base44.auth.logout();
-  };
-
   const handleLogin = () => {
     base44.auth.redirectToLogin();
   };
@@ -166,7 +162,7 @@ export default function Layout({ children, currentPageName }) {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-[#D4A574]/30" />
-                    <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 cursor-pointer text-red-400">
+                    <DropdownMenuItem onClick={() => { window.location.href = '/login'; }} className="flex items-center gap-2 cursor-pointer text-red-400">
                       <LogOut className="w-4 h-4" />
                       Déconnexion
                     </DropdownMenuItem>
