@@ -664,10 +664,10 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                               position: 'absolute',
                               inset: 0,
                               borderRadius: '50%',
-                              background: cell.color === 'white' 
+                              background: piece.color === 'white' 
                                 ? 'radial-gradient(circle at 30% 30%, #ffffff 0%, #e8e6e0 20%, #d0cdc5 100%)' 
                                 : 'radial-gradient(circle at 35% 35%, #4a4a4a 0%, #2a2a2a 30%, #0a0a0a 100%)',
-                              boxShadow: cell.color === 'white'
+                              boxShadow: piece.color === 'white'
                                 ? '0 4px 10px rgba(0,0,0,0.4), inset -1px -1px 2px rgba(0,0,0,0.2), inset 1px 1px 3px rgba(255,255,255,0.7)' 
                                 : '0 4px 10px rgba(0,0,0,0.7), inset -1px -1px 2px rgba(0,0,0,0.6), inset 1px 1px 2px rgba(100,100,100,0.3)'
                             }}
