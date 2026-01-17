@@ -1,37 +1,37 @@
-import Home from './pages/Home';
-import Play from './pages/Play';
-import Chess from './pages/Chess';
 import Checkers from './pages/Checkers';
-import Tournaments from './pages/Tournaments';
-import Search from './pages/Search';
-import Invitations from './pages/Invitations';
-import Profile from './pages/Profile';
-import Shop from './pages/Shop';
-import Friends from './pages/Friends';
+import Chess from './pages/Chess';
 import Clubs from './pages/Clubs';
-import Puzzles from './pages/Puzzles';
+import Friends from './pages/Friends';
+import Home from './pages/Home';
+import Invitations from './pages/Invitations';
 import Leaderboard from './pages/Leaderboard';
-import Spectate from './pages/Spectate';
 import Notifications from './pages/Notifications';
+import Play from './pages/Play';
+import Profile from './pages/Profile';
+import Puzzles from './pages/Puzzles';
+import Search from './pages/Search';
+import Shop from './pages/Shop';
+import Spectate from './pages/Spectate';
+import Tournaments from './pages/Tournaments';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Home": Home,
-    "Play": Play,
-    "Chess": Chess,
     "Checkers": Checkers,
-    "Tournaments": Tournaments,
-    "Search": Search,
-    "Invitations": Invitations,
-    "Profile": Profile,
-    "Shop": Shop,
-    "Friends": Friends,
+    "Chess": Chess,
     "Clubs": Clubs,
-    "Puzzles": Puzzles,
+    "Friends": Friends,
+    "Home": Home,
+    "Invitations": Invitations,
     "Leaderboard": Leaderboard,
-    "Spectate": Spectate,
     "Notifications": Notifications,
+    "Play": Play,
+    "Profile": Profile,
+    "Puzzles": Puzzles,
+    "Search": Search,
+    "Shop": Shop,
+    "Spectate": Spectate,
+    "Tournaments": Tournaments,
 }
 
 export const pagesConfig = {
