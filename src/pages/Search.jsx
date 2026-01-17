@@ -15,6 +15,7 @@ export default function Search() {
 
   useEffect(() => {
     loadUser();
+    initializeTestPlayers();
   }, []);
 
   const loadUser = async () => {
@@ -25,6 +26,24 @@ export default function Search() {
       }
     } catch (error) {
       console.log('Not authenticated');
+    }
+  };
+
+  const initializeTestPlayers = async () => {
+    try {
+      const existing = await base44.entities.Player.list();
+      if (existing.length === 0) {
+        const testPlayers = [
+          { username: 'Jean Dupont', email: 'jean@example.com', level: 15, chess_rating: 1450, is_online: true, avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jean' },
+          { username: 'Marie Martin', email: 'marie@example.com', level: 22, chess_rating: 1680, is_online: true, avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marie' },
+          { username: 'Pierre Bernard', email: 'pierre@example.com', level: 8, chess_rating: 1200, is_online: false, avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Pierre' },
+          { username: 'Sophie Petit', email: 'sophie@example.com', level: 18, chess_rating: 1520, is_online: true, avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sophie' },
+          { username: 'Lucas Moreau', email: 'lucas@example.com', level: 12, chess_rating: 1380, is_online: false, avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas' }
+        ];
+        await base44.entities.Player.bulkCreate(testPlayers);
+      }
+    } catch (error) {
+      console.error('Erreur initialisation joueurs:', error);
     }
   };
 
@@ -49,10 +68,9 @@ export default function Search() {
     
     setIsSearching(true);
     try {
-      const users = await base44.entities.User.list();
-      const filtered = users.filter(u => 
-        u.full_name && u.full_name.toLowerCase().includes(query.toLowerCase()) &&
-        u.email !== user?.email // Exclure soi-même
+      const players = await base44.entities.Player.list();
+      const filtered = players.filter(p => 
+        p.username && p.username.toLowerCase().includes(query.toLowerCase())
       );
       setResults(filtered);
     } catch (error) {
@@ -142,15 +160,15 @@ export default function Search() {
                   <Avatar className="w-12 h-12 border-2 border-amber-500/30">
                     <AvatarImage src={player.avatar_url} />
                     <AvatarFallback className="bg-amber-900 text-amber-200">
-                      {player.full_name?.charAt(0) || 'J'}
+                      {player.username?.charAt(0) || 'J'}
                     </AvatarFallback>
                   </Avatar>
                   <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white/20 ${
-                    onlineUsers.includes(player.id) ? 'bg-green-500' : 'bg-gray-500'
+                    player.is_online ? 'bg-green-500' : 'bg-gray-500'
                   }`}></div>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white">{player.full_name}</h3>
+                  <h3 className="font-semibold text-white">{player.username}</h3>
                   <div className="flex items-center gap-3 text-sm text-gray-400">
                     <span className="flex items-center gap-1">
                       <Trophy className="w-3 h-3" />
@@ -168,7 +186,7 @@ export default function Search() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleInviteToPlay(player.email, player.full_name)}
+                  onClick={() => handleInviteToPlay(player.email, player.username)}
                   className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
                 >
                   <Swords className="w-4 h-4 mr-1" />
