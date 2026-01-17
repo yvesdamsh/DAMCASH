@@ -75,6 +75,33 @@ export default function Layout({ children, currentPageName }) {
         } else {
           setUserData(currentUser);
         }
+
+        // Créer/mettre à jour l'entrée OnlineUser
+        try {
+          const existingOnlineUser = await base44.entities.OnlineUser.filter(
+            { user_id: currentUser.id },
+            '-updated_date',
+            1
+          );
+
+          if (existingOnlineUser.length > 0) {
+            // Mettre à jour
+            await base44.entities.OnlineUser.update(existingOnlineUser[0].id, {
+              status: 'online',
+              last_seen: new Date().toISOString()
+            });
+          } else {
+            // Créer nouvelle entrée
+            await base44.entities.OnlineUser.create({
+              user_id: currentUser.id,
+              username: currentUser.full_name,
+              status: 'online',
+              last_seen: new Date().toISOString()
+            });
+          }
+        } catch (onlineError) {
+          console.log('Erreur OnlineUser:', onlineError);
+        }
       }
     } catch (error) {
       console.log('User not authenticated');
