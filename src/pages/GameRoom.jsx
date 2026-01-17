@@ -290,24 +290,33 @@ export default function GameRoom() {
       )}
 
       {/* Plateau de jeu */}
-      <div className="flex-1 flex items-center justify-center overflow-auto p-6">
+      <div className="flex-1 flex items-center justify-center overflow-auto p-6 relative">
+        {!gameStarted && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="text-center">
+              <p className="text-lg text-[#D4A574]">En attente de l'adversaire...</p>
+            </div>
+          </div>
+        )}
         {gameType === 'chess' ? (
           <ChessBoard 
             playerColor={playerColor}
             onGameEnd={handleGameEnd}
             isMultiplayer={true}
-            canMove={canMove}
+            canMove={canMove && gameStarted}
             initialBoardState={boardState}
             onSaveMove={handleSaveMove}
+            blockBoard={!gameStarted}
           />
         ) : (
           <CheckersBoard 
             playerColor={playerColor}
             onGameEnd={handleGameEnd}
             isMultiplayer={true}
-            canMove={canMove}
+            canMove={canMove && gameStarted}
             initialBoardState={boardState}
             onSaveMove={handleSaveMove}
+            blockBoard={!gameStarted}
           />
         )}
       </div>
