@@ -565,6 +565,15 @@ export default function GameRoom() {
     (playerColor === 'black' && session.current_turn === 'black')
   );
 
+  console.log('=== GameRoom DEBUG ===');
+  console.log('user.id:', user?.id);
+  console.log('session.player1_id:', session?.player1_id);
+  console.log('session.player2_id:', session?.player2_id);
+  console.log('isPlayerWhite:', isPlayerWhite);
+  console.log('playerColor:', playerColor);
+  console.log('session.current_turn:', session?.current_turn);
+  console.log('canMove:', canMove);
+
   // Écran d'attente
   if (!gameStarted) {
     return (
