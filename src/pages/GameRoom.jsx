@@ -899,6 +899,52 @@ export default function GameRoom() {
           </div>
         </div>
       )}
+
+      {/* Dialog d'abandon */}
+      <AlertDialog open={showSurrenderDialog} onOpenChange={setShowSurrenderDialog}>
+        <AlertDialogContent className="bg-[#2C1810] border-[#D4A574]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-[#F5E6D3] text-xl">Abandonner la partie ?</AlertDialogTitle>
+            <AlertDialogDescription className="text-[#D4A574]">
+              Êtes-vous sûr de vouloir abandonner ? Vous perdrez cette partie et votre adversaire sera déclaré vainqueur.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-transparent border-[#D4A574]/50 text-[#F5E6D3] hover:bg-white/10">
+              Annuler
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleSurrender}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Abandonner
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Dialog proposition match nul */}
+      <AlertDialog open={showDrawProposal} onOpenChange={setShowDrawProposal}>
+        <AlertDialogContent className="bg-[#2C1810] border-[#D4A574]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-[#F5E6D3] text-xl">Proposition de match nul</AlertDialogTitle>
+            <AlertDialogDescription className="text-[#D4A574]">
+              Votre adversaire propose un match nul. Voulez-vous accepter ?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-transparent border-[#D4A574]/50 text-[#F5E6D3] hover:bg-white/10">
+              Refuser
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleAcceptDraw}
+              className="bg-amber-600 hover:bg-amber-700 text-white"
+            >
+              Accepter
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
