@@ -10,17 +10,21 @@ const PIECES = {
 
 const createInitialBoard = () => {
   const board = Array(8).fill(null).map(() => Array(8).fill(null));
-  const setup = (color, row, pawnRow) => {
-    const pieces = color === 'white' 
-      ? ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
-      : ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'];
-    const pawn = color === 'white' ? 'P' : 'p';
-    
-    pieces.forEach((p, i) => board[row][i] = p);
-    for (let i = 0; i < 8; i++) board[pawnRow][i] = pawn;
-  };
-  setup('white', 7, 6);
-  setup('black', 0, 1);
+  
+  // Rangée 0 (noirs): r, n, b, q, k, b, n, r
+  board[0] = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'];
+  
+  // Rangée 1 (pions noirs)
+  for (let i = 0; i < 8; i++) board[1][i] = 'p';
+  
+  // Rangées 2-5 (vides)
+  
+  // Rangée 6 (pions blancs)
+  for (let i = 0; i < 8; i++) board[6][i] = 'P';
+  
+  // Rangée 7 (blancs): R, N, B, Q, K, B, N, R
+  board[7] = ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'];
+  
   return board;
 };
 
