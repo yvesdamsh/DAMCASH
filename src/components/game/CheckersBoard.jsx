@@ -615,8 +615,9 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
           }}>
                {displayBoard.map((row, rowIndex) => (
                  row.map((cell, colIndex) => {
-                   const actualRow = rowIndex;
-                   const actualCol = colIndex;
+                   // Convertir les coordonnées d'affichage vers les coordonnées réelles du board
+                   const actualRow = playerColor === 'black' ? 9 - rowIndex : rowIndex;
+                   const actualCol = playerColor === 'black' ? 9 - colIndex : colIndex;
                    const piece = board[actualRow]?.[actualCol];
                    const isDark = (actualRow + actualCol) % 2 === 1;
                    const squareNum = getSquareNumber(actualRow, actualCol);
