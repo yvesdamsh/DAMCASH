@@ -337,12 +337,21 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
   };
 
   const handleSquareClick = (row, col) => {
+    console.log('=== CLICK DEBUG ===');
+    console.log('playerColor:', playerColor);
+    console.log('clicked row/col:', row, col);
+    console.log('piece at position:', board[row][col]);
+    console.log('canMove:', canMove);
+    console.log('effectiveTurn:', effectiveTurn);
+    console.log('isMultiplayer:', isMultiplayer);
+    
     if (blockBoard) return;
     if (gameStatus !== 'playing') return;
     if (!canMove) return;
     if (!isMultiplayer && effectiveTurn !== playerColor) return;
 
     const piece = board[row][col];
+    console.log('is own piece:', piece?.color === playerColor);
 
     if (chainCapture) {
       if (row === chainCapture.row && col === chainCapture.col) {
