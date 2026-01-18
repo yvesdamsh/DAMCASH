@@ -376,21 +376,54 @@ export default function CheckersBoard({
                   <AnimatePresence mode="wait">
                     {cell && (
                       <motion.div key={`${actualRow}-${actualCol}-${cell.color}-${cell.isKing}`} initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                        style={{ position: 'relative', width: '85%', height: '85%', borderRadius: '50%', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.7))' }}>
+                        style={{ position: 'relative', width: '85%', height: '85%', borderRadius: '50%', filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.8))', perspective: '1000px' }}>
+                        {/* Couche 1: Base avec ombre intérieure */}
                         <div style={{
                           position: 'absolute',
                           inset: 0,
                           borderRadius: '50%',
                           background: cell.color === 'white'
-                            ? 'radial-gradient(circle at 30% 30%, #ffffff 0%, #e8e6e0 20%, #d0cdc5 100%)'
-                            : 'radial-gradient(circle at 35% 35%, #4a4a4a 0%, #2a2a2a 30%, #0a0a0a 100%)',
+                            ? 'radial-gradient(circle at 35% 30%, #ffffff 0%, #f0ede6 15%, #ddd9cf 35%, #ccc8bb 60%, #b8b4a8 100%)'
+                            : 'radial-gradient(circle at 35% 30%, #3a3a3a 0%, #2a2a2a 20%, #1a1a1a 45%, #0d0d0d 100%)',
                           boxShadow: cell.color === 'white'
-                            ? '0 6px 15px rgba(0,0,0,0.5), inset -2px -2px 4px rgba(0,0,0,0.3), inset 2px 2px 5px rgba(255,255,255,0.8), 0 -2px 4px rgba(0,0,0,0.2) inset'
-                            : '0 6px 15px rgba(0,0,0,0.8), inset -2px -2px 4px rgba(0,0,0,0.8), inset 2px 2px 4px rgba(150,150,150,0.4), 0 -2px 4px rgba(0,0,0,0.4) inset'
+                            ? 'inset -3px -3px 6px rgba(0,0,0,0.3), inset 3px 3px 6px rgba(255,255,255,0.9), 0 8px 18px rgba(0,0,0,0.6)'
+                            : 'inset -4px -4px 8px rgba(0,0,0,0.9), inset 4px 4px 8px rgba(80,80,80,0.5), 0 8px 18px rgba(0,0,0,0.9)'
+                        }} />
+                        {/* Couche 2: Anneau supérieur de relief */}
+                        <div style={{
+                          position: 'absolute',
+                          inset: '8%',
+                          borderRadius: '50%',
+                          background: cell.color === 'white'
+                            ? 'radial-gradient(circle at 40% 35%, #f8f6f2 0%, #e8e4db 50%, transparent 100%)'
+                            : 'radial-gradient(circle at 40% 35%, #5a5a5a 0%, transparent 80%)',
+                          opacity: 0.7
+                        }} />
+                        {/* Couche 3: Surbrillance centrale */}
+                        <div style={{
+                          position: 'absolute',
+                          inset: '15%',
+                          borderRadius: '50%',
+                          background: cell.color === 'white'
+                            ? 'radial-gradient(circle at 38% 32%, #ffffff 0%, rgba(255,255,255,0.4) 40%, transparent 100%)'
+                            : 'radial-gradient(circle at 38% 32%, #6a6a6a 0%, rgba(100,100,100,0.3) 40%, transparent 100%)',
+                          opacity: 0.8
+                        }} />
+                        {/* Couche 4: Profondeur intérieure */}
+                        <div style={{
+                          position: 'absolute',
+                          inset: '25%',
+                          borderRadius: '50%',
+                          background: cell.color === 'white'
+                            ? 'radial-gradient(circle, rgba(200,196,188,0.5) 0%, rgba(150,146,138,0.3) 100%)'
+                            : 'radial-gradient(circle, rgba(30,30,30,0.6) 0%, rgba(10,10,10,0.4) 100%)',
+                          boxShadow: cell.color === 'white'
+                            ? 'inset 0 0 8px rgba(0,0,0,0.2)'
+                            : 'inset 0 0 8px rgba(0,0,0,0.8)'
                         }} />
                         {cell.isKing && (
                           <motion.div initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                            style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'clamp(24px, 50%, 40px)', textShadow: '0 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(218,165,32,0.6)', filter: 'drop-shadow(0 0 3px rgba(255,215,0,0.8))' }}>
+                            style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'clamp(24px, 50%, 40px)', textShadow: '0 3px 6px rgba(0,0,0,0.9), 0 0 10px rgba(255,215,0,0.7)', filter: 'drop-shadow(0 0 4px rgba(255,215,0,0.9))' }}>
                             👑
                           </motion.div>
                         )}
