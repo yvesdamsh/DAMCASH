@@ -855,11 +855,12 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                           animate={{ scale: 1 }}
                           style={{ 
                             position: 'absolute', 
-                            width: '30%', 
-                            height: '30%', 
+                            width: '40%', 
+                            height: '40%', 
                             borderRadius: '50%',
-                            backgroundColor: '#22c55e',
-                            boxShadow: '0 0 15px rgba(34, 197, 94, 0.9)'
+                            backgroundColor: isCapture ? '#ef4444' : '#22c55e',
+                            boxShadow: isCapture ? '0 0 20px rgba(239, 68, 68, 1)' : '0 0 20px rgba(34, 197, 94, 1)',
+                            zIndex: 100
                           }}
                         />
                       )}
