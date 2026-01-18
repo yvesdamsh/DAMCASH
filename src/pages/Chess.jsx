@@ -1,77 +1,87 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Crown } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { createPageUrl } from '../utils';
-import GameSetup from '../components/game/GameSetup';
+import { useNavigate } from 'react-router-dom';
+import { base44 } from '@/api/base44Client';
 import ChessBoard from '../components/game/ChessBoard';
+import GameSetup from '../components/game/GameSetup';
+import { createPageUrl } from './utils';
 
 export default function Chess() {
+  const navigate = useNavigate();
   const [gameStarted, setGameStarted] = useState(false);
   const [settings, setSettings] = useState({
     mode: 'ai',
-    timeControl: 'blitz',
-    color: 'white',
+    timeControl: 'classic',
+    playerColor: 'white',
     aiLevel: 'medium'
   });
 
-  const handleStart = () => {
-    if (settings.color === 'random') {
-      setSettings(prev => ({
-        ...prev,
-        color: Math.random() > 0.5 ? 'white' : 'black'
-      }));
+  const handleStartGame = async (config) => {
+    if (config.mode === 'ai') {
+      setSettings(config);
+      setGameStarted(true);
+    } else {
+      try {
+        const user = await base44.auth.me();
+        const room = await base44.entities.Room.create({
+          name: `Partie d'échecs - ${user.full_name}`,
+          owner_id: user.id,
+          owner_name: user.full_name,
+          game_type: 'chess',
+          is_private: false,
+          players: [user.id],
+          current_players: 1,
+          status: 'waiting',
+          time_control: config.timeControl
+        });
+
+        const session = await base44.entities.GameSession.create({
+          room_id: room.id,
+          player1_id: user.id,
+          player1_email: user.email,
+          player1_name: user.full_name,
+          game_type: 'chess',
+          status: 'waiting',
+          current_turn: 'white',
+          board_state: JSON.stringify(Array(8).fill(null).map(() => Array(8).fill(null))),
+          time_control: config.timeControl,
+          white_time: { bullet: 60, blitz: 180, rapid: 600, classic: 1800, unlimited: null }[config.timeControl],
+          black_time: { bullet: 60, blitz: 180, rapid: 600, classic: 1800, unlimited: null }[config.timeControl]
+        });
+
+        navigate(`${createPageUrl('GameRoom')}?roomId=${room.id}&mode=online&gameType=chess`);
+      } catch (error) {
+        console.error('Erreur création partie:', error);
+      }
     }
-    setGameStarted(true);
   };
 
-  const handleBack = () => {
+  const handleBackToSetup = () => {
     setGameStarted(false);
   };
 
+  if (!gameStarted) {
+    return <GameSetup onStart={handleStartGame} onBack={() => navigate(createPageUrl('Play'))} gameType="chess" />;
+  }
+
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <Link to={createPageUrl(gameStarted ? 'Chess' : 'Play')}>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-gray-400 hover:text-white"
-            onClick={gameStarted ? handleBack : undefined}
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-        </Link>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center">
-            <Crown className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-white">Échecs</h1>
-            <p className="text-xs text-gray-400">
-              {gameStarted 
-                ? `${settings.mode === 'ai' ? 'vs IA' : 'En ligne'} • ${settings.timeControl}`
-                : 'Configuration de la partie'
-              }
-            </p>
-          </div>
-        </div>
+    <div className="w-full min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] flex flex-col">
+      <div className="p-4 border-b border-[#D4A574]/30 bg-gradient-to-b from-[#5D3A1A] to-[#2C1810]">
+        <button
+          onClick={handleBackToSetup}
+          className="text-[#F5E6D3] hover:bg-white/10 px-4 py-2 rounded"
+        >
+          ← Retour
+        </button>
+        <h1 className="text-2xl font-bold mt-2">♔ Échecs vs IA</h1>
       </div>
 
-      {!gameStarted ? (
-        <GameSetup 
-          gameType="chess"
-          settings={settings}
-          setSettings={setSettings}
-          onStart={handleStart}
-        />
-      ) : (
-        <ChessBoard 
-          playerColor={settings.color}
+      <div className="flex-1 flex items-center justify-center overflow-auto p-6">
+        <ChessBoard
+          playerColor={settings.playerColor}
           aiLevel={settings.aiLevel}
+          onGameEnd={() => {}}
         />
-      )}
+      </div>
     </div>
   );
 }
