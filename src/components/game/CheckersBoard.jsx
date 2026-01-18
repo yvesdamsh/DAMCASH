@@ -266,12 +266,13 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     let hasValidMove = false;
     let hasPieces = false;
 
+    // Compter les pions et vérifier les mouvements valides
     for (let r = 0; r < 10; r++) {
       for (let c = 0; c < 10; c++) {
         const piece = boardState[r][c];
         if (piece && piece.color === nextColor) {
           hasPieces = true;
-          const moves = getValidMovesForColor(r, c, boardState, nextColor);
+          const moves = getValidMoves(r, c, boardState);
           if (moves.length > 0) {
             hasValidMove = true;
             break;
@@ -281,11 +282,12 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       if (hasValidMove) break;
     }
 
+    // Victoire si l'adversaire n'a plus de pions OU ne peut plus bouger
     if (!hasPieces || !hasValidMove) {
       return nextColor === 'white' ? 'blackWins' : 'whiteWins';
     }
     return null;
-  }, [getValidMovesForColor]);
+  }, [getValidMoves]);
 
   const makeMove = (fromRow, fromCol, toRow, toCol, capturedSquares = []) => {
     const newBoard = board.map(r => r.map(c => c ? { ...c } : null));
