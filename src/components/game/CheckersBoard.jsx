@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { RotateCcw, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import VictoryParticles from '../effects/VictoryParticles';
+import GameEndModal from './GameEndModal';
 
 const createInitialBoard = () => {
   const board = Array(10).fill(null).map(() => Array(10).fill(null));
@@ -540,18 +541,17 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     setChainCapture(null);
   };
 
+  const handleReplay = () => {
+    resetGame();
+  };
+
   useEffect(() => {
     const forced = getForcedCaptures(board, currentTurn);
     setMustCapture(forced.captures);
   }, [board, currentTurn, getForcedCaptures]);
 
   const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
-
-  // Debug: afficher validMoves à chaque rendu
-  if (validMoves.length > 0) {
-    console.log('🟢 RENDER: validMoves =', validMoves);
-    console.log('🟢 RENDER: selectedSquare =', selectedSquare);
-  }
+  const winner = gameStatus === 'whiteWins' ? 'white' : gameStatus === 'blackWins' ? 'black' : null;
 
   return (
     <div style={{ 
@@ -567,7 +567,15 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     }}>
       <VictoryParticles 
         show={gameStatus !== 'playing'} 
-        winner={gameStatus === 'whiteWins' ? 'white' : 'black'}
+        winner={winner}
+      />
+      
+      <GameEndModal
+        show={gameStatus !== 'playing'}
+        winner={winner}
+        playerColor={playerColor}
+        onReplay={handleReplay}
+        onHome={() => window.location.href = '/'}
       />
       
       {/* Score (top-left corner) */}
