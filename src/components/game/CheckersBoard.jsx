@@ -237,13 +237,21 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     const piece = boardState[row][col];
     if (!piece) return [];
 
+    // Vérifier d'abord les captures possibles pour cette pièce
+    const captureMoves = getCaptureMoves(row, col, boardState, piece);
+    
     if (mustCapture.length > 0) {
       const forced = mustCapture.find(c => c.row === row && c.col === col);
       return forced ? forced.moves : [];
     }
 
+    // Si ce pion a des captures possibles, retourner uniquement les captures
+    if (captureMoves.length > 0) {
+      return captureMoves;
+    }
+
     return getRegularMoves(row, col, boardState, piece);
-  }, [getRegularMoves, mustCapture]);
+  }, [getRegularMoves, getCaptureMoves, mustCapture]);
 
   const getValidMovesForColor = useCallback((row, col, boardState, color) => {
     const piece = boardState[row][col];
