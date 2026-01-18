@@ -298,7 +298,7 @@ export default function ChessBoard({
                   boxShadow: isSelected ? 'inset 0 0 0 4px #facc15' : isValidMove ? 'inset 0 0 0 3px #22c55e' : 'none'
                 }}
               >
-                {piece && <span>{PIECES[piece]}</span>}
+                {piece && piece !== '' && <span>{PIECES[piece]}</span>}
               </div>
             );
           })}
