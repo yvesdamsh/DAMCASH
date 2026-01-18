@@ -273,20 +273,20 @@ export default function ChessBoard({
       />
       <div style={{ width: 'min(90vw, calc(100vh - 200px))', height: 'min(90vw, calc(100vh - 200px))', aspectRatio: '1/1' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gridTemplateRows: 'repeat(8, 1fr)', width: '100%', height: '100%', gap: 0, border: '3px solid #3E2723' }}>
-          {Array.from({ length: 64 }).map((_, idx) => {
-            const rowIndex = Math.floor(idx / 8);
-            const colIndex = idx % 8;
-            const actualRow = playerColor === 'black' ? 7 - rowIndex : rowIndex;
-            const actualCol = playerColor === 'black' ? 7 - colIndex : colIndex;
-            const piece = board[actualRow][actualCol];
-            const isLight = (actualRow + actualCol) % 2 === 0;
-            const isSelected = selectedSquare?.row === actualRow && selectedSquare?.col === actualCol;
-            const isValidMove = validMoves.some(m => m.row === actualRow && m.col === actualCol);
+          {Array(64).fill().map((_, index) => {
+            const row = Math.floor(index / 8);
+            const col = index % 8;
+            const displayRow = playerColor === 'black' ? 7 - row : row;
+            const displayCol = playerColor === 'black' ? 7 - col : col;
+            const piece = board[displayRow][displayCol];
+            const isLight = (displayRow + displayCol) % 2 === 0;
+            const isSelected = selectedSquare?.row === displayRow && selectedSquare?.col === displayCol;
+            const isValidMove = validMoves.some(m => m.row === displayRow && m.col === displayCol);
 
             return (
               <div
-                key={`${actualRow}-${actualCol}`}
-                onClick={() => handleSquareClick(actualRow, actualCol)}
+                key={index}
+                onClick={() => handleSquareClick(displayRow, displayCol)}
                 style={{
                   backgroundColor: isLight ? '#F5E6D3' : '#B58863',
                   display: 'flex',
