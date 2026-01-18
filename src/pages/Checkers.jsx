@@ -63,13 +63,9 @@ export default function Checkers() {
         console.error('❌ Error creating game session:', error);
       }
     } else {
-      // Mode IA - afficher le board
+      // Mode IA - rediriger vers GameRoom avec mode=ai
       console.log('🤖 Starting AI game');
-      setSettings(prev => ({
-        ...prev,
-        color: finalColor
-      }));
-      setGameStarted(true);
+      navigate(`/GameRoom?mode=ai&playerColor=${finalColor}&aiLevel=${settings.aiLevel}`);
     }
   };
 
