@@ -346,7 +346,6 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     if (gameStatus !== 'playing') return;
     
     const piece = board[row][col];
-    const isMyTurn = isMultiplayer ? (effectiveTurn === playerColor) : (currentTurn === playerColor);
 
     if (chainCapture) {
       if (row === chainCapture.row && col === chainCapture.col) {
@@ -354,7 +353,6 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       }
       const move = validMoves.find(m => m.row === row && m.col === col);
       if (move) {
-        if (!isMyTurn) return;
         const result = makeMove(chainCapture.row, chainCapture.col, row, col, move.captured);
         if (!result.continueChain) {
           if (isMultiplayer && onSaveMove) {
@@ -373,8 +371,6 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       const move = validMoves.find(m => m.row === row && m.col === col);
       
       if (move) {
-        if (!isMyTurn) return;
-        
         if (mustCapture.length > 0) {
           const pieceCanCapture = mustCapture.some(c => c.row === selectedSquare.row && c.col === selectedSquare.col);
           if (!pieceCanCapture) {
@@ -389,7 +385,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
             const movingPiece = board[selectedSquare.row][selectedSquare.col];
             const nextColor = movingPiece.color === 'white' ? 'black' : 'white';
             onSaveMove(result.board, nextColor);
-          } else if (gameStatus === 'playing') {
+          } else if (gameStatus === 'playing' && !isMultiplayer) {
             setTimeout(() => makeAIMove(result.board), 500);
           }
         }
