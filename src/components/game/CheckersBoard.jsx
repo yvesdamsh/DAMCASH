@@ -26,16 +26,17 @@ const getSquareNumber = (row, col) => {
 const cloneBoard = (board) => board.map(r => r.map(c => c ? { ...c } : null));
 
 export default function CheckersBoard({
-  playerColor = 'white',
-  onGameEnd,
-  isMultiplayer = false,
-  canMove = true,
-  blockBoard = false,
-  initialBoardState = null,
-  onSaveMove = null,
-  currentTurnOverride = null,
-  gameStats = null
-}) {
+        playerColor = 'white',
+        onGameEnd,
+        isMultiplayer = false,
+        canMove = true,
+        blockBoard = false,
+        initialBoardState = null,
+        onSaveMove = null,
+        currentTurnOverride = null,
+        gameStats = null,
+        aiLevel = 'medium'
+      }) {
   const [board, setBoard] = useState(() => initialBoardState || createInitialBoard());
   const [selectedSquare, setSelectedSquare] = useState(null);
   const [validMoves, setValidMoves] = useState([]);
