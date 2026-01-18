@@ -45,7 +45,7 @@ export default function ChessBoard({
     if (gameStatus !== 'playing' && onGameEnd) onGameEnd(gameStatus);
   }, [gameStatus, onGameEnd]);
 
-  const getPieceColor = (piece) => piece ? (piece === piece.toUpperCase() ? 'white' : 'black') : null;
+  const getPieceColor = (piece) => piece && piece !== '' ? (piece === piece.toUpperCase() ? 'white' : 'black') : null;
 
   const isPathClear = (fromRow, fromCol, toRow, toCol, boardState) => {
     const rowDir = toRow === fromRow ? 0 : (toRow > fromRow ? 1 : -1);
