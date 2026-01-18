@@ -446,12 +446,16 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
             return;
           }
         }
-        console.log('Setting selected square:', { row, col });
-        setSelectedSquare({ row, col });
+        console.log('🎯 SELECTION: Setting selected square:', { row, col });
         const moves = getValidMoves(row, col, board);
-        console.log('✓ Valid moves calculated:', moves);
-        console.log('✓ Setting validMoves state...');
+        console.log('🎯 VALID MOVES CALCULATED:', moves);
+        console.log('🎯 Number of valid moves:', moves.length);
+        if (moves.length > 0) {
+          console.log('🎯 First move details:', moves[0]);
+        }
+        setSelectedSquare({ row, col });
         setValidMoves(moves);
+        console.log('🎯 State updated - selectedSquare and validMoves set');
       } else {
         console.log('✗ Not own piece or no piece');
       }
