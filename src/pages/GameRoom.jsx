@@ -729,7 +729,7 @@ export default function GameRoom() {
           />
         ) : (
           <CheckersBoard 
-            playerColor={playerColor}
+            playerColor={effectivePlayerColor}
             onGameEnd={handleGameEnd}
             isMultiplayer={true}
             canMove={canMove && gameStarted && !isSpectator}
