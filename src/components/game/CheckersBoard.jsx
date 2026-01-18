@@ -324,16 +324,16 @@ export default function CheckersBoard({
     setMustCapture(forced.captures);
   }, [board, effectiveTurn, getForcedCaptures]);
 
-  // IA joue automatiquement si c'est son tour
+  // IA joue quand currentTurn === 'black' (IA) et c'est le tour des noirs
   useEffect(() => {
-    if (isMultiplayer || blockBoard || gameStatus !== 'playing') return;
-    if (effectiveTurn === playerColor) return; // C'est au joueur de jouer
+    if (isMultiplayer || !aiLevel || blockBoard || gameStatus !== 'playing') return;
+    if (currentTurn !== 'black') return; // Attendre que ce soit le tour de l'IA (noirs)
 
-    const aiMove = () => {
-      // Trouver toutes les pièces de l'IA
-      const aiColor = effectiveTurn;
+    const makeAIMove = () => {
+      const aiColor = 'black';
       const possibleMoves = [];
 
+      // Trouver tous les coups possibles pour l'IA
       for (let r = 0; r < 10; r++) {
         for (let c = 0; c < 10; c++) {
           const piece = board[r][c];
@@ -348,27 +348,22 @@ export default function CheckersBoard({
         }
       }
 
-      if (possibleMoves.length === 0) return; // Pas de coups disponibles
+      if (possibleMoves.length === 0) return;
 
-      // Sélectionner un coup aléatoire (facile) ou stratégique (hard)
-      let selectedMove;
-      if (aiLevel === 'easy') {
-        selectedMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-      } else {
-        // Medium/Hard: priorité aux captures
-        const captures = possibleMoves.filter(m => m.isCapture);
-        selectedMove = captures.length > 0 
+      // Choisir un coup: facile = aléatoire, sinon priorité aux captures
+      const captures = possibleMoves.filter(m => m.isCapture);
+      const selectedMove = aiLevel === 'easy'
+        ? possibleMoves[Math.floor(Math.random() * possibleMoves.length)]
+        : captures.length > 0
           ? captures[Math.floor(Math.random() * captures.length)]
           : possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-      }
 
-      // Exécuter le coup
       makeMove(selectedMove.fromRow, selectedMove.fromCol, selectedMove.row, selectedMove.col, selectedMove.captured || []);
     };
 
-    const timer = setTimeout(aiMove, 800); // Délai pour que ce soit moins instantané
+    const timer = setTimeout(makeAIMove, 800);
     return () => clearTimeout(timer);
-  }, [effectiveTurn, playerColor, board, isMultiplayer, blockBoard, gameStatus, aiLevel, getValidMovesForColor]);
+  }, [currentTurn, board, isMultiplayer, blockBoard, gameStatus, aiLevel, getValidMovesForColor, makeMove]);
 
   const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
   const winner = gameStatus === 'whiteWins' ? 'white' : gameStatus === 'blackWins' ? 'black' : null;
