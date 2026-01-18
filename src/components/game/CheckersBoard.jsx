@@ -412,8 +412,13 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
           const canCapture = mustCapture.some(c => c.row === row && c.col === col);
           if (!canCapture) return;
         }
+        const moves = getValidMoves(row, col, board);
+        console.log('🔵 SELECTING PIECE at', row, col);
+        console.log('🔵 Player color:', playerColor, 'Piece color:', piece.color);
+        console.log('🔵 mustCapture:', mustCapture);
+        console.log('🔵 Calculated moves:', moves);
         setSelectedSquare({ row, col });
-        setValidMoves(getValidMoves(row, col, board));
+        setValidMoves(moves);
       }
     }
   };
