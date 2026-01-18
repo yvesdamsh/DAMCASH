@@ -16,6 +16,7 @@ export default function Chess() {
   });
 
   const handleStartGame = async (config) => {
+    if (!config) return;
     if (config.mode === 'ai') {
       setSettings(config);
       setGameStarted(true);
