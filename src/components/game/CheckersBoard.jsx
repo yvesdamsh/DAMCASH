@@ -320,7 +320,9 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     }
 
     const nextColor = piece.color === 'white' ? 'black' : 'white';
-    setCurrentTurn(nextColor);
+    if (!isMultiplayer) {
+      setCurrentTurn(nextColor);
+    }
     setChainCapture(null);
 
     const forced = getForcedCaptures(newBoard, nextColor);
