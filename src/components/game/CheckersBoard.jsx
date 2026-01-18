@@ -531,9 +531,9 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
   };
 
   useEffect(() => {
-    const forced = getForcedCaptures(board, currentTurn);
+    const forced = getForcedCaptures(board, effectiveTurn);
     setMustCapture(forced.captures);
-  }, [board, currentTurn, getForcedCaptures]);
+  }, [board, effectiveTurn, getForcedCaptures]);
 
   const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
   const winner = gameStatus === 'whiteWins' ? 'white' : gameStatus === 'blackWins' ? 'black' : null;
