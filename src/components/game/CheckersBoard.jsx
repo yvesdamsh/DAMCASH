@@ -376,7 +376,7 @@ export default function CheckersBoard({
                   <AnimatePresence mode="wait">
                     {cell && (
                       <motion.div key={`${actualRow}-${actualCol}-${cell.color}-${cell.isKing}`} initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                        style={{ position: 'relative', width: '85%', height: '85%', borderRadius: '50%', filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.6))' }}>
+                        style={{ position: 'relative', width: '85%', height: '85%', borderRadius: '50%', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.7))' }}>
                         <div style={{
                           position: 'absolute',
                           inset: 0,
@@ -385,9 +385,15 @@ export default function CheckersBoard({
                             ? 'radial-gradient(circle at 30% 30%, #ffffff 0%, #e8e6e0 20%, #d0cdc5 100%)'
                             : 'radial-gradient(circle at 35% 35%, #4a4a4a 0%, #2a2a2a 30%, #0a0a0a 100%)',
                           boxShadow: cell.color === 'white'
-                            ? '0 4px 10px rgba(0,0,0,0.4), inset -1px -1px 2px rgba(0,0,0,0.2), inset 1px 1px 3px rgba(255,255,255,0.7)'
-                            : '0 4px 10px rgba(0,0,0,0.7), inset -1px -1px 2px rgba(0,0,0,0.6), inset 1px 1px 2px rgba(100,100,100,0.3)'
+                            ? '0 6px 15px rgba(0,0,0,0.5), inset -2px -2px 4px rgba(0,0,0,0.3), inset 2px 2px 5px rgba(255,255,255,0.8), 0 -2px 4px rgba(0,0,0,0.2) inset'
+                            : '0 6px 15px rgba(0,0,0,0.8), inset -2px -2px 4px rgba(0,0,0,0.8), inset 2px 2px 4px rgba(150,150,150,0.4), 0 -2px 4px rgba(0,0,0,0.4) inset'
                         }} />
+                        {cell.isKing && (
+                          <motion.div initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                            style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'clamp(24px, 50%, 40px)', textShadow: '0 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(218,165,32,0.6)', filter: 'drop-shadow(0 0 3px rgba(255,215,0,0.8))' }}>
+                            👑
+                          </motion.div>
+                        )}
                       </motion.div>
                     )}
                   </AnimatePresence>
