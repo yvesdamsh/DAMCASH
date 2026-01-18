@@ -346,6 +346,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     if (gameStatus !== 'playing') return;
     
     const piece = board[row][col];
+    const isMyTurn = isMultiplayer ? (effectiveTurn === playerColor) : (currentTurn === playerColor);
 
     if (chainCapture) {
       if (row === chainCapture.row && col === chainCapture.col) {
@@ -353,7 +354,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       }
       const move = validMoves.find(m => m.row === row && m.col === col);
       if (move) {
-        if (!canMove) return;
+        if (!isMyTurn) return;
         const result = makeMove(chainCapture.row, chainCapture.col, row, col, move.captured);
         if (!result.continueChain) {
           if (isMultiplayer && onSaveMove) {
@@ -372,9 +373,8 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       const move = validMoves.find(m => m.row === row && m.col === col);
       
       if (move) {
-        if (!canMove) return;
+        if (!isMyTurn) return;
         
-        // Vérifier les captures forcées
         if (mustCapture.length > 0) {
           const pieceCanCapture = mustCapture.some(c => c.row === selectedSquare.row && c.col === selectedSquare.col);
           if (!pieceCanCapture) {
@@ -394,7 +394,6 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
           }
         }
       } else if (piece && piece.color === playerColor) {
-        // Autoriser la sélection pour voir les mouvements valides
         setSelectedSquare({ row, col });
         setValidMoves(getValidMoves(row, col, board));
       } else {
@@ -402,7 +401,6 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
         setValidMoves([]);
       }
     } else {
-      // Première sélection - autoriser pour voir les mouvements valides
       if (piece && piece.color === playerColor) {
         setSelectedSquare({ row, col });
         setValidMoves(getValidMoves(row, col, board));
