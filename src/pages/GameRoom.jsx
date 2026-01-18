@@ -575,6 +575,7 @@ export default function GameRoom() {
 
   const computedPlayerColor = user && session && user.id === session.player1_id ? 'white' : 'black';
   const effectivePlayerColor = gameMode === 'ai' ? playerColor : computedPlayerColor;
+  const isPlayerWhite = gameMode === 'ai' ? playerColor === 'white' : user?.id === session?.player1_id;
   const gameType = session?.game_type;
   const canMove = !isSpectator && (
     (effectivePlayerColor === 'white' && session.current_turn === 'white') || 
