@@ -9,14 +9,14 @@ const PIECES = {
 };
 
 const createInitialBoard = () => [
-  ['r','n','b','q','k','b','n','r'],  // rangée 0 - pièces noires
-  ['p','p','p','p','p','p','p','p'],  // rangée 1 - pions noirs
-  [null,null,null,null,null,null,null,null],
-  [null,null,null,null,null,null,null,null],
-  [null,null,null,null,null,null,null,null],
-  [null,null,null,null,null,null,null,null],
-  ['P','P','P','P','P','P','P','P'],  // rangée 6 - pions blancs
-  ['R','N','B','Q','K','B','N','R']   // rangée 7 - pièces blanches
+  ['r','n','b','q','k','b','n','r'],
+  ['p','p','p','p','p','p','p','p'],
+  ['','','','','','','',''],
+  ['','','','','','','',''],
+  ['','','','','','','',''],
+  ['','','','','','','',''],
+  ['P','P','P','P','P','P','P','P'],
+  ['R','N','B','Q','K','B','N','R']
 ];
 
 const cloneBoard = (board) => board.map(r => [...r]);
