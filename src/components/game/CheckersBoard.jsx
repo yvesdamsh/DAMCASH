@@ -367,6 +367,10 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       }
       const move = validMoves.find(m => m.row === row && m.col === col);
       if (move) {
+        if (!isMyTurn) {
+          console.log('✗ Cannot move - not your turn');
+          return;
+        }
         const result = makeMove(chainCapture.row, chainCapture.col, row, col, move.captured);
         if (!result.continueChain) {
           if (isMultiplayer && onSaveMove) {
