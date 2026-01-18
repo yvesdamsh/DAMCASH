@@ -592,6 +592,12 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
 
   const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
 
+  // Debug: afficher validMoves à chaque rendu
+  if (validMoves.length > 0) {
+    console.log('🟢 RENDER: validMoves =', validMoves);
+    console.log('🟢 RENDER: selectedSquare =', selectedSquare);
+  }
+
   return (
     <div style={{ 
       display: 'flex',
