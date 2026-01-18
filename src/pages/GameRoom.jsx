@@ -6,18 +6,8 @@ import ChessBoard from '../components/game/ChessBoard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ArrowLeft, Clock, Flag, Handshake } from 'lucide-react';
+import { ArrowLeft, Clock } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 
 const TIME_CONTROLS = {
   bullet: 60,
@@ -33,9 +23,6 @@ export default function GameRoom() {
   const roomId = urlParams.get('roomId');
   const isWaiting = urlParams.get('waiting') === 'true';
   const isSpectator = urlParams.get('spectate') === 'true';
-  const isAIMode = urlParams.get('mode') === 'ai';
-  const aiColor = urlParams.get('color') || 'white';
-  const aiLevel = urlParams.get('aiLevel') || 'medium';
   
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
@@ -49,23 +36,15 @@ export default function GameRoom() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loadingMessages, setLoadingMessages] = useState(false);
-  const [showSurrenderDialog, setShowSurrenderDialog] = useState(false);
-  const [showDrawProposal, setShowDrawProposal] = useState(false);
-  const [drawProposalFrom, setDrawProposalFrom] = useState(null);
   const endGameSentRef = useRef(false);
   const spectatorJoinedRef = useRef(false);
 
   // Charger les données initiales
   useEffect(() => {
-    if (isAIMode) {
-      setLoading(false);
-      setGameStarted(true);
-      return;
-    }
     if (roomId) {
       loadData();
     }
-  }, [roomId, isAIMode]);
+  }, [roomId]);
 
   // Fallback: recharger périodiquement si le realtime se coupe
   useEffect(() => {
@@ -74,30 +53,36 @@ export default function GameRoom() {
     return () => clearInterval(interval);
   }, [roomId]);
 
-  // Realtime: écouter les changements de GameSession pour les jointures de joueur
+  // Realtime: écouter les changements de GameSession pour cette room
   useEffect(() => {
     if (!roomId) return;
 
     const unsubscribe = base44.entities.GameSession.subscribe(async (event) => {
-      if (!event?.data) return;
-      const matchesRoom = event.data.room_id === roomId;
-      if (!matchesRoom) return;
-
+      const matchesRoom = event?.data?.room_id === roomId;
+      const matchesSession = event?.id && session?.id && event.id === session.id;
+      if (!matchesRoom && !matchesSession) return;
       const sess = event.data;
 
       setSession(prev => ({ ...prev, ...sess }));
-      setGameStarted(!!sess.player2_id || sess.status === 'in_progress');
 
-      if (sess.status === 'finished' && !endGameSentRef.current) {
-        endGameSentRef.current = true;
-        let gameEndStatus = 'draw';
-        if (sess.winner_id) {
-          const isPlayer1Winner = sess.winner_id === sess.player1_id;
-          gameEndStatus = isPlayer1Winner ? 'whiteWins' : 'blackWins';
+      if (sess.board_state) {
+        try {
+          setBoardState(JSON.parse(sess.board_state));
+        } catch (e) {
+          console.log('Erreur parsing board_state');
         }
-        setTimeout(() => handleGameEnd(gameEndStatus), 500);
       }
 
+      if (typeof sess.white_time !== 'undefined') {
+        setWhiteTime(sess.white_time);
+      }
+      if (typeof sess.black_time !== 'undefined') {
+        setBlackTime(sess.black_time);
+      }
+
+      setGameStarted(!!sess.player2_id || sess.status === 'in_progress');
+
+      // Rafraîchir l'adversaire si nécessaire (sans accès User)
       const opponentId = user?.id === sess.player1_id ? sess.player2_id : sess.player1_id;
       if (opponentId && opponent?.id !== opponentId) {
         const onlineUsers = await base44.entities.OnlineUser.filter({ user_id: opponentId });
@@ -120,71 +105,46 @@ export default function GameRoom() {
     return () => {
       if (typeof unsubscribe === 'function') unsubscribe();
     };
-  }, [roomId, user?.id, opponent?.id]);
+  }, [roomId, user?.id, opponent?.id, session?.id]);
 
-  // Écouter les propositions de match nul
+  // Realtime dédié aux coups: écouter les créations de GameMove
   useEffect(() => {
-    if (!user || !roomId) return;
+    if (!roomId) return;
 
-    const unsubscribe = base44.entities.Notification?.subscribe?.((event) => {
+    const unsubscribe = base44.entities.GameMove?.subscribe?.((event) => {
       if (event?.type !== 'create') return;
-      if (!event?.data || event.data.user_email !== user.email) return;
-      if (event.data.type === 'draw_proposal') {
-        setShowDrawProposal(true);
-        setDrawProposalFrom(event.data.from_user);
-      }
-    });
+      const matchesRoom = event?.data?.room_id === roomId;
+      if (!matchesRoom) return;
 
-    return () => {
-      if (typeof unsubscribe === 'function') unsubscribe();
-    };
-  }, [user, roomId]);
+      const move = event.data;
 
-  // Realtime dédié aux coups: écouter les changements de GameSession pour la synchro board
-  useEffect(() => {
-    if (!roomId || !session?.id) return;
-
-    // Subscription realtime ACTIVE sur GameSession pour synchroniser le board_state
-    const unsubscribe = base44.entities.GameSession.subscribe((event) => {
-      if (!event?.data) return;
-
-      // Vérifier que c'est bien notre session
-      const isOurSession = event.data.id === session.id || event.data.room_id === roomId;
-      if (!isOurSession) return;
-
-      const updatedSession = event.data;
-
-      // Synchroniser le board_state immédiatement
-      if (updatedSession.board_state) {
+      if (move.board_state) {
         try {
-          setBoardState(JSON.parse(updatedSession.board_state));
+          setBoardState(JSON.parse(move.board_state));
         } catch (e) {
-          console.log('Erreur parsing board_state');
+          console.log('Erreur parsing board_state (move)');
         }
       }
 
-      // Synchroniser les timers
-      if (typeof updatedSession.white_time !== 'undefined') {
-        setWhiteTime(updatedSession.white_time);
+      if (typeof move.white_time !== 'undefined') {
+        setWhiteTime(move.white_time);
       }
-      if (typeof updatedSession.black_time !== 'undefined') {
-        setBlackTime(updatedSession.black_time);
+      if (typeof move.black_time !== 'undefined') {
+        setBlackTime(move.black_time);
       }
 
-      // Synchroniser le tour et le statut
-      if (updatedSession.current_turn) {
-        setSession(prev => ({ 
-          ...prev, 
-          current_turn: updatedSession.current_turn,
-          last_move_timestamp: updatedSession.last_move_timestamp
-        }));
+      if (move.next_turn) {
+        setSession(prev => ({ ...prev, current_turn: move.next_turn }));
+      }
+      if (move.created_date || move.created_at) {
+        setSession(prev => ({ ...prev, last_move_timestamp: move.created_date || move.created_at }));
       }
     });
 
     return () => {
       if (typeof unsubscribe === 'function') unsubscribe();
     };
-  }, [roomId, session?.id]);
+  }, [roomId]);
 
   // Chat: charger + realtime messages
   useEffect(() => {
@@ -207,8 +167,7 @@ export default function GameRoom() {
 
     loadMessages();
 
-    // Subscription realtime ACTIVE pour chaque nouveau message
-    const unsubscribe = base44.entities.GameChatMessage.subscribe((event) => {
+    const unsubscribe = base44.entities.GameChatMessage?.subscribe?.((event) => {
       if (event?.type !== 'create') return;
       if (!event?.data || event.data.room_id !== roomId) return;
       setMessages(prev => {
@@ -229,8 +188,7 @@ export default function GameRoom() {
     if (isSpectator) return;
 
     try {
-      // Créer le message - le realtime subscription le récupérera automatiquement
-      await base44.entities.GameChatMessage.create({
+      await base44.entities.GameChatMessage?.create?.({
         room_id: roomId,
         sender_id: user.id,
         sender_name: user.full_name,
@@ -295,8 +253,7 @@ export default function GameRoom() {
             player2_id: currentUser.id,
             player2_email: currentUser.email,
             player2_name: currentUser.full_name,
-            status: 'in_progress',
-            current_turn: 'white'
+            status: 'in_progress'
           });
           // Marquer l'invitation comme acceptée si elle existe
           try {
@@ -506,115 +463,11 @@ export default function GameRoom() {
     } else {
       await base44.entities.PlayerStats.create(payload);
     }
-    };
+  };
 
-    const handleSurrender = async () => {
-      if (!session || !user || endGameSentRef.current) return;
-      endGameSentRef.current = true;
-      setShowSurrenderDialog(false);
-
-      const playerColor = user.id === session.player1_id ? 'white' : 'black';
-      const winnerId = playerColor === 'white' ? session.player2_id : session.player1_id;
-      const winnerEmail = playerColor === 'white' ? session.player2_email : session.player1_email;
-
-      try {
-        await base44.entities.GameSession.update(session.id, {
-          status: 'finished',
-          winner_id: winnerId,
-          finished_at: new Date().toISOString()
-        });
-
-        if (winnerEmail) {
-          await base44.entities.Notification?.create?.({
-            user_email: winnerEmail,
-            type: 'game_result',
-            title: 'Victoire par abandon',
-            message: 'Votre adversaire a abandonné - Vous avez gagné!',
-            link: `GameRoom?roomId=${roomId}`
-          });
-        }
-
-        setTimeout(() => {
-          handleGameEnd(playerColor === 'white' ? 'blackWins' : 'whiteWins');
-        }, 500);
-      } catch (e) {
-        console.log('Erreur abandon:', e?.message || e);
-        endGameSentRef.current = false;
-      }
-    };
-
-    const handleProposeDrawal = async () => {
-      if (!session || !user) return;
-
-      const opponentId = user.id === session.player1_id ? session.player2_id : session.player1_id;
-      const opponentEmail = user.id === session.player1_id ? session.player2_email : session.player1_email;
-
-      try {
-        if (opponentEmail) {
-          await base44.entities.Notification?.create?.({
-            user_email: opponentEmail,
-            type: 'draw_proposal',
-            title: 'Proposition de match nul',
-            message: `${user.full_name} propose un match nul`,
-            from_user: user.email,
-            link: `GameRoom?roomId=${roomId}`
-          });
-        }
-
-        await base44.entities.GameChatMessage.create({
-          room_id: roomId,
-          sender_id: 'system',
-          sender_name: 'Système',
-          message: `${user.full_name} a proposé un match nul`
-        });
-
-        setDrawProposalFrom(user.id);
-        toast('Proposition envoyée', { description: 'En attente de la réponse de votre adversaire' });
-      } catch (e) {
-        console.log('Erreur proposition match nul:', e?.message || e);
-      }
-    };
-
-    const handleAcceptDraw = async () => {
-    if (!session || endGameSentRef.current) return;
-    endGameSentRef.current = true;
-    setShowDrawProposal(false);
-
-    try {
-      await base44.entities.GameSession.update(session.id, {
-        status: 'finished',
-        winner_id: null,
-        finished_at: new Date().toISOString()
-      });
-
-      await Promise.all([
-        base44.entities.Notification?.create?.({
-          user_email: session.player1_email,
-          type: 'game_result',
-          title: 'Match nul',
-          message: 'La partie s\'est terminée par un match nul',
-          link: `GameRoom?roomId=${roomId}`
-        }),
-        base44.entities.Notification?.create?.({
-          user_email: session.player2_email,
-          type: 'game_result',
-          title: 'Match nul',
-          message: 'La partie s\'est terminée par un match nul',
-          link: `GameRoom?roomId=${roomId}`
-        })
-      ]);
-
-      setTimeout(() => navigate('/Play'), 1000);
-    } catch (e) {
-      console.log('Erreur acceptation match nul:', e?.message || e);
-      endGameSentRef.current = false;
-    }
-    };
-
-    const handleGameEnd = async (status) => {
+  const handleGameEnd = async (status) => {
     if (!session || endGameSentRef.current) return;
     if (session.status === 'finished' || isSpectator) {
-      navigate('/Play');
       return;
     }
 
@@ -682,8 +535,6 @@ export default function GameRoom() {
       }
     } catch (e) {
       console.log('Erreur fin de partie:', e?.message || e);
-    } finally {
-      navigate('/Play');
     }
   };
 
@@ -691,36 +542,6 @@ export default function GameRoom() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
-      </div>
-    );
-  }
-
-  // Mode IA - afficher directement le plateau
-  if (isAIMode) {
-    return (
-      <div className="w-full min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] flex flex-col">
-        <div className="p-4 border-b border-[#D4A574]/30 bg-gradient-to-b from-[#5D3A1A] to-[#2C1810]">
-          <div className="flex items-center justify-between">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/Checkers')}
-              className="text-[#F5E6D3] hover:bg-white/10"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour
-            </Button>
-            <h1 className="text-2xl font-bold">⚫ Dames vs IA</h1>
-            <div className="w-24" />
-          </div>
-        </div>
-        <div className="flex-1 flex items-center justify-center overflow-auto p-6">
-          <CheckersBoard 
-            playerColor={aiColor}
-            aiLevel={aiLevel}
-            onGameEnd={() => navigate('/Checkers')}
-            isMultiplayer={false}
-          />
-        </div>
       </div>
     );
   }
@@ -743,15 +564,6 @@ export default function GameRoom() {
     (playerColor === 'white' && session.current_turn === 'white') || 
     (playerColor === 'black' && session.current_turn === 'black')
   );
-
-  console.log('=== GameRoom DEBUG ===');
-  console.log('user.id:', user?.id);
-  console.log('session.player1_id:', session?.player1_id);
-  console.log('session.player2_id:', session?.player2_id);
-  console.log('isPlayerWhite:', isPlayerWhite);
-  console.log('playerColor:', playerColor);
-  console.log('session.current_turn:', session?.current_turn);
-  console.log('canMove:', canMove);
 
   // Écran d'attente
   if (!gameStarted) {
@@ -799,13 +611,13 @@ export default function GameRoom() {
           <h1 className="text-2xl font-bold">
             {gameType === 'chess' ? '♔ Échecs' : '⚫ Dames'}
           </h1>
-          <div className="w-24" />
+          <div className="w-20" />
         </div>
       </div>
 
       {/* Barre Adversaire - EN HAUT */}
       {opponent && (
-        <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-b-2 border-[#D4A574]/40 px-6 py-4 shadow-xl shadow-black/50 backdrop-blur-lg">
+        <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-b-2 border-[#D4A574]/40 px-6 py-4 shadow-lg">
           <div className="max-w-6xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-4 flex-1">
               <Avatar className="w-14 h-14 border-3 border-[#D4A574]">
@@ -816,15 +628,15 @@ export default function GameRoom() {
               </Avatar>
               <div className="flex-1">
                 <p className="font-bold text-lg text-[#F5E6D3]">{opponent.full_name}</p>
-                <p className={`text-sm font-bold flex items-center gap-2 ${
+                <p className={`text-sm font-semibold ${
                   session.current_turn === (isPlayerWhite ? 'black' : 'white') 
-                    ? 'text-lime-400 animate-pulse' 
+                    ? 'text-yellow-400' 
                     : 'text-[#D4A574]'
                 }`}>
                   {session.player2_id ? (
                     session.current_turn === (isPlayerWhite ? 'black' : 'white') 
-                      ? <><span className="inline-block w-2 h-2 bg-lime-400 rounded-full"></span> C'est son tour</> 
-                      : 'En attente de votre coup...'
+                      ? 'En train de jouer...' 
+                      : 'En attente'
                   ) : (
                     'En attente de rejoindre...'
                   )}
@@ -833,7 +645,7 @@ export default function GameRoom() {
             </div>
             <div className={`text-4xl font-bold font-mono px-6 py-2 rounded-lg ${
               session.current_turn === (isPlayerWhite ? 'black' : 'white') 
-                ? 'bg-red-500/20 border-2 border-red-500 text-red-400 animate-pulse' 
+                ? 'bg-red-500/20 border-2 border-red-500 text-red-400' 
                 : 'bg-[#2C1810] border-2 border-[#D4A574]/50 text-[#F5E6D3]'
             }`}>
               {formatTime(isPlayerWhite ? blackTime : whiteTime)}
@@ -861,48 +673,34 @@ export default function GameRoom() {
             onSaveMove={handleSaveMove}
             blockBoard={!gameStarted}
             currentTurnOverride={session?.current_turn}
+            gameStats={{
+              gameType,
+              moveCount: session?.move_count || 0,
+              timeControl: session?.time_control || 'classic'
+            }}
           />
         ) : (
           <CheckersBoard 
             playerColor={playerColor}
             onGameEnd={handleGameEnd}
             isMultiplayer={true}
-            canMove={true}
+            canMove={canMove && gameStarted && !isSpectator}
             initialBoardState={boardState}
             onSaveMove={handleSaveMove}
             blockBoard={!gameStarted}
             currentTurnOverride={session?.current_turn}
+            gameStats={{
+              gameType,
+              moveCount: session?.move_count || 0,
+              timeControl: session?.time_control || 'classic'
+            }}
           />
         )}
       </div>
 
-      {/* Barre d'outils - Options de partie */}
-      {!isSpectator && gameStarted && session?.status === 'in_progress' && (
-        <div className="px-6 py-4 bg-[#2C1810]/50 border-t border-[#D4A574]/20">
-          <div className="max-w-4xl mx-auto flex gap-4 justify-center">
-            <Button
-              onClick={handleProposeDrawal}
-              size="lg"
-              className="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-8 py-3 shadow-lg"
-            >
-              <Handshake className="w-5 h-5 mr-2" />
-              Proposer Match Nul
-            </Button>
-            <Button
-              onClick={() => setShowSurrenderDialog(true)}
-              size="lg"
-              className="bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-3 shadow-lg"
-            >
-              <Flag className="w-5 h-5 mr-2" />
-              Abandonner
-            </Button>
-          </div>
-        </div>
-      )}
-
       {/* Chat */}
       <div className="px-6 pb-4">
-        <div className="bg-[#2C1810]/70 backdrop-blur-lg border border-[#D4A574]/30 rounded-xl p-4 shadow-lg">
+        <div className="bg-[#2C1810] border border-[#D4A574]/30 rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-[#F5E6D3]">Chat</h3>
             {loadingMessages && (
@@ -946,7 +744,7 @@ export default function GameRoom() {
 
       {/* Barre Joueur Courant - EN BAS */}
       {user && (
-        <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-t-2 border-[#D4A574]/40 px-6 py-4 shadow-xl shadow-black/50 backdrop-blur-lg">
+        <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-t-2 border-[#D4A574]/40 px-6 py-4 shadow-lg">
           <div className="max-w-6xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-4 flex-1">
               <Avatar className="w-14 h-14 border-3 border-[#D4A574]">
@@ -957,16 +755,16 @@ export default function GameRoom() {
               </Avatar>
               <div className="flex-1">
                 <p className="font-bold text-lg text-[#F5E6D3]">{user.full_name}</p>
-                <p className={`text-sm font-bold flex items-center gap-2 ${
-                  canMove ? 'text-lime-400 animate-pulse' : 'text-[#D4A574]'
+                <p className={`text-sm font-semibold ${
+                  canMove ? 'text-lime-400' : 'text-[#D4A574]'
                 }`}>
-                  {canMove ? <><span className="inline-block w-2 h-2 bg-lime-400 rounded-full"></span> C'est à vous de jouer!</> : 'En attente de l\'adversaire...'}
+                  {canMove ? 'Votre tour' : 'En attente'}
                 </p>
               </div>
             </div>
             <div className={`text-4xl font-bold font-mono px-6 py-2 rounded-lg ${
               canMove 
-                ? 'bg-green-500/20 border-2 border-green-500 text-green-400 animate-pulse' 
+                ? 'bg-green-500/20 border-2 border-green-500 text-green-400' 
                 : 'bg-[#2C1810] border-2 border-[#D4A574]/50 text-[#F5E6D3]'
             }`}>
               {formatTime(isPlayerWhite ? whiteTime : blackTime)}
@@ -974,52 +772,6 @@ export default function GameRoom() {
           </div>
         </div>
       )}
-
-      {/* Dialog d'abandon */}
-      <AlertDialog open={showSurrenderDialog} onOpenChange={setShowSurrenderDialog}>
-        <AlertDialogContent className="bg-[#2C1810] border-[#D4A574]">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-[#F5E6D3] text-xl">Abandonner la partie ?</AlertDialogTitle>
-            <AlertDialogDescription className="text-[#D4A574]">
-              Êtes-vous sûr de vouloir abandonner ? Vous perdrez cette partie et votre adversaire sera déclaré vainqueur.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="bg-transparent border-[#D4A574]/50 text-[#F5E6D3] hover:bg-white/10">
-              Annuler
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleSurrender}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
-              Abandonner
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Dialog proposition match nul */}
-      <AlertDialog open={showDrawProposal} onOpenChange={setShowDrawProposal}>
-        <AlertDialogContent className="bg-[#2C1810] border-[#D4A574]">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-[#F5E6D3] text-xl">Proposition de match nul</AlertDialogTitle>
-            <AlertDialogDescription className="text-[#D4A574]">
-              Votre adversaire propose un match nul. Voulez-vous accepter ?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="bg-transparent border-[#D4A574]/50 text-[#F5E6D3] hover:bg-white/10">
-              Refuser
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleAcceptDraw}
-              className="bg-amber-600 hover:bg-amber-700 text-white"
-            >
-              Accepter
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

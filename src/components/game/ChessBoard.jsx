@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { RotateCcw, Plus, Flag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import VictoryParticles from '../effects/VictoryParticles';
+import GameEndModal from './GameEndModal';
 
 const PIECES = {
   K: '♔', Q: '♕', R: '♖', B: '♗', N: '♘', P: '♙',
@@ -20,7 +21,7 @@ const initialBoard = [
   ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
 ];
 
-export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', onGameEnd, isMultiplayer = false, canMove = true, blockBoard = false, initialBoardState = null, onSaveMove = null, currentTurnOverride = null }) {
+export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', onGameEnd, isMultiplayer = false, canMove = true, blockBoard = false, initialBoardState = null, onSaveMove = null, currentTurnOverride = null, gameStats = null }) {
   const [board, setBoard] = useState(() => initialBoardState ? initialBoardState : initialBoard);
   const [selectedSquare, setSelectedSquare] = useState(null);
   const [currentTurn, setCurrentTurn] = useState('white');
@@ -484,11 +485,21 @@ export default function ChessBoard({ playerColor = 'white', aiLevel = 'medium', 
   const rows = [8, 7, 6, 5, 4, 3, 2, 1];
   const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
 
+  const winner = gameStatus === 'whiteWins' ? 'white' : gameStatus === 'blackWins' ? 'black' : null;
+
   return (
     <div className="flex flex-col items-center justify-center w-full flex-1 gap-4 overflow-auto p-4">
       <VictoryParticles 
         show={gameStatus !== 'playing'} 
-        winner={gameStatus === 'whiteWins' ? 'white' : 'black'}
+        winner={winner}
+      />
+      <GameEndModal
+        show={gameStatus !== 'playing'}
+        winner={winner}
+        playerColor={playerColor}
+        onReplay={resetGame}
+        onHome={() => window.location.href = '/'}
+        stats={gameStats}
       />
       <div className="flex items-center justify-between w-full max-w-lg px-2">
         <div className={`px-4 py-2 rounded-lg ${currentTurn === playerColor ? 'bg-amber-500/20 border border-amber-500' : 'bg-white/5'}`}>

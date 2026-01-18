@@ -2,8 +2,9 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { RotateCcw, Home, Trophy, Frown } from 'lucide-react';
+import VictoryParticles from '../effects/VictoryParticles';
 
-export default function GameEndModal({ show, winner, playerColor, onReplay, onHome }) {
+export default function GameEndModal({ show, winner, playerColor, onReplay, onHome, stats }) {
   const isDraw = winner === null || winner === 'draw';
   const isWinner = !isDraw && winner === playerColor;
   
@@ -11,6 +12,9 @@ export default function GameEndModal({ show, winner, playerColor, onReplay, onHo
     <AnimatePresence>
       {show && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          {isWinner && (
+            <VictoryParticles show={true} winner={winner} />
+          )}
           <motion.div
             initial={{ scale: 0, opacity: 0, y: 50 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -72,6 +76,26 @@ export default function GameEndModal({ show, winner, playerColor, onReplay, onHo
                 <p className="text-center text-[#F5E6D3] text-xl">
                   {winner === 'white' ? '⚪ Blancs' : '⚫ Noirs'} ont gagné
                 </p>
+              </div>
+            )}
+
+            {/* Stats */}
+            {stats && (
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 mb-6 border border-[#D4A574]/30">
+                <div className="text-[#F5E6D3] text-sm space-y-2">
+                  <div className="flex justify-between">
+                    <span>Jeu</span>
+                    <span className="text-[#D4A574]">{stats.gameType === 'chess' ? 'Échecs' : 'Dames'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Coups</span>
+                    <span className="text-[#D4A574]">{stats.moveCount || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Temps</span>
+                    <span className="text-[#D4A574] capitalize">{stats.timeControl || 'classic'}</span>
+                  </div>
+                </div>
               </div>
             )}
 

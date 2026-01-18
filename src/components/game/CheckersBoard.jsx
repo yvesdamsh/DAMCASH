@@ -34,6 +34,7 @@ const getSquareNumber = (row, col) => {
 
 const cloneBoard = (board) => board.map(r => r.map(c => c ? { ...c } : null));
 
+<<<<<<< HEAD
 export default function CheckersBoard({
   playerColor = 'white',
   aiLevel = 'medium',
@@ -45,6 +46,9 @@ export default function CheckersBoard({
   onSaveMove = null,
   currentTurnOverride = null
 }) {
+=======
+export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium', onGameEnd, isMultiplayer = false, canMove = true, blockBoard = false, initialBoardState = null, onSaveMove = null, currentTurnOverride = null, gameStats = null }) {
+>>>>>>> 12c88df (Improve end game modal with stats and confetti)
   const [board, setBoard] = useState(() => initialBoardState ? initialBoardState : createInitialBoard());
   const [selectedSquare, setSelectedSquare] = useState(null);
   const [validMoves, setValidMoves] = useState([]);
@@ -535,6 +539,8 @@ export default function CheckersBoard({
   const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
   const winner = gameStatus === 'whiteWins' ? 'white' : gameStatus === 'blackWins' ? 'black' : null;
 
+  const winner = gameStatus === 'whiteWins' ? 'white' : gameStatus === 'blackWins' ? 'black' : null;
+
   return (
     <div style={{
       display: 'flex',
@@ -547,7 +553,14 @@ export default function CheckersBoard({
       padding: '16px',
       overflow: 'auto'
     }}>
+<<<<<<< HEAD
       <VictoryParticles show={gameStatus !== 'playing'} winner={winner} />
+=======
+      <VictoryParticles 
+        show={gameStatus !== 'playing'} 
+        winner={winner}
+      />
+>>>>>>> 12c88df (Improve end game modal with stats and confetti)
 
       <GameEndModal
         show={gameStatus !== 'playing'}
@@ -555,6 +568,10 @@ export default function CheckersBoard({
         playerColor={playerColor}
         onReplay={resetGame}
         onHome={() => window.location.href = '/'}
+<<<<<<< HEAD
+=======
+        stats={gameStats}
+>>>>>>> 12c88df (Improve end game modal with stats and confetti)
       />
 
       {/* Score */}
