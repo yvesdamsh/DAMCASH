@@ -359,10 +359,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       }
       const move = validMoves.find(m => m.row === row && m.col === col);
       if (move) {
-        if (!isMyTurn) {
-          console.log('✗ Cannot move - not your turn');
-          return;
-        }
+        if (!isMyTurn) return;
         const result = makeMove(chainCapture.row, chainCapture.col, row, col, move.captured);
         if (!result.continueChain) {
           if (isMultiplayer && onSaveMove) {
@@ -378,42 +375,25 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     }
 
     if (selectedSquare) {
-      console.log('=== MOVE ATTEMPT ===');
-      console.log('selectedSquare:', selectedSquare);
-      console.log('clicked destination:', row, col);
-      console.log('validMoves:', validMoves);
-      
       const move = validMoves.find(m => m.row === row && m.col === col);
-      console.log('found move:', move);
       
       if (move) {
-        // Bloquer l'exécution du mouvement si ce n'est pas le tour du joueur
-        if (!isMyTurn) {
-          console.log('✗ Cannot execute move - not your turn');
-          return;
-        }
+        // Bloquer l'exécution seulement si ce n'est pas mon tour
+        if (!isMyTurn) return;
         
-        console.log('✓ Valid move found, executing makeMove...');
         const result = makeMove(selectedSquare.row, selectedSquare.col, row, col, move.captured || []);
-        console.log('makeMove result:', result);
         
         if (!result.continueChain) {
-          console.log('No chain capture, checking save...');
-          console.log('isMultiplayer:', isMultiplayer);
-          console.log('onSaveMove exists:', !!onSaveMove);
-          
           if (isMultiplayer && onSaveMove) {
             const movingPiece = board[selectedSquare.row][selectedSquare.col];
             const nextColor = movingPiece.color === 'white' ? 'black' : 'white';
-            console.log('✓ Calling onSaveMove with nextColor:', nextColor);
             onSaveMove(result.board, nextColor);
           } else if (gameStatus === 'playing') {
-            console.log('Calling AI move...');
             setTimeout(() => makeAIMove(result.board), 500);
           }
         }
       } else if (piece && piece.color === playerColor) {
-        console.log('Changing piece selection');
+        // Changer de pion sélectionné
         if (mustCapture.length > 0) {
           const canCapture = mustCapture.some(c => c.row === row && c.col === col);
           if (!canCapture) return;
@@ -421,35 +401,19 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
         setSelectedSquare({ row, col });
         setValidMoves(getValidMoves(row, col, board));
       } else {
-        console.log('Deselecting piece');
+        // Désélectionner
         setSelectedSquare(null);
         setValidMoves([]);
       }
     } else {
-      console.log('No selected square, checking piece:', piece);
+      // Première sélection - TOUJOURS autoriser la sélection pour voir les mouvements
       if (piece && piece.color === playerColor) {
-        console.log('✓ Own piece found! Selecting...');
         if (mustCapture.length > 0) {
-          console.log('mustCapture positions:', mustCapture);
           const canCapture = mustCapture.some(c => c.row === row && c.col === col);
-          console.log('canCapture:', canCapture);
-          if (!canCapture) {
-            console.log('✗ Cannot capture, return');
-            return;
-          }
-        }
-        console.log('🎯 SELECTION: Setting selected square:', { row, col });
-        const moves = getValidMoves(row, col, board);
-        console.log('🎯 VALID MOVES CALCULATED:', moves);
-        console.log('🎯 Number of valid moves:', moves.length);
-        if (moves.length > 0) {
-          console.log('🎯 First move details:', moves[0]);
+          if (!canCapture) return;
         }
         setSelectedSquare({ row, col });
-        setValidMoves(moves);
-        console.log('🎯 State updated - selectedSquare and validMoves set');
-      } else {
-        console.log('✗ Not own piece or no piece');
+        setValidMoves(getValidMoves(row, col, board));
       }
     }
   };
