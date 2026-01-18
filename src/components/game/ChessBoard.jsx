@@ -8,25 +8,16 @@ const PIECES = {
   k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟'
 };
 
-const createInitialBoard = () => {
-  const board = Array(8).fill(null).map(() => Array(8).fill(null));
-  
-  // Rangée 0 (noirs): r, n, b, q, k, b, n, r
-  board[0] = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'];
-  
-  // Rangée 1 (pions noirs)
-  for (let i = 0; i < 8; i++) board[1][i] = 'p';
-  
-  // Rangées 2-5 (vides)
-  
-  // Rangée 6 (pions blancs)
-  for (let i = 0; i < 8; i++) board[6][i] = 'P';
-  
-  // Rangée 7 (blancs): R, N, B, Q, K, B, N, R
-  board[7] = ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'];
-  
-  return board;
-};
+const createInitialBoard = () => [
+  ['r','n','b','q','k','b','n','r'],  // rangée 0 - pièces noires
+  ['p','p','p','p','p','p','p','p'],  // rangée 1 - pions noirs
+  [null,null,null,null,null,null,null,null],
+  [null,null,null,null,null,null,null,null],
+  [null,null,null,null,null,null,null,null],
+  [null,null,null,null,null,null,null,null],
+  ['P','P','P','P','P','P','P','P'],  // rangée 6 - pions blancs
+  ['R','N','B','Q','K','B','N','R']   // rangée 7 - pièces blanches
+];
 
 const cloneBoard = (board) => board.map(r => [...r]);
 
