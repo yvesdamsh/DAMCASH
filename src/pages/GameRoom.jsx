@@ -713,7 +713,7 @@ export default function GameRoom() {
         )}
         {gameType === 'chess' ? (
           <ChessBoard 
-            playerColor={playerColor}
+            playerColor={effectivePlayerColor}
             onGameEnd={handleGameEnd}
             isMultiplayer={true}
             canMove={canMove && gameStarted && !isSpectator}
