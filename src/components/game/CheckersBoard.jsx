@@ -674,6 +674,11 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                    const isCapture = validMoves.find(m => m.row === actualRow && m.col === actualCol)?.isCapture;
                    const isMustCapture = mustCapture.some(c => c.row === actualRow && c.col === actualCol);
 
+                   // Debug: logger les mouvements valides pour cette case
+                   if (isValidMove && rowIndex === 0 && colIndex === 0) {
+                     console.log('🟢 VALID MOVE DETECTED at', actualRow, actualCol, 'validMoves:', validMoves);
+                   }
+
                    const baseStyles = {
                      display: 'flex',
                      alignItems: 'center',
