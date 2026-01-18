@@ -273,34 +273,35 @@ export default function ChessBoard({
       />
       <div style={{ width: 'min(90vw, calc(100vh - 200px))', height: 'min(90vw, calc(100vh - 200px))', aspectRatio: '1/1' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gridTemplateRows: 'repeat(8, 1fr)', width: '100%', height: '100%', gap: 0, border: '3px solid #3E2723' }}>
-          {displayBoard.map((row, rowIndex) => (
-            row.map((piece, colIndex) => {
-              const actualRow = playerColor === 'black' ? 7 - rowIndex : rowIndex;
-              const actualCol = playerColor === 'black' ? 7 - colIndex : colIndex;
-              const isLight = (actualRow + actualCol) % 2 === 0;
-              const isSelected = selectedSquare?.row === actualRow && selectedSquare?.col === actualCol;
-              const isValidMove = validMoves.some(m => m.row === actualRow && m.col === actualCol);
+          {Array.from({ length: 64 }).map((_, idx) => {
+            const rowIndex = Math.floor(idx / 8);
+            const colIndex = idx % 8;
+            const actualRow = playerColor === 'black' ? 7 - rowIndex : rowIndex;
+            const actualCol = playerColor === 'black' ? 7 - colIndex : colIndex;
+            const piece = board[actualRow][actualCol];
+            const isLight = (actualRow + actualCol) % 2 === 0;
+            const isSelected = selectedSquare?.row === actualRow && selectedSquare?.col === actualCol;
+            const isValidMove = validMoves.some(m => m.row === actualRow && m.col === actualCol);
 
-              return (
-                <div
-                  key={`${rowIndex}-${colIndex}`}
-                  onClick={() => handleSquareClick(actualRow, actualCol)}
-                  style={{
-                    backgroundColor: isLight ? '#F5E6D3' : '#B58863',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    position: 'relative',
-                    fontSize: 'clamp(32px, 70%, 60px)',
-                    boxShadow: isSelected ? 'inset 0 0 0 4px #facc15' : isValidMove ? 'inset 0 0 0 3px #22c55e' : 'none'
-                  }}
-                >
-                  {piece && <span>{PIECES[piece]}</span>}
-                </div>
-              );
-            })
-          ))}
+            return (
+              <div
+                key={`${actualRow}-${actualCol}`}
+                onClick={() => handleSquareClick(actualRow, actualCol)}
+                style={{
+                  backgroundColor: isLight ? '#F5E6D3' : '#B58863',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  fontSize: 'clamp(32px, 70%, 60px)',
+                  boxShadow: isSelected ? 'inset 0 0 0 4px #facc15' : isValidMove ? 'inset 0 0 0 3px #22c55e' : 'none'
+                }}
+              >
+                {piece && <span>{PIECES[piece]}</span>}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
