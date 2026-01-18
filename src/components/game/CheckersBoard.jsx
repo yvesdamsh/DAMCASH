@@ -399,13 +399,25 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
         setValidMoves([]);
       }
     } else {
+      console.log('No selected square, checking piece:', piece);
       if (piece && piece.color === playerColor) {
+        console.log('✓ Own piece found! Selecting...');
         if (mustCapture.length > 0) {
+          console.log('mustCapture positions:', mustCapture);
           const canCapture = mustCapture.some(c => c.row === row && c.col === col);
-          if (!canCapture) return;
+          console.log('canCapture:', canCapture);
+          if (!canCapture) {
+            console.log('✗ Cannot capture, return');
+            return;
+          }
         }
+        console.log('Setting selected square:', { row, col });
         setSelectedSquare({ row, col });
-        setValidMoves(getValidMoves(row, col, board));
+        const moves = getValidMoves(row, col, board);
+        console.log('Valid moves:', moves);
+        setValidMoves(moves);
+      } else {
+        console.log('✗ Not own piece or no piece');
       }
     }
   };
