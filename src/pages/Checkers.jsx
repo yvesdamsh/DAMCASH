@@ -16,12 +16,14 @@ export default function Checkers() {
   });
 
   const handleStart = () => {
-    if (settings.color === 'random') {
-      setSettings(prev => ({
-        ...prev,
-        color: Math.random() > 0.5 ? 'white' : 'black'
-      }));
-    }
+    const finalColor = settings.color === 'random' 
+      ? (Math.random() > 0.5 ? 'white' : 'black')
+      : settings.color;
+    
+    setSettings(prev => ({
+      ...prev,
+      color: finalColor
+    }));
     setGameStarted(true);
   };
 

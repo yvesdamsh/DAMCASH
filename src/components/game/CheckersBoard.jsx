@@ -661,11 +661,9 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                    }
 
                    return (
-                     <motion.div
+                     <div
                        key={`${rowIndex}-${colIndex}`}
                        onClick={() => isDark && handleSquareClick(actualRow, actualCol)}
-                       whileHover={isDark ? { backgroundColor: isDark ? '#6d4a2a' : '#F5E6D3' } : {}}
-                       whileTap={isDark ? { scale: 0.98 } : {}}
                        style={baseStyles}
                      >
                       {isDark && squareNum && (
@@ -823,11 +821,11 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
                           }}
                         />
                       )}
-                    </motion.div>
-                  );
-                })
-              ))}
-              </div>
+                      </div>
+                      );
+                      })
+                      ))}
+                      </div>
               </div>
               </div>
               );
