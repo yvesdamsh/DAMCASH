@@ -405,7 +405,7 @@ export default function CheckersBoard({
                           inset: '6%',
                           borderRadius: '50%',
                           background: cell.color === 'white' ? '#f0ebe1' : '#4a4a4a',
-                          border: cell.color === 'white' ? '2px solid #dcd6ca' : '2px solid '#313131',
+                          border: cell.color === 'white' ? '2px solid #dcd6ca' : '2px solid #313131',
                           boxShadow: cell.color === 'white'
                             ? 'inset 0 2px 4px rgba(0,0,0,0.2), 0 1px 2px rgba(255,255,255,0.8)'
                             : 'inset 0 2px 4px rgba(0,0,0,0.6), 0 1px 2px rgba(120,120,120,0.3)'
