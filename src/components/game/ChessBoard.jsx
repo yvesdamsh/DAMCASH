@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { RotateCcw, Plus } from 'lucide-react';
@@ -17,3 +18,6 @@ const initialBoard = [
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
+  ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+  ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+];
