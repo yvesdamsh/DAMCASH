@@ -374,8 +374,17 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       const move = validMoves.find(m => m.row === row && m.col === col);
       
       if (move) {
-        // Bloquer l'exécution seulement si ce n'est pas mon tour
+        // Vérifier si le mouvement est autorisé selon les règles de capture forcée
         if (!isMyTurn) return;
+        
+        // Vérifier les captures forcées
+        if (mustCapture.length > 0) {
+          const pieceCanCapture = mustCapture.some(c => c.row === selectedSquare.row && c.col === selectedSquare.col);
+          if (!pieceCanCapture) {
+            console.log('❌ Cannot move - forced capture elsewhere');
+            return;
+          }
+        }
         
         const result = makeMove(selectedSquare.row, selectedSquare.col, row, col, move.captured || []);
         
@@ -389,11 +398,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
           }
         }
       } else if (piece && piece.color === playerColor) {
-        // Changer de pion sélectionné
-        if (mustCapture.length > 0) {
-          const canCapture = mustCapture.some(c => c.row === row && c.col === col);
-          if (!canCapture) return;
-        }
+        // Changer de pion sélectionné - toujours autoriser pour voir les mouvements
         setSelectedSquare({ row, col });
         setValidMoves(getValidMoves(row, col, board));
       } else {
@@ -402,19 +407,10 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
         setValidMoves([]);
       }
     } else {
-      // Première sélection - TOUJOURS autoriser la sélection pour voir les mouvements
+      // Première sélection - TOUJOURS autoriser pour voir les mouvements
       if (piece && piece.color === playerColor) {
-        if (mustCapture.length > 0) {
-          const canCapture = mustCapture.some(c => c.row === row && c.col === col);
-          if (!canCapture) return;
-        }
-        const moves = getValidMoves(row, col, board);
-        console.log('🔵 SELECTING PIECE at', row, col);
-        console.log('🔵 Player color:', playerColor, 'Piece color:', piece.color);
-        console.log('🔵 mustCapture:', mustCapture);
-        console.log('🔵 Calculated moves:', moves);
         setSelectedSquare({ row, col });
-        setValidMoves(moves);
+        setValidMoves(getValidMoves(row, col, board));
       }
     }
   };
