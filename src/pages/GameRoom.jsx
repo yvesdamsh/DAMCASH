@@ -44,18 +44,23 @@ export default function GameRoom() {
 
   // Charger les données initiales
   useEffect(() => {
-    if (roomId) {
+    if (gameMode === 'ai') {
+      // Mode IA: pas besoin de charger depuis la base de données
+      setLoading(false);
+      setUser(null);
+      setGameStarted(true);
+    } else if (roomId) {
       loadData();
     } else {
       setLoading(false);
     }
-    
+
     const timeout = setTimeout(() => {
       setLoading(false);
     }, 5000);
-    
+
     return () => clearTimeout(timeout);
-  }, [roomId]);
+  }, [roomId, gameMode]);
 
   // Fallback: recharger périodiquement si le realtime se coupe
   useEffect(() => {
