@@ -257,15 +257,8 @@ export default function ChessBoard({
     return () => clearTimeout(timer);
   }, [currentTurn, board, isMultiplayer, blockBoard, gameStatus, aiLevel]);
 
-  const getPieceSymbol = (piece) => {
-    const symbols = {
-      'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟',
-      'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'
-    };
-    return symbols[piece] || '';
-  };
-
   const winner = gameStatus === 'whiteWins' ? 'white' : gameStatus === 'blackWins' ? 'black' : null;
+  const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', flex: 1, backgroundColor: '#1a1a1a', padding: '16px', overflow: 'auto' }}>
@@ -278,32 +271,33 @@ export default function ChessBoard({
         onHome={() => window.location.href = '/'}
         stats={gameStats}
       />
-      <div style={{ width: 'min(90vw, calc(100vh - 200px))', height: 'min(90vw, calc(100vh - 200px))', aspectRatio: '1/1', display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 0, border: '3px solid #3E2723' }}>
-        {Array.from({length: 64}).map((_, i) => {
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 40px)', gap: 0, border: '3px solid #3E2723' }}>
+        {displayBoard.flat().map((piece, i) => {
           const r = Math.floor(i / 8);
           const c = i % 8;
-          const displayRow = playerColor === 'black' ? 7 - r : r;
-          const displayCol = playerColor === 'black' ? 7 - c : c;
-          const piece = board[displayRow][displayCol];
-          const isSelected = selectedSquare?.row === displayRow && selectedSquare?.col === displayCol;
-          const isValidMove = validMoves.some(m => m.row === displayRow && m.col === displayCol);
+          const actualRow = playerColor === 'black' ? 7 - r : r;
+          const actualCol = playerColor === 'black' ? 7 - c : c;
+          const isSelected = selectedSquare?.row === actualRow && selectedSquare?.col === actualCol;
+          const isValidMove = validMoves.some(m => m.row === actualRow && m.col === actualCol);
           
           return (
             <div
               key={i}
-              onClick={() => handleSquareClick(displayRow, displayCol)}
+              onClick={() => handleSquareClick(actualRow, actualCol)}
               style={{
-                aspectRatio: '1',
+                width: '40px',
+                height: '40px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 backgroundColor: (r + c) % 2 === 0 ? '#F5E6D3' : '#B58863',
                 cursor: 'pointer',
-                fontSize: '40px',
-                boxShadow: isSelected ? 'inset 0 0 0 4px #facc15' : isValidMove ? 'inset 0 0 0 3px #22c55e' : 'none'
+                fontSize: '24px',
+                fontWeight: 'bold',
+                boxShadow: isSelected ? 'inset 0 0 0 3px #facc15' : isValidMove ? 'inset 0 0 0 2px #22c55e' : 'none'
               }}
             >
-              {piece && piece !== '' ? getPieceSymbol(piece) : ''}
+              {piece}
             </div>
           );
         })}
