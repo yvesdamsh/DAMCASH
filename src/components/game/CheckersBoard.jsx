@@ -202,8 +202,8 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     const directions = piece.isKing 
       ? [[-1, -1], [-1, 1], [1, -1], [1, 1]]
       : piece.color === 'white' 
-        ? [[-1, -1], [-1, 1]]
-        : [[1, -1], [1, 1]];
+        ? [[1, -1], [1, 1]]
+        : [[-1, -1], [-1, 1]];
 
     if (piece.isKing) {
       directions.forEach(([dr, dc]) => {
