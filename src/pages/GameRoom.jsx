@@ -573,8 +573,8 @@ export default function GameRoom() {
     );
   }
 
-  const isPlayerWhite = user && session && user.id === session.player1_id;
-  const playerColor = isPlayerWhite ? 'white' : 'black';
+  const computedPlayerColor = user && session && user.id === session.player1_id ? 'white' : 'black';
+  const effectivePlayerColor = gameMode === 'ai' ? playerColor : computedPlayerColor;
   const gameType = session?.game_type;
   const canMove = !isSpectator && (
     (playerColor === 'white' && session.current_turn === 'white') || 
