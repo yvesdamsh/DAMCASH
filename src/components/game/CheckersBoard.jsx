@@ -238,15 +238,13 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     const piece = boardState[row][col];
     if (!piece) return [];
 
-    // Toujours calculer les captures possibles pour cette pièce
+    // TOUJOURS retourner les captures si elles existent
     const captureMoves = getCaptureMoves(row, col, boardState, piece);
-    
-    // Si ce pion a des captures possibles, les retourner
     if (captureMoves.length > 0) {
       return captureMoves;
     }
 
-    // Sinon, retourner les mouvements normaux
+    // Sinon retourner les mouvements normaux
     return getRegularMoves(row, col, boardState, piece);
   }, [getRegularMoves, getCaptureMoves]);
 
