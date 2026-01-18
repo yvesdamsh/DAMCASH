@@ -581,6 +581,38 @@ export default function GameRoom() {
     (playerColor === 'black' && session.current_turn === 'black')
   );
 
+  // Mode IA: afficher directement le plateau
+  if (gameMode === 'ai') {
+    return (
+      <div className="w-full min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] flex flex-col">
+        {/* Header */}
+        <div className="p-4 border-b border-[#D4A574]/30 bg-gradient-to-b from-[#5D3A1A] to-[#2C1810]">
+          <div className="flex items-center justify-between">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/Checkers')}
+              className="text-[#F5E6D3] hover:bg-white/10"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Retour
+            </Button>
+            <h1 className="text-2xl font-bold">⚫ Dames vs IA</h1>
+            <div className="w-20" />
+          </div>
+        </div>
+
+        {/* Plateau de jeu */}
+        <div className="flex-1 flex items-center justify-center overflow-auto p-6">
+          <CheckersBoard 
+            playerColor={playerColor}
+            aiLevel={aiLevel}
+            onGameEnd={() => {}}
+          />
+        </div>
+      </div>
+    );
+  }
+
   // Écran d'attente
   if (!gameStarted) {
     return (
