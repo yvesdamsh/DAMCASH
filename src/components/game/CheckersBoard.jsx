@@ -348,11 +348,11 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       }
       const move = validMoves.find(m => m.row === row && m.col === col);
       if (move) {
+        const movingPiece = board[chainCapture.row][chainCapture.col];
+        const nextColor = movingPiece.color === 'white' ? 'black' : 'white';
         const result = makeMove(chainCapture.row, chainCapture.col, row, col, move.captured);
         if (!result.continueChain) {
           if (isMultiplayer && onSaveMove) {
-            const movingPiece = board[chainCapture.row][chainCapture.col];
-            const nextColor = movingPiece.color === 'white' ? 'black' : 'white';
             onSaveMove(result.board, nextColor);
           } else if (!isMultiplayer) {
             setTimeout(() => makeAIMove(result.board), 500);
