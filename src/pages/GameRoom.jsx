@@ -43,7 +43,15 @@ export default function GameRoom() {
   useEffect(() => {
     if (roomId) {
       loadData();
+    } else {
+      setLoading(false);
     }
+    
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
+    
+    return () => clearTimeout(timeout);
   }, [roomId]);
 
   // Fallback: recharger périodiquement si le realtime se coupe
