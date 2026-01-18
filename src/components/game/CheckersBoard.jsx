@@ -345,6 +345,9 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     if (blockBoard) return;
     if (gameStatus !== 'playing') return;
     
+    // Vérifier si c'est le tour du joueur
+    if (effectiveTurn !== playerColor) return;
+    
     const piece = board[row][col];
 
     if (chainCapture) {
@@ -359,7 +362,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
             const movingPiece = board[chainCapture.row][chainCapture.col];
             const nextColor = movingPiece.color === 'white' ? 'black' : 'white';
             onSaveMove(result.board, nextColor);
-          } else if (currentTurn !== playerColor) {
+          } else if (!isMultiplayer) {
             setTimeout(() => makeAIMove(result.board), 500);
           }
         }
