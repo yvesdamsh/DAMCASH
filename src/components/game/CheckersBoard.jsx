@@ -345,29 +345,13 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
   };
 
   const handleSquareClick = (row, col) => {
-    console.log('=== CLICK DEBUG ===');
-    console.log('playerColor:', playerColor);
-    console.log('clicked row/col:', row, col);
-    console.log('piece at position:', board[row][col]);
-    console.log('canMove:', canMove);
-    console.log('effectiveTurn:', effectiveTurn);
-    console.log('isMultiplayer:', isMultiplayer);
+    if (blockBoard) return;
+    if (gameStatus !== 'playing') return;
     
-    if (blockBoard) {
-      console.log('✗ Board blocked');
-      return;
-    }
-    if (gameStatus !== 'playing') {
-      console.log('✗ Game not playing');
-      return;
-    }
-    
-    // Vérifier si c'est le tour du joueur (bloquer seulement les mouvements, pas la sélection)
-    const isMyTurn = isMultiplayer ? (effectiveTurn === playerColor) : (effectiveTurn === playerColor);
-    console.log('isMyTurn:', isMyTurn);
-
+    // Toujours autoriser la sélection de pions pour voir les mouvements valides
+    // Bloquer seulement l'EXECUTION du mouvement si ce n'est pas le tour du joueur
+    const isMyTurn = effectiveTurn === playerColor;
     const piece = board[row][col];
-    console.log('is own piece:', piece?.color === playerColor);
 
     if (chainCapture) {
       if (row === chainCapture.row && col === chainCapture.col) {
