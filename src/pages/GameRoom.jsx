@@ -77,28 +77,19 @@ export default function GameRoom() {
 
       const sess = event.data;
 
-      // Mettre à jour la session
       setSession(prev => ({ ...prev, ...sess }));
-
-      // Démarrer la partie quand player2_id est présent
       setGameStarted(!!sess.player2_id || sess.status === 'in_progress');
 
-      // Si la partie est terminée, déclencher handleGameEnd
       if (sess.status === 'finished' && !endGameSentRef.current) {
         endGameSentRef.current = true;
-        
-        // Déterminer le statut de fin
         let gameEndStatus = 'draw';
         if (sess.winner_id) {
           const isPlayer1Winner = sess.winner_id === sess.player1_id;
           gameEndStatus = isPlayer1Winner ? 'whiteWins' : 'blackWins';
         }
-        
-        // Appeler handleGameEnd pour gérer la fin
         setTimeout(() => handleGameEnd(gameEndStatus), 500);
       }
 
-      // Rafraîchir l'adversaire si nécessaire
       const opponentId = user?.id === sess.player1_id ? sess.player2_id : sess.player1_id;
       if (opponentId && opponent?.id !== opponentId) {
         const onlineUsers = await base44.entities.OnlineUser.filter({ user_id: opponentId });
@@ -122,6 +113,24 @@ export default function GameRoom() {
       if (typeof unsubscribe === 'function') unsubscribe();
     };
   }, [roomId, user?.id, opponent?.id]);
+
+  // Écouter les propositions de match nul
+  useEffect(() => {
+    if (!user || !roomId) return;
+
+    const unsubscribe = base44.entities.Notification?.subscribe?.((event) => {
+      if (event?.type !== 'create') return;
+      if (!event?.data || event.data.user_email !== user.email) return;
+      if (event.data.type === 'draw_proposal') {
+        setShowDrawProposal(true);
+        setDrawProposalFrom(event.data.from_user);
+      }
+    });
+
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
+  }, [user, roomId]);
 
   // Realtime dédié aux coups: écouter les changements de GameSession pour la synchro board
   useEffect(() => {
@@ -492,60 +501,70 @@ export default function GameRoom() {
     };
 
     const handleSurrender = async () => {
-    if (!session || !user || endGameSentRef.current) return;
-    endGameSentRef.current = true;
-    setShowSurrenderDialog(false);
+      if (!session || !user || endGameSentRef.current) return;
+      endGameSentRef.current = true;
+      setShowSurrenderDialog(false);
 
-    const playerColor = user.id === session.player1_id ? 'white' : 'black';
-    const winnerId = playerColor === 'white' ? session.player2_id : session.player1_id;
-    const winnerEmail = playerColor === 'white' ? session.player2_email : session.player1_email;
+      const playerColor = user.id === session.player1_id ? 'white' : 'black';
+      const winnerId = playerColor === 'white' ? session.player2_id : session.player1_id;
+      const winnerEmail = playerColor === 'white' ? session.player2_email : session.player1_email;
 
-    try {
-      await base44.entities.GameSession.update(session.id, {
-        status: 'finished',
-        winner_id: winnerId,
-        finished_at: new Date().toISOString()
-      });
+      try {
+        await base44.entities.GameSession.update(session.id, {
+          status: 'finished',
+          winner_id: winnerId,
+          finished_at: new Date().toISOString()
+        });
 
-      await base44.entities.Notification?.create?.({
-        user_email: winnerEmail,
-        type: 'game_result',
-        title: 'Victoire par abandon',
-        message: 'Votre adversaire a abandonné la partie - Vous avez gagné!',
-        link: `GameRoom?roomId=${roomId}`
-      });
+        if (winnerEmail) {
+          await base44.entities.Notification?.create?.({
+            user_email: winnerEmail,
+            type: 'game_result',
+            title: 'Victoire par abandon',
+            message: 'Votre adversaire a abandonné - Vous avez gagné!',
+            link: `GameRoom?roomId=${roomId}`
+          });
+        }
 
-      setTimeout(() => navigate('/Play'), 1000);
-    } catch (e) {
-      console.log('Erreur abandon:', e?.message || e);
-      endGameSentRef.current = false;
-    }
+        setTimeout(() => {
+          handleGameEnd(playerColor === 'white' ? 'blackWins' : 'whiteWins');
+        }, 500);
+      } catch (e) {
+        console.log('Erreur abandon:', e?.message || e);
+        endGameSentRef.current = false;
+      }
     };
 
     const handleProposeDrawal = async () => {
-    if (!session || !user) return;
+      if (!session || !user) return;
 
-    const opponentEmail = user.id === session.player1_id ? session.player2_email : session.player1_email;
+      const opponentId = user.id === session.player1_id ? session.player2_id : session.player1_id;
+      const opponentEmail = user.id === session.player1_id ? session.player2_email : session.player1_email;
 
-    try {
-      await base44.entities.Notification?.create?.({
-        user_email: opponentEmail,
-        type: 'draw_proposal',
-        title: 'Proposition de match nul',
-        message: `${user.full_name} propose un match nul`,
-        from_user: user.email,
-        link: `GameRoom?roomId=${roomId}`
-      });
+      try {
+        if (opponentEmail) {
+          await base44.entities.Notification?.create?.({
+            user_email: opponentEmail,
+            type: 'draw_proposal',
+            title: 'Proposition de match nul',
+            message: `${user.full_name} propose un match nul`,
+            from_user: user.email,
+            link: `GameRoom?roomId=${roomId}`
+          });
+        }
 
-      await base44.entities.GameChatMessage.create({
-        room_id: roomId,
-        sender_id: 'system',
-        sender_name: 'Système',
-        message: `${user.full_name} a proposé un match nul`
-      });
-    } catch (e) {
-      console.log('Erreur proposition match nul:', e?.message || e);
-    }
+        await base44.entities.GameChatMessage.create({
+          room_id: roomId,
+          sender_id: 'system',
+          sender_name: 'Système',
+          message: `${user.full_name} a proposé un match nul`
+        });
+
+        setDrawProposalFrom(user.id);
+        toast('Proposition envoyée', { description: 'En attente de la réponse de votre adversaire' });
+      } catch (e) {
+        console.log('Erreur proposition match nul:', e?.message || e);
+      }
     };
 
     const handleAcceptDraw = async () => {
@@ -759,15 +778,15 @@ export default function GameRoom() {
               </Avatar>
               <div className="flex-1">
                 <p className="font-bold text-lg text-[#F5E6D3]">{opponent.full_name}</p>
-                <p className={`text-sm font-semibold ${
+                <p className={`text-sm font-bold flex items-center gap-2 ${
                   session.current_turn === (isPlayerWhite ? 'black' : 'white') 
-                    ? 'text-lime-400' 
+                    ? 'text-lime-400 animate-pulse' 
                     : 'text-[#D4A574]'
                 }`}>
                   {session.player2_id ? (
                     session.current_turn === (isPlayerWhite ? 'black' : 'white') 
-                      ? "🟢 C'est son tour" 
-                      : 'En attente...'
+                      ? <><span className="inline-block w-2 h-2 bg-lime-400 rounded-full"></span> C'est son tour</> 
+                      : 'En attente de votre coup...'
                   ) : (
                     'En attente de rejoindre...'
                   )}
@@ -776,7 +795,7 @@ export default function GameRoom() {
             </div>
             <div className={`text-4xl font-bold font-mono px-6 py-2 rounded-lg ${
               session.current_turn === (isPlayerWhite ? 'black' : 'white') 
-                ? 'bg-red-500/20 border-2 border-red-500 text-red-400' 
+                ? 'bg-red-500/20 border-2 border-red-500 text-red-400 animate-pulse' 
                 : 'bg-[#2C1810] border-2 border-[#D4A574]/50 text-[#F5E6D3]'
             }`}>
               {formatTime(isPlayerWhite ? blackTime : whiteTime)}
@@ -821,23 +840,23 @@ export default function GameRoom() {
 
       {/* Barre d'outils - Options de partie */}
       {!isSpectator && gameStarted && session?.status === 'in_progress' && (
-        <div className="px-6 py-4">
+        <div className="px-6 py-4 bg-[#2C1810]/50 border-t border-[#D4A574]/20">
           <div className="max-w-4xl mx-auto flex gap-4 justify-center">
             <Button
               onClick={handleProposeDrawal}
               size="lg"
-              className="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-8 py-6 text-lg shadow-lg"
+              className="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-8 py-3 shadow-lg"
             >
               <Handshake className="w-5 h-5 mr-2" />
-              🤝 Match Nul
+              Proposer Match Nul
             </Button>
             <Button
               onClick={() => setShowSurrenderDialog(true)}
               size="lg"
-              className="bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-6 text-lg shadow-lg"
+              className="bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-3 shadow-lg"
             >
               <Flag className="w-5 h-5 mr-2" />
-              🏳️ Abandonner
+              Abandonner
             </Button>
           </div>
         </div>
@@ -900,16 +919,16 @@ export default function GameRoom() {
               </Avatar>
               <div className="flex-1">
                 <p className="font-bold text-lg text-[#F5E6D3]">{user.full_name}</p>
-                <p className={`text-sm font-semibold ${
-                  canMove ? 'text-lime-400' : 'text-[#D4A574]'
+                <p className={`text-sm font-bold flex items-center gap-2 ${
+                  canMove ? 'text-lime-400 animate-pulse' : 'text-[#D4A574]'
                 }`}>
-                  {canMove ? "🟢 C'est votre tour" : 'En attente de l\'adversaire...'}
+                  {canMove ? <><span className="inline-block w-2 h-2 bg-lime-400 rounded-full"></span> C'est à vous de jouer!</> : 'En attente de l\'adversaire...'}
                 </p>
               </div>
             </div>
             <div className={`text-4xl font-bold font-mono px-6 py-2 rounded-lg ${
               canMove 
-                ? 'bg-green-500/20 border-2 border-green-500 text-green-400' 
+                ? 'bg-green-500/20 border-2 border-green-500 text-green-400 animate-pulse' 
                 : 'bg-[#2C1810] border-2 border-[#D4A574]/50 text-[#F5E6D3]'
             }`}>
               {formatTime(isPlayerWhite ? whiteTime : blackTime)}
