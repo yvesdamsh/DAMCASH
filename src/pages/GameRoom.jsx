@@ -33,6 +33,9 @@ export default function GameRoom() {
   const roomId = urlParams.get('roomId');
   const isWaiting = urlParams.get('waiting') === 'true';
   const isSpectator = urlParams.get('spectate') === 'true';
+  const isAIMode = urlParams.get('mode') === 'ai';
+  const aiColor = urlParams.get('color') || 'white';
+  const aiLevel = urlParams.get('aiLevel') || 'medium';
   
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
@@ -54,10 +57,15 @@ export default function GameRoom() {
 
   // Charger les données initiales
   useEffect(() => {
+    if (isAIMode) {
+      setLoading(false);
+      setGameStarted(true);
+      return;
+    }
     if (roomId) {
       loadData();
     }
-  }, [roomId]);
+  }, [roomId, isAIMode]);
 
   // Fallback: recharger périodiquement si le realtime se coupe
   useEffect(() => {
@@ -683,6 +691,36 @@ export default function GameRoom() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
+      </div>
+    );
+  }
+
+  // Mode IA - afficher directement le plateau
+  if (isAIMode) {
+    return (
+      <div className="w-full min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] flex flex-col">
+        <div className="p-4 border-b border-[#D4A574]/30 bg-gradient-to-b from-[#5D3A1A] to-[#2C1810]">
+          <div className="flex items-center justify-between">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/Checkers')}
+              className="text-[#F5E6D3] hover:bg-white/10"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Retour
+            </Button>
+            <h1 className="text-2xl font-bold">⚫ Dames vs IA</h1>
+            <div className="w-24" />
+          </div>
+        </div>
+        <div className="flex-1 flex items-center justify-center overflow-auto p-6">
+          <CheckersBoard 
+            playerColor={aiColor}
+            aiLevel={aiLevel}
+            onGameEnd={() => navigate('/Checkers')}
+            isMultiplayer={false}
+          />
+        </div>
       </div>
     );
   }
