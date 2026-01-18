@@ -122,12 +122,22 @@ export default function GameSetup({ gameType, settings, setSettings, onStart }) 
       )}
 
       {/* Start Button */}
-      <Button
-        onClick={onStart}
-        className="w-full py-6 text-lg font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white shadow-lg shadow-amber-500/25"
+      <button
+        onClick={() => {
+          console.log('🎮 BOUTON CLIQUE - Settings:', settings);
+          if (settings.mode === 'ai') {
+            const finalColor = settings.color === 'random' ? (Math.random() > 0.5 ? 'white' : 'black') : settings.color;
+            console.log('🤖 Mode IA - Redirection vers GameRoom');
+            window.location.href = `/GameRoom?mode=ai&color=${finalColor}&aiLevel=${settings.aiLevel}&timeControl=${settings.timeControl}`;
+          } else {
+            console.log('🌐 Mode Online - Appel onStart');
+            onStart();
+          }
+        }}
+        className="w-full py-6 text-lg font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white shadow-lg shadow-amber-500/25 rounded-lg"
       >
         Commencer la partie
-      </Button>
+      </button>
     </div>
   );
 }
