@@ -324,6 +324,52 @@ export default function CheckersBoard({
     setMustCapture(forced.captures);
   }, [board, effectiveTurn, getForcedCaptures]);
 
+  // IA joue automatiquement si c'est son tour
+  useEffect(() => {
+    if (isMultiplayer || blockBoard || gameStatus !== 'playing') return;
+    if (effectiveTurn === playerColor) return; // C'est au joueur de jouer
+
+    const aiMove = () => {
+      // Trouver toutes les pièces de l'IA
+      const aiColor = effectiveTurn;
+      const possibleMoves = [];
+
+      for (let r = 0; r < 10; r++) {
+        for (let c = 0; c < 10; c++) {
+          const piece = board[r][c];
+          if (piece && piece.color === aiColor) {
+            const moves = getValidMovesForColor(r, c, board, aiColor);
+            if (moves.length > 0) {
+              moves.forEach(move => {
+                possibleMoves.push({ fromRow: r, fromCol: c, ...move });
+              });
+            }
+          }
+        }
+      }
+
+      if (possibleMoves.length === 0) return; // Pas de coups disponibles
+
+      // Sélectionner un coup aléatoire (facile) ou stratégique (hard)
+      let selectedMove;
+      if (aiLevel === 'easy') {
+        selectedMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+      } else {
+        // Medium/Hard: priorité aux captures
+        const captures = possibleMoves.filter(m => m.isCapture);
+        selectedMove = captures.length > 0 
+          ? captures[Math.floor(Math.random() * captures.length)]
+          : possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+      }
+
+      // Exécuter le coup
+      makeMove(selectedMove.fromRow, selectedMove.fromCol, selectedMove.row, selectedMove.col, selectedMove.captured || []);
+    };
+
+    const timer = setTimeout(aiMove, 800); // Délai pour que ce soit moins instantané
+    return () => clearTimeout(timer);
+  }, [effectiveTurn, playerColor, board, isMultiplayer, blockBoard, gameStatus, aiLevel, getValidMovesForColor]);
+
   const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
   const winner = gameStatus === 'whiteWins' ? 'white' : gameStatus === 'blackWins' ? 'black' : null;
 
