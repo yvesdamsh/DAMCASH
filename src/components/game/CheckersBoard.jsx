@@ -348,6 +348,8 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     const isMyTurn = effectiveTurn === playerColor;
     const piece = board[row][col];
 
+    console.log('🎮 CLICK:', { row, col, effectiveTurn, playerColor, isMyTurn, piece: piece?.color });
+
     if (chainCapture) {
       if (row === chainCapture.row && col === chainCapture.col) {
         return;
@@ -373,8 +375,12 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       const move = validMoves.find(m => m.row === row && m.col === col);
       
       if (move) {
+        console.log('✅ MOVE FOUND:', move, 'isMyTurn:', isMyTurn);
         // Bloquer l'EXECUTION du mouvement si ce n'est pas notre tour
-        if (!isMyTurn) return;
+        if (!isMyTurn) {
+          console.log('❌ BLOCKED: Not your turn');
+          return;
+        }
         
         // Vérifier les captures forcées
         if (mustCapture.length > 0) {
