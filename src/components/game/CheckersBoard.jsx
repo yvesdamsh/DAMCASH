@@ -395,6 +395,12 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       console.log('found move:', move);
       
       if (move) {
+        // Bloquer l'exécution du mouvement si ce n'est pas le tour du joueur
+        if (!isMyTurn) {
+          console.log('✗ Cannot execute move - not your turn');
+          return;
+        }
+        
         console.log('✓ Valid move found, executing makeMove...');
         const result = makeMove(selectedSquare.row, selectedSquare.col, row, col, move.captured || []);
         console.log('makeMove result:', result);
