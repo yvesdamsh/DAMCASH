@@ -235,33 +235,19 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
 
   const getValidMoves = useCallback((row, col, boardState) => {
     const piece = boardState[row][col];
-    console.log('🔍 getValidMoves called for', row, col, 'piece:', piece);
     if (!piece) return [];
 
-    // Recalculer les forced captures pour la couleur de la pièce
-    const forcedCaptures = getForcedCaptures(boardState, piece.color);
-    console.log('🔍 forcedCaptures:', forcedCaptures);
-    
-    // Si des captures sont forcées pour cette couleur
-    if (forcedCaptures.captures.length > 0) {
-      const forced = forcedCaptures.captures.find(c => c.row === row && c.col === col);
-      console.log('🔍 forced captures exist, this piece forced?', !!forced);
-      // Si cette pièce n'est pas dans les captures forcées, elle ne peut pas bouger
-      return forced ? forced.moves : [];
-    }
-
-    // Sinon, vérifier les captures possibles pour cette pièce
+    // Toujours calculer les captures possibles pour cette pièce
     const captureMoves = getCaptureMoves(row, col, boardState, piece);
-    console.log('🔍 captureMoves:', captureMoves);
+    
+    // Si ce pion a des captures possibles, les retourner
     if (captureMoves.length > 0) {
       return captureMoves;
     }
 
-    // Mouvements normaux
-    const regularMoves = getRegularMoves(row, col, boardState, piece);
-    console.log('🔍 regularMoves:', regularMoves);
-    return regularMoves;
-  }, [getRegularMoves, getCaptureMoves, getForcedCaptures]);
+    // Sinon, retourner les mouvements normaux
+    return getRegularMoves(row, col, boardState, piece);
+  }, [getRegularMoves, getCaptureMoves]);
 
   const getValidMovesForColor = useCallback((row, col, boardState, color) => {
     const piece = boardState[row][col];
