@@ -577,9 +577,9 @@ export default function GameRoom() {
   const effectivePlayerColor = gameMode === 'ai' ? playerColor : computedPlayerColor;
   const isPlayerWhite = gameMode === 'ai' ? playerColor === 'white' : user?.id === session?.player1_id;
   const gameType = session?.game_type;
-  const canMove = !isSpectator && (
-    (effectivePlayerColor === 'white' && session.current_turn === 'white') || 
-    (effectivePlayerColor === 'black' && session.current_turn === 'black')
+  const canMove = gameMode !== 'ai' && !isSpectator && (
+    (effectivePlayerColor === 'white' && session?.current_turn === 'white') || 
+    (effectivePlayerColor === 'black' && session?.current_turn === 'black')
   );
 
   // Mode IA: afficher directement le plateau
