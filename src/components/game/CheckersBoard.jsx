@@ -347,8 +347,6 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     if (blockBoard) return;
     if (gameStatus !== 'playing') return;
     
-    // Toujours autoriser la sélection de pions pour voir les mouvements valides
-    // Bloquer seulement l'EXECUTION du mouvement si ce n'est pas le tour du joueur
     const isMyTurn = effectiveTurn === playerColor;
     const piece = board[row][col];
 
@@ -377,14 +375,13 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       const move = validMoves.find(m => m.row === row && m.col === col);
       
       if (move) {
-        // Vérifier si le mouvement est autorisé selon les règles de capture forcée
+        // Bloquer l'EXECUTION du mouvement si ce n'est pas notre tour
         if (!isMyTurn) return;
         
         // Vérifier les captures forcées
         if (mustCapture.length > 0) {
           const pieceCanCapture = mustCapture.some(c => c.row === selectedSquare.row && c.col === selectedSquare.col);
           if (!pieceCanCapture) {
-            console.log('❌ Cannot move - forced capture elsewhere');
             return;
           }
         }
@@ -401,16 +398,15 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
           }
         }
       } else if (piece && piece.color === playerColor) {
-        // Changer de pion sélectionné - toujours autoriser pour voir les mouvements
+        // Autoriser la sélection pour voir les mouvements valides
         setSelectedSquare({ row, col });
         setValidMoves(getValidMoves(row, col, board));
       } else {
-        // Désélectionner
         setSelectedSquare(null);
         setValidMoves([]);
       }
     } else {
-      // Première sélection - TOUJOURS autoriser pour voir les mouvements
+      // Première sélection - autoriser pour voir les mouvements valides
       if (piece && piece.color === playerColor) {
         setSelectedSquare({ row, col });
         setValidMoves(getValidMoves(row, col, board));

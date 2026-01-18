@@ -83,6 +83,21 @@ export default function GameRoom() {
       // Démarrer la partie quand player2_id est présent
       setGameStarted(!!sess.player2_id || sess.status === 'in_progress');
 
+      // Si la partie est terminée, déclencher handleGameEnd
+      if (sess.status === 'finished' && !endGameSentRef.current) {
+        endGameSentRef.current = true;
+        
+        // Déterminer le statut de fin
+        let gameEndStatus = 'draw';
+        if (sess.winner_id) {
+          const isPlayer1Winner = sess.winner_id === sess.player1_id;
+          gameEndStatus = isPlayer1Winner ? 'whiteWins' : 'blackWins';
+        }
+        
+        // Appeler handleGameEnd pour gérer la fin
+        setTimeout(() => handleGameEnd(gameEndStatus), 500);
+      }
+
       // Rafraîchir l'adversaire si nécessaire
       const opponentId = user?.id === sess.player1_id ? sess.player2_id : sess.player1_id;
       if (opponentId && opponent?.id !== opponentId) {
@@ -479,10 +494,11 @@ export default function GameRoom() {
     const handleSurrender = async () => {
     if (!session || !user || endGameSentRef.current) return;
     endGameSentRef.current = true;
+    setShowSurrenderDialog(false);
 
     const playerColor = user.id === session.player1_id ? 'white' : 'black';
     const winnerId = playerColor === 'white' ? session.player2_id : session.player1_id;
-    const loserId = user.id;
+    const winnerEmail = playerColor === 'white' ? session.player2_email : session.player1_email;
 
     try {
       await base44.entities.GameSession.update(session.id, {
@@ -492,14 +508,14 @@ export default function GameRoom() {
       });
 
       await base44.entities.Notification?.create?.({
-        user_email: winnerId,
+        user_email: winnerEmail,
         type: 'game_result',
         title: 'Victoire par abandon',
-        message: 'Votre adversaire a abandonné la partie',
+        message: 'Votre adversaire a abandonné la partie - Vous avez gagné!',
         link: `GameRoom?roomId=${roomId}`
       });
 
-      navigate('/Play');
+      setTimeout(() => navigate('/Play'), 1000);
     } catch (e) {
       console.log('Erreur abandon:', e?.message || e);
       endGameSentRef.current = false;
@@ -509,11 +525,11 @@ export default function GameRoom() {
     const handleProposeDrawal = async () => {
     if (!session || !user) return;
 
-    const opponentId = user.id === session.player1_id ? session.player2_id : session.player1_id;
+    const opponentEmail = user.id === session.player1_id ? session.player2_email : session.player1_email;
 
     try {
       await base44.entities.Notification?.create?.({
-        user_email: opponentId,
+        user_email: opponentEmail,
         type: 'draw_proposal',
         title: 'Proposition de match nul',
         message: `${user.full_name} propose un match nul`,
@@ -535,6 +551,7 @@ export default function GameRoom() {
     const handleAcceptDraw = async () => {
     if (!session || endGameSentRef.current) return;
     endGameSentRef.current = true;
+    setShowDrawProposal(false);
 
     try {
       await base44.entities.GameSession.update(session.id, {
@@ -545,14 +562,14 @@ export default function GameRoom() {
 
       await Promise.all([
         base44.entities.Notification?.create?.({
-          user_email: session.player1_id,
+          user_email: session.player1_email,
           type: 'game_result',
           title: 'Match nul',
           message: 'La partie s\'est terminée par un match nul',
           link: `GameRoom?roomId=${roomId}`
         }),
         base44.entities.Notification?.create?.({
-          user_email: session.player2_id,
+          user_email: session.player2_email,
           type: 'game_result',
           title: 'Match nul',
           message: 'La partie s\'est terminée par un match nul',
@@ -560,7 +577,7 @@ export default function GameRoom() {
         })
       ]);
 
-      navigate('/Play');
+      setTimeout(() => navigate('/Play'), 1000);
     } catch (e) {
       console.log('Erreur acceptation match nul:', e?.message || e);
       endGameSentRef.current = false;
