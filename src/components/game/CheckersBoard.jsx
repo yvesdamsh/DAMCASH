@@ -374,20 +374,36 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     }
 
     if (selectedSquare) {
+      console.log('=== MOVE ATTEMPT ===');
+      console.log('selectedSquare:', selectedSquare);
+      console.log('clicked destination:', row, col);
+      console.log('validMoves:', validMoves);
+      
       const move = validMoves.find(m => m.row === row && m.col === col);
+      console.log('found move:', move);
+      
       if (move) {
+        console.log('✓ Valid move found, executing makeMove...');
         const result = makeMove(selectedSquare.row, selectedSquare.col, row, col, move.captured || []);
+        console.log('makeMove result:', result);
+        
         if (!result.continueChain) {
+          console.log('No chain capture, checking save...');
+          console.log('isMultiplayer:', isMultiplayer);
+          console.log('onSaveMove exists:', !!onSaveMove);
+          
           if (isMultiplayer && onSaveMove) {
-            // Sauvegarder le coup pour l'adversaire
             const movingPiece = board[selectedSquare.row][selectedSquare.col];
             const nextColor = movingPiece.color === 'white' ? 'black' : 'white';
+            console.log('✓ Calling onSaveMove with nextColor:', nextColor);
             onSaveMove(result.board, nextColor);
           } else if (gameStatus === 'playing') {
+            console.log('Calling AI move...');
             setTimeout(() => makeAIMove(result.board), 500);
           }
         }
       } else if (piece && piece.color === playerColor) {
+        console.log('Changing piece selection');
         if (mustCapture.length > 0) {
           const canCapture = mustCapture.some(c => c.row === row && c.col === col);
           if (!canCapture) return;
@@ -395,6 +411,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
         setSelectedSquare({ row, col });
         setValidMoves(getValidMoves(row, col, board));
       } else {
+        console.log('Deselecting piece');
         setSelectedSquare(null);
         setValidMoves([]);
       }
