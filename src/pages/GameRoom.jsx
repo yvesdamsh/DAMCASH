@@ -19,10 +19,13 @@ const TIME_CONTROLS = {
 
 export default function GameRoom() {
   const navigate = useNavigate();
-  const urlParams = new URLSearchParams(window.location.search);
-  const roomId = urlParams.get('roomId');
-  const isWaiting = urlParams.get('waiting') === 'true';
-  const isSpectator = urlParams.get('spectate') === 'true';
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomId = urlParams.get('roomId');
+    const gameMode = urlParams.get('mode') || 'online';
+    const aiLevel = urlParams.get('aiLevel') || 'medium';
+    const playerColor = urlParams.get('playerColor') || 'white';
+    const isWaiting = urlParams.get('waiting') === 'true';
+    const isSpectator = urlParams.get('spectate') === 'true';
   
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
