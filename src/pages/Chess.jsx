@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { createPageUrl } from '@/utils';
 import ChessBoard from '../components/game/ChessBoard';
 import GameSetup from '../components/game/GameSetup';
-import { createPageUrl } from './utils';
 
 export default function Chess() {
   const navigate = useNavigate();
