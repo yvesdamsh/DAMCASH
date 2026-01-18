@@ -562,7 +562,7 @@ export default function GameRoom() {
     );
   }
 
-  if (!session) {
+  if (!session && gameMode !== 'ai') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] flex flex-col items-center justify-center gap-4">
         <p className="text-xl">Jeu introuvable</p>
