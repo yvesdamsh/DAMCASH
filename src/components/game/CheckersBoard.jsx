@@ -344,11 +344,27 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     console.log('canMove:', canMove);
     console.log('effectiveTurn:', effectiveTurn);
     console.log('isMultiplayer:', isMultiplayer);
+    console.log('currentTurnOverride:', currentTurnOverride);
     
-    if (blockBoard) return;
-    if (gameStatus !== 'playing') return;
-    if (!canMove) return;
-    if (!isMultiplayer && effectiveTurn !== playerColor) return;
+    if (blockBoard) {
+      console.log('✗ Board blocked');
+      return;
+    }
+    if (gameStatus !== 'playing') {
+      console.log('✗ Game not playing');
+      return;
+    }
+    
+    // En multijoueur, bloquer si ce n'est pas le tour du joueur
+    if (isMultiplayer && effectiveTurn !== playerColor) {
+      console.log('✗ Not your turn! effectiveTurn:', effectiveTurn, 'playerColor:', playerColor);
+      return;
+    }
+    
+    if (!canMove) {
+      console.log('✗ Cannot move (canMove=false)');
+      return;
+    }
 
     const piece = board[row][col];
     console.log('is own piece:', piece?.color === playerColor);
