@@ -604,10 +604,10 @@ export default function GameRoom() {
         {/* Plateau de jeu */}
         <div className="flex-1 flex items-center justify-center overflow-auto p-6">
           <CheckersBoard 
-            playerColor={playerColor}
-            aiLevel={aiLevel}
-            onGameEnd={() => {}}
-          />
+              playerColor={effectivePlayerColor}
+              aiLevel={aiLevel}
+              onGameEnd={() => {}}
+            />
         </div>
       </div>
     );
