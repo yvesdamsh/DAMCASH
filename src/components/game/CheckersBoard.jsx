@@ -449,7 +449,8 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
         console.log('Setting selected square:', { row, col });
         setSelectedSquare({ row, col });
         const moves = getValidMoves(row, col, board);
-        console.log('Valid moves:', moves);
+        console.log('✓ Valid moves calculated:', moves);
+        console.log('✓ Setting validMoves state...');
         setValidMoves(moves);
       } else {
         console.log('✗ Not own piece or no piece');
