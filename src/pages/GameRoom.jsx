@@ -250,7 +250,8 @@ export default function GameRoom() {
             player2_id: currentUser.id,
             player2_email: currentUser.email,
             player2_name: currentUser.full_name,
-            status: 'in_progress'
+            status: 'in_progress',
+            current_turn: 'white'
           });
           // Marquer l'invitation comme acceptée si elle existe
           try {
@@ -639,13 +640,13 @@ export default function GameRoom() {
                 <p className="font-bold text-lg text-[#F5E6D3]">{opponent.full_name}</p>
                 <p className={`text-sm font-semibold ${
                   session.current_turn === (isPlayerWhite ? 'black' : 'white') 
-                    ? 'text-yellow-400' 
+                    ? 'text-lime-400' 
                     : 'text-[#D4A574]'
                 }`}>
                   {session.player2_id ? (
                     session.current_turn === (isPlayerWhite ? 'black' : 'white') 
-                      ? 'En train de jouer...' 
-                      : 'En attente'
+                      ? "🟢 C'est son tour" 
+                      : 'En attente...'
                   ) : (
                     'En attente de rejoindre...'
                   )}
@@ -757,7 +758,7 @@ export default function GameRoom() {
                 <p className={`text-sm font-semibold ${
                   canMove ? 'text-lime-400' : 'text-[#D4A574]'
                 }`}>
-                  {canMove ? 'Votre tour' : 'En attente'}
+                  {canMove ? "🟢 C'est votre tour" : 'En attente de l\'adversaire...'}
                 </p>
               </div>
             </div>
