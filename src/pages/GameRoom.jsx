@@ -725,30 +725,7 @@ export default function GameRoom() {
           <h1 className="text-2xl font-bold">
             {gameType === 'chess' ? '♔ Échecs' : '⚫ Dames'}
           </h1>
-          <div className="flex gap-2">
-            {!isSpectator && gameStarted && session?.status === 'in_progress' && (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleProposeDrawal}
-                  className="border-amber-600 text-amber-600 hover:bg-amber-600/10"
-                >
-                  <Handshake className="w-4 h-4 mr-1" />
-                  Match nul
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowSurrenderDialog(true)}
-                  className="border-red-500 text-red-500 hover:bg-red-500/10"
-                >
-                  <Flag className="w-4 h-4 mr-1" />
-                  Abandonner
-                </Button>
-              </>
-            )}
-          </div>
+          <div className="w-24" />
         </div>
       </div>
 
@@ -824,6 +801,30 @@ export default function GameRoom() {
           />
         )}
       </div>
+
+      {/* Barre d'outils - Options de partie */}
+      {!isSpectator && gameStarted && session?.status === 'in_progress' && (
+        <div className="px-6 py-4">
+          <div className="max-w-4xl mx-auto flex gap-4 justify-center">
+            <Button
+              onClick={handleProposeDrawal}
+              size="lg"
+              className="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-8 py-6 text-lg shadow-lg"
+            >
+              <Handshake className="w-5 h-5 mr-2" />
+              🤝 Match Nul
+            </Button>
+            <Button
+              onClick={() => setShowSurrenderDialog(true)}
+              size="lg"
+              className="bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-6 text-lg shadow-lg"
+            >
+              <Flag className="w-5 h-5 mr-2" />
+              🏳️ Abandonner
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Chat */}
       <div className="px-6 pb-4">
