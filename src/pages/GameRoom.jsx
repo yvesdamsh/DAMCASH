@@ -6,8 +6,18 @@ import ChessBoard from '../components/game/ChessBoard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ArrowLeft, Clock } from 'lucide-react';
+import { ArrowLeft, Clock, Flag, Handshake } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const TIME_CONTROLS = {
   bullet: 60,
@@ -36,6 +46,9 @@ export default function GameRoom() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [showSurrenderDialog, setShowSurrenderDialog] = useState(false);
+  const [showDrawProposal, setShowDrawProposal] = useState(false);
+  const [drawProposalFrom, setDrawProposalFrom] = useState(null);
   const endGameSentRef = useRef(false);
   const spectatorJoinedRef = useRef(false);
 
@@ -461,9 +474,100 @@ export default function GameRoom() {
     } else {
       await base44.entities.PlayerStats.create(payload);
     }
-  };
+    };
 
-  const handleGameEnd = async (status) => {
+    const handleSurrender = async () => {
+    if (!session || !user || endGameSentRef.current) return;
+    endGameSentRef.current = true;
+
+    const playerColor = user.id === session.player1_id ? 'white' : 'black';
+    const winnerId = playerColor === 'white' ? session.player2_id : session.player1_id;
+    const loserId = user.id;
+
+    try {
+      await base44.entities.GameSession.update(session.id, {
+        status: 'finished',
+        winner_id: winnerId,
+        finished_at: new Date().toISOString()
+      });
+
+      await base44.entities.Notification?.create?.({
+        user_email: winnerId,
+        type: 'game_result',
+        title: 'Victoire par abandon',
+        message: 'Votre adversaire a abandonné la partie',
+        link: `GameRoom?roomId=${roomId}`
+      });
+
+      navigate('/Play');
+    } catch (e) {
+      console.log('Erreur abandon:', e?.message || e);
+      endGameSentRef.current = false;
+    }
+    };
+
+    const handleProposeDrawal = async () => {
+    if (!session || !user) return;
+
+    const opponentId = user.id === session.player1_id ? session.player2_id : session.player1_id;
+
+    try {
+      await base44.entities.Notification?.create?.({
+        user_email: opponentId,
+        type: 'draw_proposal',
+        title: 'Proposition de match nul',
+        message: `${user.full_name} propose un match nul`,
+        from_user: user.email,
+        link: `GameRoom?roomId=${roomId}`
+      });
+
+      await base44.entities.GameChatMessage.create({
+        room_id: roomId,
+        sender_id: 'system',
+        sender_name: 'Système',
+        message: `${user.full_name} a proposé un match nul`
+      });
+    } catch (e) {
+      console.log('Erreur proposition match nul:', e?.message || e);
+    }
+    };
+
+    const handleAcceptDraw = async () => {
+    if (!session || endGameSentRef.current) return;
+    endGameSentRef.current = true;
+
+    try {
+      await base44.entities.GameSession.update(session.id, {
+        status: 'finished',
+        winner_id: null,
+        finished_at: new Date().toISOString()
+      });
+
+      await Promise.all([
+        base44.entities.Notification?.create?.({
+          user_email: session.player1_id,
+          type: 'game_result',
+          title: 'Match nul',
+          message: 'La partie s\'est terminée par un match nul',
+          link: `GameRoom?roomId=${roomId}`
+        }),
+        base44.entities.Notification?.create?.({
+          user_email: session.player2_id,
+          type: 'game_result',
+          title: 'Match nul',
+          message: 'La partie s\'est terminée par un match nul',
+          link: `GameRoom?roomId=${roomId}`
+        })
+      ]);
+
+      navigate('/Play');
+    } catch (e) {
+      console.log('Erreur acceptation match nul:', e?.message || e);
+      endGameSentRef.current = false;
+    }
+    };
+
+    const handleGameEnd = async (status) => {
     if (!session || endGameSentRef.current) return;
     if (session.status === 'finished' || isSpectator) {
       navigate('/Play');
@@ -621,7 +725,30 @@ export default function GameRoom() {
           <h1 className="text-2xl font-bold">
             {gameType === 'chess' ? '♔ Échecs' : '⚫ Dames'}
           </h1>
-          <div className="w-20" />
+          <div className="flex gap-2">
+            {!isSpectator && gameStarted && session?.status === 'in_progress' && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleProposeDrawal}
+                  className="border-amber-600 text-amber-600 hover:bg-amber-600/10"
+                >
+                  <Handshake className="w-4 h-4 mr-1" />
+                  Match nul
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowSurrenderDialog(true)}
+                  className="border-red-500 text-red-500 hover:bg-red-500/10"
+                >
+                  <Flag className="w-4 h-4 mr-1" />
+                  Abandonner
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
