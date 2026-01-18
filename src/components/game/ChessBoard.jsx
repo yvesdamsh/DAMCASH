@@ -257,7 +257,14 @@ export default function ChessBoard({
     return () => clearTimeout(timer);
   }, [currentTurn, board, isMultiplayer, blockBoard, gameStatus, aiLevel]);
 
-  const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
+  const getPieceSymbol = (piece) => {
+    const symbols = {
+      'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟',
+      'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'
+    };
+    return symbols[piece] || '';
+  };
+
   const winner = gameStatus === 'whiteWins' ? 'white' : gameStatus === 'blackWins' ? 'black' : null;
 
   return (
@@ -271,38 +278,35 @@ export default function ChessBoard({
         onHome={() => window.location.href = '/'}
         stats={gameStats}
       />
-      <div style={{ width: 'min(90vw, calc(100vh - 200px))', height: 'min(90vw, calc(100vh - 200px))', aspectRatio: '1/1' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gridTemplateRows: 'repeat(8, 1fr)', width: '100%', height: '100%', gap: 0, border: '3px solid #3E2723' }}>
-          {Array(64).fill().map((_, index) => {
-            const row = Math.floor(index / 8);
-            const col = index % 8;
-            const displayRow = playerColor === 'black' ? 7 - row : row;
-            const displayCol = playerColor === 'black' ? 7 - col : col;
-            const piece = board[displayRow][displayCol];
-            const isLight = (displayRow + displayCol) % 2 === 0;
-            const isSelected = selectedSquare?.row === displayRow && selectedSquare?.col === displayCol;
-            const isValidMove = validMoves.some(m => m.row === displayRow && m.col === displayCol);
-
-            return (
-              <div
-                key={index}
-                onClick={() => handleSquareClick(displayRow, displayCol)}
-                style={{
-                  backgroundColor: isLight ? '#F5E6D3' : '#B58863',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  position: 'relative',
-                  fontSize: 'clamp(32px, 70%, 60px)',
-                  boxShadow: isSelected ? 'inset 0 0 0 4px #facc15' : isValidMove ? 'inset 0 0 0 3px #22c55e' : 'none'
-                }}
-              >
-                {piece && piece !== '' && <span>{PIECES[piece]}</span>}
-              </div>
-            );
-          })}
-        </div>
+      <div style={{ width: 'min(90vw, calc(100vh - 200px))', height: 'min(90vw, calc(100vh - 200px))', aspectRatio: '1/1', display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 0, border: '3px solid #3E2723' }}>
+        {Array.from({length: 64}).map((_, i) => {
+          const r = Math.floor(i / 8);
+          const c = i % 8;
+          const displayRow = playerColor === 'black' ? 7 - r : r;
+          const displayCol = playerColor === 'black' ? 7 - c : c;
+          const piece = board[displayRow][displayCol];
+          const isSelected = selectedSquare?.row === displayRow && selectedSquare?.col === displayCol;
+          const isValidMove = validMoves.some(m => m.row === displayRow && m.col === displayCol);
+          
+          return (
+            <div
+              key={i}
+              onClick={() => handleSquareClick(displayRow, displayCol)}
+              style={{
+                aspectRatio: '1',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: (r + c) % 2 === 0 ? '#F5E6D3' : '#B58863',
+                cursor: 'pointer',
+                fontSize: '40px',
+                boxShadow: isSelected ? 'inset 0 0 0 4px #facc15' : isValidMove ? 'inset 0 0 0 3px #22c55e' : 'none'
+              }}
+            >
+              {piece && piece !== '' ? getPieceSymbol(piece) : ''}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
