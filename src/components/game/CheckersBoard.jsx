@@ -342,13 +342,22 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
   };
 
   const handleSquareClick = (row, col) => {
+    console.log('🎯 CLICK sur case:', row, col);
+    console.log('🎯 blockBoard:', blockBoard, 'gameStatus:', gameStatus, 'effectiveTurn:', effectiveTurn, 'playerColor:', playerColor);
+    
     if (blockBoard) return;
     if (gameStatus !== 'playing') return;
     
     // Vérifier si c'est le tour du joueur
-    if (effectiveTurn !== playerColor) return;
+    if (effectiveTurn !== playerColor) {
+      console.log('❌ PAS VOTRE TOUR');
+      return;
+    }
     
     const piece = board[row][col];
+    console.log('🎯 Piece à cette case:', piece);
+    console.log('🎯 selectedSquare:', selectedSquare);
+    console.log('🎯 validMoves:', validMoves);
 
     if (chainCapture) {
       if (row === chainCapture.row && col === chainCapture.col) {
@@ -356,6 +365,7 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
       }
       const move = validMoves.find(m => m.row === row && m.col === col);
       if (move) {
+        console.log('✅ CHAIN CAPTURE - Appel makeMove');
         const result = makeMove(chainCapture.row, chainCapture.col, row, col, move.captured);
         if (!result.continueChain) {
           if (isMultiplayer && onSaveMove) {
@@ -371,17 +381,23 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
     }
 
     if (selectedSquare) {
+      console.log('🎯 Il y a une pièce sélectionnée');
       const move = validMoves.find(m => m.row === row && m.col === col);
+      console.log('🎯 Mouvement trouvé?', move);
       
       if (move) {
+        console.log('✅ MOUVEMENT VALIDE TROUVÉ - Appel makeMove');
         if (mustCapture.length > 0) {
           const pieceCanCapture = mustCapture.some(c => c.row === selectedSquare.row && c.col === selectedSquare.col);
           if (!pieceCanCapture) {
+            console.log('❌ Capture obligatoire mais pièce ne peut pas capturer');
             return;
           }
         }
         
+        console.log('🚀 APPEL MAKEMOVE de', selectedSquare.row, selectedSquare.col, 'vers', row, col);
         const result = makeMove(selectedSquare.row, selectedSquare.col, row, col, move.captured || []);
+        console.log('✅ makeMove terminé, result:', result);
         
         if (!result.continueChain) {
           if (isMultiplayer && onSaveMove) {
@@ -393,16 +409,21 @@ export default function CheckersBoard({ playerColor = 'white', aiLevel = 'medium
           }
         }
       } else if (piece && piece.color === playerColor) {
+        console.log('🎯 Sélection nouvelle pièce');
         setSelectedSquare({ row, col });
         setValidMoves(getValidMoves(row, col, board));
       } else {
+        console.log('🎯 Désélection');
         setSelectedSquare(null);
         setValidMoves([]);
       }
     } else {
       if (piece && piece.color === playerColor) {
+        console.log('✅ SÉLECTION PIÈCE:', row, col);
         setSelectedSquare({ row, col });
-        setValidMoves(getValidMoves(row, col, board));
+        const moves = getValidMoves(row, col, board);
+        console.log('✅ Mouvements valides:', moves);
+        setValidMoves(moves);
       }
     }
   };
