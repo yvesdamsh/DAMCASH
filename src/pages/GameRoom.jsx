@@ -810,7 +810,7 @@ export default function GameRoom() {
             playerColor={playerColor}
             onGameEnd={handleGameEnd}
             isMultiplayer={true}
-            canMove={true}
+            canMove={canMove && gameStarted && !isSpectator}
             initialBoardState={boardState}
             onSaveMove={handleSaveMove}
             blockBoard={!gameStarted}
