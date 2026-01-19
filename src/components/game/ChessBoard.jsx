@@ -312,6 +312,7 @@ export default function ChessBoard({
             const actualCol = playerColor === 'black' ? 7 - c : c;
             const isSelected = selectedSquare?.row === actualRow && selectedSquare?.col === actualCol;
             const isValidMove = validMoves.some(m => m.row === actualRow && m.col === actualCol);
+            const pieceColor = piece ? getPieceColor(piece) : null;
             
             return (
               <div
@@ -328,6 +329,11 @@ export default function ChessBoard({
                   backgroundColor: (r + c) % 2 === 0 ? '#F0D9B5' : '#B58863',
                   cursor: 'pointer',
                   fontSize: '48px',
+                  color: pieceColor === 'white' ? '#FFFFFF' : '#000000',
+                  textShadow: pieceColor === 'white' 
+                    ? '0 0 3px #000000, 0 0 5px #000000' 
+                    : '0 0 3px #FFFFFF, 0 0 5px #FFFFFF',
+                  fontWeight: 'bold',
                   boxShadow: isSelected ? 'inset 0 0 0 4px #FFD700' : isValidMove ? 'inset 0 0 0 3px #4ADE80' : 'none',
                   position: 'relative'
                 }}
