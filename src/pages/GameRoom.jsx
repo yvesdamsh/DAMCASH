@@ -112,12 +112,7 @@ export default function GameRoom() {
 
       setGameStarted(!!sess.player2_id || sess.status === 'in_progress');
 
-      // Déterminer si c'est une victoire par abandon pour moi
-      if (sess.status === 'finished' && sess.winner_id && user && sess.winner_id === user.id) {
-        const loserName = user.id === sess.player1_id ? (sess.player2_name || opponent?.full_name) : sess.player1_name;
-        setResignationMessage(loserName || 'Votre adversaire');
-        setVictoryByResignModal(true);
-      }
+
 
       // Rafraîchir l'adversaire si nécessaire (sans accès User)
       const opponentId = user?.id === sess.player1_id ? sess.player2_id : sess.player1_id;
