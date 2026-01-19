@@ -195,6 +195,15 @@ export default function Tournaments() {
                 </div>
               </div>
             </div>
+            <motion.button 
+              onClick={() => setShowCreateModal(true)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-400 hover:to-red-500 text-white font-black px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-orange-500/50"
+            >
+              <Plus className="w-5 h-5" />
+              Créer mon tournoi
+            </motion.button>
           </div>
 
           {/* STATS EN TEMPS RÉEL */}
