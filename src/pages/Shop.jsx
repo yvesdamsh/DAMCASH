@@ -4,11 +4,15 @@ import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { ShoppingBag, Gem, Palette, User, Crown, Circle, Check, Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Shop() {
   const [user, setUser] = useState(null);
-  const [activeTab, setActiveTab] = useState('themes');
+  const [activeTab, setActiveTab] = useState('gems');
+  const [inventory, setInventory] = useState([]);
+  const [purchaseDialog, setPurchaseDialog] = useState(null);
 
   useEffect(() => {
     loadUser();
