@@ -1305,23 +1305,25 @@ export default function GameRoom() {
 
         {/* Boutons d'action */}
         {!isSpectator && (
-          <div className="flex gap-3 justify-center my-4">
+          <div className="flex flex-col md:flex-row gap-2 md:gap-3 justify-center my-4 w-full">
             <Button 
               onClick={handleOfferDraw}
               disabled={drawOfferSent || session?.status !== 'in_progress'}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-blue-600 hover:bg-blue-700 text-white w-full md:w-auto min-h-[44px]"
             >
               🤝 {drawOfferSent ? 'En attente...' : 'Proposer nul'}
             </Button>
             <Button 
               onClick={() => setShowResignConfirm(true)}
               disabled={session?.status !== 'in_progress'}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-red-600 hover:bg-red-700 text-white w-full md:w-auto min-h-[44px]"
             >
               🏳️ Abandonner
             </Button>
             {user && session && user.id === session.player1_id && (
-              <SpectatorManager roomId={roomId} hostId={user.id} session={session} />
+              <div className="w-full md:w-auto">
+                <SpectatorManager roomId={roomId} hostId={user.id} session={session} />
+              </div>
             )}
           </div>
         )}
