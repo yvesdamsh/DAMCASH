@@ -255,9 +255,9 @@ export default function VideoCall({
             <>
               <video
                 ref={localVideoRef}
-                autoPlay
-                playsInline
-                muted
+                autoPlay={true}
+                playsInline={true}
+                muted={true}
                 className="w-full h-full object-cover scaleX-[-1]"
               />
               {/* Boutons visibles uniquement si caméra activée */}
