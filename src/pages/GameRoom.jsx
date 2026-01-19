@@ -726,6 +726,10 @@ export default function GameRoom() {
         finished_at: new Date().toISOString()
       });
 
+      const duration = session.last_move_timestamp 
+        ? Math.floor((new Date() - new Date(session.created_date)) / 1000)
+        : null;
+
       await base44.entities.GameResult?.create?.({
         room_id: roomId,
         game_type: gameType,
@@ -735,7 +739,10 @@ export default function GameRoom() {
         player1_name: session.player1_name,
         player2_id: session.player2_id,
         player2_name: session.player2_name || session.invited_player_name,
-        result: isDraw ? 'draw' : (whiteWinner ? 'white' : 'black')
+        result: isDraw ? 'draw' : (whiteWinner ? 'white' : 'black'),
+        final_board_state: session.board_state,
+        moves_count: session.move_count || 0,
+        duration_seconds: duration
       });
 
       if (ranked) {
