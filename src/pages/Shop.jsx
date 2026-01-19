@@ -230,6 +230,55 @@ export default function Shop() {
         </div>
       </div>
 
+      {/* Modal Confirmation Achat */}
+      <Dialog open={!!purchaseDialog} onOpenChange={() => setPurchaseDialog(null)}>
+        <DialogContent className="bg-slate-900 border-slate-700">
+          <DialogHeader>
+            <DialogTitle className="text-white">Confirmer l'achat</DialogTitle>
+          </DialogHeader>
+          {purchaseDialog && (
+            <div className="space-y-4">
+              <DialogDescription className="text-gray-300">
+                Voulez-vous acheter <span className="font-semibold text-amber-300">{purchaseDialog.name}</span> pour <span className="font-semibold text-amber-300">{purchaseDialog.real_price || purchaseDialog.price_gems + ' gemmes'}</span>?
+              </DialogDescription>
+
+              {purchaseDialog.category !== 'gems' && (
+                <div className="bg-white/5 rounded-lg p-3 space-y-2 text-sm">
+                  <div className="flex justify-between text-gray-300">
+                    <span>Solde actuel:</span>
+                    <span className="font-semibold text-amber-200">{user?.gems || 100} gemmes</span>
+                  </div>
+                  {(user?.gems || 100) >= purchaseDialog.price_gems ? (
+                    <div className="flex justify-between text-gray-300">
+                      <span>Après achat:</span>
+                      <span className="font-semibold text-green-400">{(user?.gems || 100) - purchaseDialog.price_gems} gemmes</span>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between text-red-400">
+                      <span>Solde insuffisant!</span>
+                      <span className="font-semibold">Achetez des gemmes</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter className="gap-3">
+            <Button variant="outline" onClick={() => setPurchaseDialog(null)}>
+              Annuler
+            </Button>
+            <Button
+              onClick={handleConfirmPurchase}
+              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500"
+              disabled={purchaseDialog?.category !== 'gems' && (user?.gems || 100) < purchaseDialog?.price_gems}
+            >
+              Acheter
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-5 bg-white/5 border border-white/10">
           <TabsTrigger value="gems" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-300">
