@@ -1312,7 +1312,64 @@ export default function GameRoom() {
               </motion.div>
             </div>
 
-            {/* Ligne 2: Joueur 2 */}
+            {/* Ligne 2: Caméras côte à côte */}
+            <div className="flex gap-2 h-[120px]">
+              {/* Caméra Joueur 1 */}
+              <div className="flex-1 rounded-lg overflow-hidden bg-gray-900 shadow-lg border border-[#D4A574]/50 flex flex-col items-center justify-center">
+                {session.player1_id === user?.id && localStream ? (
+                  <video
+                    ref={localVideoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <>
+                    <span className="text-2xl mb-1">📹</span>
+                    <p className="text-[#D4A574] text-xs font-semibold">Caméra off</p>
+                    {session.player1_id === user?.id && (
+                      <Button
+                        onClick={activateMyCamera}
+                        className="mt-2 bg-blue-600 hover:bg-blue-700 text-white"
+                        size="sm"
+                      >
+                        🎥 Activer
+                      </Button>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* Caméra Joueur 2 */}
+              <div className="flex-1 rounded-lg overflow-hidden bg-gray-900 shadow-lg border border-[#D4A574]/50 flex flex-col items-center justify-center">
+                {session.player2_id === user?.id && localStream ? (
+                  <video
+                    ref={localVideoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <>
+                    <span className="text-2xl mb-1">📹</span>
+                    <p className="text-[#D4A574] text-xs font-semibold">Caméra off</p>
+                    {session.player2_id === user?.id && (
+                      <Button
+                        onClick={activateMyCamera}
+                        className="mt-2 bg-blue-600 hover:bg-blue-700 text-white"
+                        size="sm"
+                      >
+                        🎥 Activer
+                      </Button>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Ligne 3: Joueur 2 */}
             <div className="flex items-center gap-2">
               <Avatar className="w-9 h-9 border-2 border-[#D4A574] flex-shrink-0">
                 <AvatarImage src={session.player2_id === user?.id ? user?.avatar_url : opponent?.avatar_url} />
