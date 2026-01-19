@@ -385,8 +385,14 @@ export default function GameRoom() {
 
   const handleOfferDraw = async () => {
     if (!session || !user || isSpectator) return;
+    setShowDrawProposalModal(true);
+  };
+
+  const confirmDrawProposal = async () => {
+    if (!session || !user || isSpectator) return;
 
     try {
+      setDrawProposalLoading(true);
       const opponentId = user.id === session.player1_id ? session.player2_id : session.player1_id;
 
       await base44.entities.DrawOffer.create({
@@ -398,12 +404,15 @@ export default function GameRoom() {
       });
 
       setDrawOfferSent(true);
+      setShowDrawProposalModal(false);
       toast.success('Proposition de nul envoyée', {
         description: 'En attente de la réponse...',
         duration: 3000
       });
     } catch (e) {
       toast.error('Erreur lors de l\'envoi');
+    } finally {
+      setDrawProposalLoading(false);
     }
   };
 
