@@ -1,47 +1,76 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 
-const pieceSymbols = {
-  'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
-  'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
+const PIECE_IMAGES = {
+    'P': 'https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg',
+    'R': 'https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg',
+    'N': 'https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg',
+    'B': 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg',
+    'Q': 'https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg',
+    'K': 'https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg',
+    'p': 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg',
+    'r': 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg',
+    'n': 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg',
+    'b': 'https://upload.wikimedia.org/wikipedia/commons/9/98/Chess_bdt45.svg',
+    'q': 'https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg',
+    'k': 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg'
 };
 
-const ChessPiece = ({ type, isSelected, set = 'standard', onDragEnd, dragConstraints, canDrag, animateFrom }) => {
-  const isWhite = type === type.toUpperCase();
-  const symbol = pieceSymbols[type] || '';
+const ChessPiece = memo(({ type, isSelected, animateFrom, set = 'standard', onDragEnd, dragConstraints, canDrag = true }) => {
+    if (!type) return null;
 
-  return (
-    <motion.div
-      drag={canDrag}
-      dragMomentum={false}
-      dragElastic={0}
-      onDragEnd={onDragEnd}
-      dragConstraints={dragConstraints}
-      initial={animateFrom ? { x: animateFrom.x, y: animateFrom.y } : false}
-      animate={{ x: 0, y: 0 }}
-      exit={{ scale: 0, opacity: 0 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className={`
-        absolute inset-0 flex items-center justify-center
-        text-4xl md:text-5xl
-        ${canDrag ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}
-        ${isSelected ? 'z-50' : 'z-10'}
-      `}
-      style={{
-        color: isWhite ? '#FFFFFF' : '#000000',
-        WebkitTextStroke: isWhite ? '2px #000000' : '2px #FFFFFF',
-        filter: isWhite 
-          ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))' 
-          : 'drop-shadow(0 2px 4px rgba(255,255,255,0.6))',
-        fontWeight: 'bold',
-        userSelect: 'none',
-        WebkitUserSelect: 'none',
-        touchAction: 'none'
-      }}
-    >
-      {symbol}
-    </motion.div>
-  );
-};
+    // Map for unicode pieces
+    const UNICODE_PIECES = {
+        'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
+        'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
+    };
+
+    const initial = animateFrom ? { x: animateFrom.x, y: animateFrom.y, scale: 1, opacity: 1 } : { scale: 0.8, opacity: 0 };
+    const animate = { x: 0, y: 0, scale: 1, opacity: 1 };
+
+    const dragProps = {
+        drag: canDrag,
+        dragConstraints: dragConstraints,
+        dragMomentum: false,
+        dragElastic: 0.1,
+        dragSnapToOrigin: true,
+        onDragEnd: canDrag ? onDragEnd : undefined,
+        whileDrag: { scale: 1.2, zIndex: 100, cursor: 'grabbing' },
+        className: `chess-piece w-full h-full flex items-center justify-center ${isSelected ? 'drop-shadow-xl' : (canDrag ? 'cursor-grab' : 'cursor-default')}`,
+        style: { touchAction: 'none', WebkitUserSelect: 'none', userSelect: 'none' },
+        initial,
+        animate,
+        layout: true
+    };
+
+    if (set === 'unicode') {
+        const isWhite = typeof type === 'string' && type === type.toUpperCase();
+        return (
+            <motion.div
+                {...dragProps}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                className={`${dragProps.className} ${isSelected ? 'scale-110' : ''}`}
+            >
+                <span className={`text-4xl md:text-6xl select-none ${isWhite ? 'text-white drop-shadow-md stroke-black' : 'text-black drop-shadow-md'}`} style={{ textShadow: isWhite ? '0 0 2px black' : '0 0 1px white' }}>
+                    {UNICODE_PIECES[type]}
+                </span>
+            </motion.div>
+        );
+    }
+
+    return (
+        <motion.div
+            {...dragProps}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        >
+            <img 
+                src={PIECE_IMAGES[type]} 
+                alt={type} 
+                className={`w-[90%] h-[90%] select-none ${isSelected ? '-translate-y-2 scale-110' : ''}`}
+                draggable={false}
+            />
+        </motion.div>
+    );
+});
 
 export default ChessPiece;
