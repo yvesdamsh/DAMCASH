@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { Plus, Lock, Users, Clock, ArrowLeft } from 'lucide-react';
+import { Plus, Lock, Users, Clock, ArrowLeft, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CreateRoomModal from '../components/room/CreateRoomModal';
+import { toast } from 'sonner';
 
 const TIME_CONTROL_LABELS = {
   bullet: 'Bullet (1 min)',
@@ -54,10 +55,7 @@ export default function RoomLobby() {
 
   const loadRooms = async () => {
     try {
-      const allRooms = await base44.entities.Room.filter(
-        { status: 'waiting' },
-        '-created_date'
-      );
+      const allRooms = await base44.entities.Room.list('-created_date');
       setRooms(allRooms);
     } catch (error) {
       console.error('Erreur chargement salons:', error);
@@ -105,6 +103,74 @@ export default function RoomLobby() {
       alert('Erreur en rejoignant le salon');
     } finally {
       setJoiningRoom(null);
+    }
+  };
+
+  const handleSpectateRequest = async (room) => {
+    if (!user) {
+      toast.error('Vous devez être connecté');
+      return;
+    }
+
+    try {
+      const banned = await base44.entities.BannedSpectator.filter({
+        room_id: room.id,
+        banned_user_id: user.id
+      });
+      if (banned.length > 0) {
+        toast.error('Accès refusé', {
+          description: 'Vous avez été banni de cette partie'
+        });
+        return;
+      }
+
+      const existing = await base44.entities.SpectatorRequest.filter({
+        room_id: room.id,
+        requester_id: user.id,
+        status: 'pending'
+      });
+      if (existing.length > 0) {
+        toast.info('Demande en attente', {
+          description: 'Votre demande est en cours de traitement'
+        });
+        return;
+      }
+
+      const accepted = await base44.entities.SpectatorRequest.filter({
+        room_id: room.id,
+        requester_id: user.id,
+        status: 'accepted'
+      });
+      if (accepted.length > 0) {
+        navigate(`/GameRoom?roomId=${room.id}&spectate=true`);
+        return;
+      }
+
+      await base44.entities.SpectatorRequest.create({
+        room_id: room.id,
+        requester_id: user.id,
+        requester_name: user.full_name,
+        host_id: room.owner_id,
+        status: 'pending'
+      });
+
+      await base44.entities.Notification?.create?.({
+        user_email: room.owner_id,
+        type: 'spectator_request',
+        title: '👁️ Demande de spectateur',
+        message: `${user.full_name} souhaite observer votre partie`,
+        link: `GameRoom?roomId=${room.id}`,
+        from_user: user.email,
+        icon: '👁️'
+      });
+
+      toast.success('Demande envoyée', {
+        description: 'L\'hôte va examiner votre demande',
+        icon: '👁️'
+      });
+    } catch (e) {
+      console.log('Erreur demande spectateur:', e);
+      toast.error('Erreur lors de l\'envoi');
     }
   };
 
@@ -210,20 +276,33 @@ export default function RoomLobby() {
                         </span>
                       </div>
                     </div>
-                    <Button
-                      onClick={() => joinRoom(room)}
-                      disabled={
-                        room.current_players >= room.max_players ||
-                        joiningRoom === room.id
-                      }
-                      className="bg-amber-600 hover:bg-amber-700 disabled:opacity-50 ml-4"
-                    >
-                      {joiningRoom === room.id
-                        ? 'Connexion...'
-                        : room.current_players >= room.max_players
-                        ? 'Complet'
-                        : 'Rejoindre'}
-                    </Button>
+                    <div className="flex gap-2 ml-4">
+                      <Button
+                        onClick={() => joinRoom(room)}
+                        disabled={
+                          room.current_players >= room.max_players ||
+                          joiningRoom === room.id ||
+                          room.status !== 'waiting'
+                        }
+                        className="bg-amber-600 hover:bg-amber-700 disabled:opacity-50"
+                      >
+                        {joiningRoom === room.id
+                          ? 'Connexion...'
+                          : room.current_players >= room.max_players
+                          ? 'Complet'
+                          : 'Rejoindre'}
+                      </Button>
+                      {room.status === 'in_progress' && (
+                        <Button
+                          onClick={() => handleSpectateRequest(room)}
+                          variant="outline"
+                          className="border-purple-500/50 text-purple-300 hover:bg-purple-500/20"
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          Observer
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               ))
