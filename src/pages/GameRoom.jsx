@@ -83,24 +83,7 @@ export default function GameRoom() {
     return () => clearInterval(interval);
   }, [roomId]);
 
-  // Recharger la session toutes les 2 secondes pour detecter l'abandon
-  useEffect(() => {
-    if (!roomId) return;
 
-    const reloadSession = async () => {
-      try {
-        const sessions = await base44.entities.GameSession.filter({ room_id: roomId });
-        if (sessions.length > 0) {
-          setSession(sessions[0]); // Force la mise à jour du state
-        }
-      } catch (error) {
-        console.error('Erreur rechargement session:', error);
-      }
-    };
-
-    const interval = setInterval(reloadSession, 2000);
-    return () => clearInterval(interval);
-  }, [roomId]);
 
   // Realtime: écouter les changements de GameSession pour cette room
   useEffect(() => {
