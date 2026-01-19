@@ -1,26 +1,15 @@
 import React, { useState, useEffect, useCallback, memo, useRef, useMemo } from 'react';
 import ChessPiece from './ChessPiece';
 import { AnimatePresence } from 'framer-motion';
-import { isInCheck } from '@/components/chessLogic';
-
-const createInitialBoard = () => {
-  const board = Array(8).fill(null).map(() => Array(8).fill(null));
-  
-  // Pions
-  for (let i = 0; i < 8; i++) {
-    board[1][i] = 'p'; // Noirs
-    board[6][i] = 'P'; // Blancs
-  }
-  
-  // Autres pièces
-  const pieces = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'];
-  for (let i = 0; i < 8; i++) {
-    board[0][i] = pieces[i]; // Noirs
-    board[7][i] = pieces[i].toUpperCase(); // Blancs
-  }
-  
-  return board;
-};
+import { 
+  createInitialBoard, 
+  isInCheck, 
+  getValidMoves, 
+  isCheckmate, 
+  isStalemate 
+} from '@/components/chessLogic';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 const ChessSquare = memo(({ 
     r, c, piece, isDark, isSelected, isTarget, isLastMove, isLastMoveTarget, isPremoveSource, isPremoveTarget, isCheck,
@@ -150,6 +139,14 @@ export default function ChessBoard({
   const [lastMove, setLastMove] = useState(null);
   const [lastDragMove, setLastDragMove] = useState(null);
   const [premove, setPremove] = useState(null);
+  const [gameState, setGameState] = useState({
+    castlingRights: {
+      white: { kingside: true, queenside: true },
+      black: { kingside: true, queenside: true }
+    },
+    lastMove: null
+  });
+  const [promotionDialog, setPromotionDialog] = useState(null);
 
   const canInteract = !blockBoard && (isMultiplayer ? canMove : true);
   const boardRef = useRef(null);
@@ -202,7 +199,11 @@ export default function ChessBoard({
     if (selectedSquare) {
       const move = validMoves.find(m => m.to.r === r && m.to.c === c);
       if (move) {
-        makeMove(selectedSquare[0], selectedSquare[1], r, c);
+        if (move.promotion) {
+          setPromotionDialog({ from: selectedSquare, to: [r, c], move });
+        } else {
+          makeMove(selectedSquare[0], selectedSquare[1], r, c, move);
+        }
       } else if (piece && pieceColor === currentTurn && pieceColor === (playerColor || 'white')) {
         setSelectedSquare([r, c]);
         setValidMoves(getValidMovesForPiece(r, c));
@@ -224,97 +225,80 @@ export default function ChessBoard({
     const move = validMoves.find(m => m.to.r === toR && m.to.c === toC);
     if (move) {
       setLastDragMove({ from: { r: fromR, c: fromC }, to: { r: toR, c: toC } });
-      makeMove(fromR, fromC, toR, toC);
+      if (move.promotion) {
+        setPromotionDialog({ from: [fromR, fromC], to: [toR, toC], move });
+      } else {
+        makeMove(fromR, fromC, toR, toC, move);
+      }
     }
   };
 
   const getValidMovesForPiece = (r, c) => {
-    // Logique simplifiée pour les mouvements
-    const piece = board[r][c];
-    if (!piece) return [];
-    
-    const moves = [];
-    const type = piece.toUpperCase();
-    const isWhite = piece === piece.toUpperCase();
-    
-    // Pion
-    if (type === 'P') {
-      const direction = isWhite ? -1 : 1;
-      const startRow = isWhite ? 6 : 1;
-      
-      if (!board[r + direction]?.[c]) {
-        moves.push({ to: { r: r + direction, c } });
-        if (r === startRow && !board[r + 2 * direction]?.[c]) {
-          moves.push({ to: { r: r + 2 * direction, c } });
-        }
-      }
-      
-      // Captures
-      [-1, 1].forEach(dc => {
-        const target = board[r + direction]?.[c + dc];
-        if (target && (target === target.toUpperCase()) !== isWhite) {
-          moves.push({ to: { r: r + direction, c: c + dc } });
-        }
-      });
-    }
-    
-    // Cavalier
-    if (type === 'N') {
-      const knightMoves = [
-        [-2, -1], [-2, 1], [-1, -2], [-1, 2],
-        [1, -2], [1, 2], [2, -1], [2, 1]
-      ];
-      knightMoves.forEach(([dr, dc]) => {
-        const newR = r + dr, newC = c + dc;
-        if (newR >= 0 && newR < 8 && newC >= 0 && newC < 8) {
-          const target = board[newR][newC];
-          if (!target || (target === target.toUpperCase()) !== isWhite) {
-            moves.push({ to: { r: newR, c: newC } });
-          }
-        }
-      });
-    }
-    
-    // Fou, Tour, Dame, Roi - logique simplifiée
-    if (['B', 'R', 'Q', 'K'].includes(type)) {
-      const directions = type === 'B' ? [[-1,-1],[-1,1],[1,-1],[1,1]] :
-                        type === 'R' ? [[-1,0],[1,0],[0,-1],[0,1]] :
-                        type === 'Q' ? [[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]] :
-                        [[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]];
-      
-      const maxDist = type === 'K' ? 1 : 7;
-      
-      directions.forEach(([dr, dc]) => {
-        for (let i = 1; i <= maxDist; i++) {
-          const newR = r + dr * i, newC = c + dc * i;
-          if (newR < 0 || newR >= 8 || newC < 0 || newC >= 8) break;
-          
-          const target = board[newR][newC];
-          if (!target) {
-            moves.push({ to: { r: newR, c: newC } });
-          } else {
-            if ((target === target.toUpperCase()) !== isWhite) {
-              moves.push({ to: { r: newR, c: newC } });
-            }
-            break;
-          }
-        }
-      });
-    }
-    
-    return moves;
+    return getValidMoves(board, r, c, gameState);
   };
 
-  const makeMove = (fromR, fromC, toR, toC) => {
+  const makeMove = (fromR, fromC, toR, toC, moveData, promotionPiece = null) => {
     const newBoard = board.map(row => [...row]);
-    const capturedPiece = newBoard[toR][toC];
-    newBoard[toR][toC] = newBoard[fromR][fromC];
-    newBoard[fromR][fromC] = null;
+    const piece = newBoard[fromR][fromC];
+    const pieceType = piece.toUpperCase();
+    
+    // Promotion
+    if (moveData?.promotion && promotionPiece) {
+      const isWhite = piece === piece.toUpperCase();
+      newBoard[toR][toC] = isWhite ? promotionPiece.toUpperCase() : promotionPiece.toLowerCase();
+      newBoard[fromR][fromC] = null;
+    }
+    // En passant
+    else if (moveData?.enPassant) {
+      newBoard[toR][toC] = newBoard[fromR][fromC];
+      newBoard[fromR][fromC] = null;
+      newBoard[fromR][toC] = null; // Capturer le pion adverse
+    }
+    // Roque
+    else if (moveData?.castling) {
+      newBoard[toR][toC] = newBoard[fromR][fromC];
+      newBoard[fromR][fromC] = null;
+      
+      if (moveData.castling === 'kingside') {
+        newBoard[fromR][5] = newBoard[fromR][7];
+        newBoard[fromR][7] = null;
+      } else {
+        newBoard[fromR][3] = newBoard[fromR][0];
+        newBoard[fromR][0] = null;
+      }
+    }
+    // Coup normal
+    else {
+      newBoard[toR][toC] = newBoard[fromR][fromC];
+      newBoard[fromR][fromC] = null;
+    }
+    
+    // Mettre à jour les droits de roque
+    const newCastlingRights = { ...gameState.castlingRights };
+    if (pieceType === 'K') {
+      const color = piece === piece.toUpperCase() ? 'white' : 'black';
+      newCastlingRights[color] = { kingside: false, queenside: false };
+    }
+    if (pieceType === 'R') {
+      const color = piece === piece.toUpperCase() ? 'white' : 'black';
+      if (fromC === 0) newCastlingRights[color].queenside = false;
+      if (fromC === 7) newCastlingRights[color].kingside = false;
+    }
+    
+    const moveInfo = {
+      from: { r: fromR, c: fromC },
+      to: { r: toR, c: toC },
+      pawnDoubleMove: pieceType === 'P' && Math.abs(toR - fromR) === 2
+    };
     
     setBoard(newBoard);
-    setLastMove({ from: { r: fromR, c: fromC }, to: { r: toR, c: toC } });
+    setLastMove(moveInfo);
     setSelectedSquare(null);
     setValidMoves([]);
+    setGameState({
+      castlingRights: newCastlingRights,
+      lastMove: moveInfo
+    });
     
     const nextTurn = currentTurn === 'white' ? 'black' : 'white';
     setCurrentTurn(nextTurn);
@@ -324,45 +308,78 @@ export default function ChessBoard({
       onSaveMove(newBoard, nextTurn);
     }
 
-    // Vérifier échec et mat (simplifié)
-    const opponentColor = nextTurn;
-    const opponentKing = opponentColor === 'white' ? 'K' : 'k';
-    let kingFound = false;
-    for (let r = 0; r < 8; r++) {
-      for (let c = 0; c < 8; c++) {
-        if (newBoard[r][c] === opponentKing) {
-          kingFound = true;
-          break;
+    // Vérifier échec et mat ou pat
+    setTimeout(() => {
+      const newGameState = {
+        castlingRights: newCastlingRights,
+        lastMove: moveInfo
+      };
+      
+      if (isCheckmate(newBoard, nextTurn, newGameState)) {
+        if (onGameEnd) {
+          const winner = currentTurn === 'white' ? 'whiteWins' : 'blackWins';
+          onGameEnd(winner);
+        }
+      } else if (isStalemate(newBoard, nextTurn, newGameState)) {
+        if (onGameEnd) {
+          onGameEnd('draw');
         }
       }
-      if (kingFound) break;
-    }
-
-    if (!kingFound && onGameEnd) {
-      const winner = currentTurn === 'white' ? 'whiteWins' : 'blackWins';
-      setTimeout(() => onGameEnd(winner), 500);
-    }
+    }, 100);
   };
 
   const rows = isFlipped ? [7,6,5,4,3,2,1,0] : [0,1,2,3,4,5,6,7];
   const cols = isFlipped ? [7,6,5,4,3,2,1,0] : [0,1,2,3,4,5,6,7];
 
+  const handlePromotion = (piece) => {
+    if (!promotionDialog) return;
+    const { from, to, move } = promotionDialog;
+    setPromotionDialog(null);
+    makeMove(from[0], from[1], to[0], to[1], move, piece);
+  };
+
   return (
-    <div 
-      className="relative select-none w-full h-full flex justify-center items-center" 
-      style={{ touchAction: 'none', WebkitUserSelect: 'none', userSelect: 'none' }}
-      onContextMenu={(e) => e.preventDefault()}
-    >
-      <div className={`${currentTheme.bg} p-0 md:p-1 rounded-none md:rounded-lg shadow-none md:shadow-2xl border-0 md:border-4 border-[#2c1e12] max-h-full aspect-square w-full md:max-w-[90vh]`}>
-        <div 
-          ref={boardRef}
-          className={`grid gap-0 w-full h-full ${currentTheme.light} border-0 md:border-2 ${currentTheme.border} shadow-inner rounded-none md:rounded`}
-          style={{ 
-            gridTemplateColumns: 'repeat(8, 1fr)', 
-            gridTemplateRows: 'repeat(8, 1fr)',
-            aspectRatio: '1/1'
-          }}
-        >
+    <>
+      <Dialog open={!!promotionDialog} onOpenChange={() => setPromotionDialog(null)}>
+        <DialogContent className="bg-[#2C1810] border-[#D4A574]/50 text-[#F5E6D3]">
+          <DialogHeader>
+            <DialogTitle>Choisir une promotion</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-4 gap-4 p-4">
+            {['q', 'r', 'b', 'n'].map(piece => {
+              const isWhite = currentTurn === 'white';
+              const displayPiece = isWhite ? piece.toUpperCase() : piece;
+              const symbols = { q: '♕', r: '♖', b: '♗', n: '♘', Q: '♕', R: '♖', B: '♗', N: '♘' };
+              
+              return (
+                <Button
+                  key={piece}
+                  onClick={() => handlePromotion(piece)}
+                  className="h-20 bg-[#5D3A1A] hover:bg-[#8B5A2B] border-2 border-[#D4A574]/50"
+                >
+                  <span className="text-5xl">{symbols[displayPiece]}</span>
+                </Button>
+              );
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <div 
+        className="relative select-none w-full h-full flex justify-center items-center" 
+        style={{ touchAction: 'none', WebkitUserSelect: 'none', userSelect: 'none' }}
+        onContextMenu={(e) => e.preventDefault()}
+      >
+        <div className={`${currentTheme.bg} p-0 md:p-1 rounded-none md:rounded-lg shadow-none md:shadow-2xl border-0 md:border-4 border-[#2c1e12] max-h-full aspect-square w-full md:max-w-[90vh]`}>
+          <div 
+            ref={boardRef}
+            className={`grid gap-0 w-full h-full ${currentTheme.light} border-0 md:border-2 ${currentTheme.border} shadow-inner rounded-none md:rounded`}
+            style={{ 
+              gridTemplateColumns: 'repeat(8, 1fr)', 
+              gridTemplateRows: 'repeat(8, 1fr)',
+              aspectRatio: '1/1'
+            }}
+          >
           {rows.map((r) => (
             cols.map((c) => {
               const piece = board[r][c];
@@ -430,5 +447,6 @@ export default function ChessBoard({
         </div>
       </div>
     </div>
+    </>
   );
 }
