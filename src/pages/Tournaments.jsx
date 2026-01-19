@@ -164,6 +164,10 @@ export default function Tournaments() {
     }
   };
 
+  const handleTournamentCreated = () => {
+    queryClient.invalidateQueries({ queryKey: ['tournaments'] });
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] flex items-center justify-center">
