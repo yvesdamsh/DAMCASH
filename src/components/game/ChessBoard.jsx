@@ -265,9 +265,11 @@ export default function ChessBoard({
 
   const getPieceSymbol = (piece) => {
     if (!piece) return '';
+    const isWhite = piece === piece.toUpperCase();
     const type = piece.toUpperCase();
     const symbols = {
-      'R': '♜', 'N': '♞', 'B': '♝', 'Q': '♛', 'K': '♚', 'P': '♟'
+      'R': '♜', 'N': '♞', 'B': '♝', 'Q': '♛', 'K': '♚', 
+      'P': isWhite ? '♙' : '♟'
     };
     return symbols[type] || '';
   };
