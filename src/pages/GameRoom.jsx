@@ -1155,7 +1155,15 @@ export default function GameRoom() {
         {!isSpectator && gameStarted && session?.status === 'in_progress' && (
           <div className="flex gap-3 justify-center">
             <Button
-              onClick={handleOfferDraw}
+              onClick={() => {
+                alert('BOUTON CLIQUÉ!');
+                console.log('=== CLIC DÉTECTÉ ===');
+                console.log('drawOfferSent:', drawOfferSent);
+                console.log('user:', user);
+                console.log('session:', session);
+                console.log('isSpectator:', isSpectator);
+                handleOfferDraw();
+              }}
               variant="outline"
               className="bg-blue-500/20 border-blue-500/50 text-blue-300 hover:bg-blue-500/30"
               disabled={drawOfferSent}
