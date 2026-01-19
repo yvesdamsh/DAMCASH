@@ -260,8 +260,20 @@ export default function ChessBoard({
   const winner = gameStatus === 'whiteWins' ? 'white' : gameStatus === 'blackWins' ? 'black' : null;
   const displayBoard = playerColor === 'black' ? [...board].reverse().map(r => [...r].reverse()) : board;
 
+  const getPieceSymbol = (piece) => {
+    if (!piece) return '';
+    const symbols = {
+      'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟',
+      'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'
+    };
+    return symbols[piece] || '';
+  };
+
+  const rows = ['8', '7', '6', '5', '4', '3', '2', '1'];
+  const cols = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', flex: 1, backgroundColor: '#1a1a1a', padding: '16px', overflow: 'auto' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', flex: 1, backgroundColor: '#7B6148', padding: '20px', overflow: 'auto' }}>
       <VictoryParticles show={gameStatus !== 'playing'} winner={winner} />
       <GameEndModal
         show={gameStatus !== 'playing'}
@@ -271,36 +283,73 @@ export default function ChessBoard({
         onHome={() => window.location.href = '/'}
         stats={gameStats}
       />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 40px)', gap: 0, border: '3px solid #3E2723' }}>
-        {displayBoard.flat().map((piece, i) => {
-          const r = Math.floor(i / 8);
-          const c = i % 8;
-          const actualRow = playerColor === 'black' ? 7 - r : r;
-          const actualCol = playerColor === 'black' ? 7 - c : c;
-          const isSelected = selectedSquare?.row === actualRow && selectedSquare?.col === actualCol;
-          const isValidMove = validMoves.some(m => m.row === actualRow && m.col === actualCol);
-          
-          return (
-            <div
-              key={i}
-              onClick={() => handleSquareClick(actualRow, actualCol)}
-              style={{
-                width: '40px',
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: (r + c) % 2 === 0 ? '#F5E6D3' : '#B58863',
-                cursor: 'pointer',
-                fontSize: '24px',
-                fontWeight: 'bold',
-                boxShadow: isSelected ? 'inset 0 0 0 3px #facc15' : isValidMove ? 'inset 0 0 0 2px #22c55e' : 'none'
-              }}
-            >
-              {piece}
+      <div style={{ backgroundColor: '#7B6148', padding: '24px', borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '30px repeat(8, 60px)', gridTemplateRows: 'repeat(8, 60px) 30px', gap: 0 }}>
+          {/* Numéros de rangées à gauche */}
+          {rows.map((row, i) => (
+            <div key={`row-${i}`} style={{ 
+              gridColumn: 1, 
+              gridRow: i + 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#F0D9B5',
+              fontSize: '16px',
+              fontWeight: 'bold'
+            }}>
+              {playerColor === 'black' ? rows[7 - i] : row}
             </div>
-          );
-        })}
+          ))}
+
+          {/* Cases du plateau */}
+          {displayBoard.flat().map((piece, i) => {
+            const r = Math.floor(i / 8);
+            const c = i % 8;
+            const actualRow = playerColor === 'black' ? 7 - r : r;
+            const actualCol = playerColor === 'black' ? 7 - c : c;
+            const isSelected = selectedSquare?.row === actualRow && selectedSquare?.col === actualCol;
+            const isValidMove = validMoves.some(m => m.row === actualRow && m.col === actualCol);
+            
+            return (
+              <div
+                key={i}
+                onClick={() => handleSquareClick(actualRow, actualCol)}
+                style={{
+                  gridColumn: c + 2,
+                  gridRow: r + 1,
+                  width: '60px',
+                  height: '60px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: (r + c) % 2 === 0 ? '#F0D9B5' : '#B58863',
+                  cursor: 'pointer',
+                  fontSize: '48px',
+                  boxShadow: isSelected ? 'inset 0 0 0 4px #FFD700' : isValidMove ? 'inset 0 0 0 3px #4ADE80' : 'none',
+                  position: 'relative'
+                }}
+              >
+                {getPieceSymbol(piece)}
+              </div>
+            );
+          })}
+
+          {/* Lettres de colonnes en bas */}
+          {cols.map((col, i) => (
+            <div key={`col-${i}`} style={{ 
+              gridColumn: i + 2, 
+              gridRow: 9,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#F0D9B5',
+              fontSize: '16px',
+              fontWeight: 'bold'
+            }}>
+              {playerColor === 'black' ? cols[7 - i] : col}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
