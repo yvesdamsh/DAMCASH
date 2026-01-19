@@ -157,30 +157,30 @@ export default function VideoCall({
       setIsCameraOn(true);
       setIsMicOn(true);
 
+      // Attacher au video element LOCAL
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
-        // S'assurer que la vidéo se lit
+        localVideoRef.current.muted = true;
         localVideoRef.current.play().catch(err => {
           console.log('Play error:', err);
         });
         console.log('✅ Stream attaché au video element local');
       }
 
-      // Ajouter les tracks au peer connection existant
-      if (peerConnectionRef.current) {
+      // Ajouter les tracks au peer connection quand il est prêt
+      if (peerConnectionRef.current && opponentId) {
         stream.getTracks().forEach(track => {
           peerConnectionRef.current.addTrack(track, stream);
         });
 
-        // Faire une offre ou envoyer les tracks existants
         const offer = await peerConnectionRef.current.createOffer({ iceRestart: true });
         await peerConnectionRef.current.setLocalDescription(offer);
         sendSignal('offer', offer);
       }
     } catch (error) {
-        console.error('❌ Erreur activation caméra:', error.name, error.message);
-        setCameraError(true);
-      }
+      console.error('❌ Erreur activation caméra:', error.name, error.message);
+      setCameraError(true);
+    }
   };
 
   const deactivateCamera = () => {
