@@ -180,24 +180,7 @@ export default function GameRoom() {
   };
   }, [roomId]);
 
-  // Écouter les changements de session pour detecter l'abandon
-  useEffect(() => {
-    if (!session || !user || victoryByResignModal) return;
 
-    // Si la partie est terminée
-    if (session.status === 'finished') {
-      // Si je suis le gagnant, afficher le modal
-      if (session.winner_id === user.id) {
-        const loserName = user.id === session.player1_id 
-          ? (session.player2_name || opponent?.full_name || 'Votre adversaire')
-          : (session.player1_name || opponent?.full_name || 'Votre adversaire');
-
-        console.log('Victoire détectée - gagnant:', user.id, 'perdant:', loserName);
-        setResignationMessage(loserName);
-        setVictoryByResignModal(true);
-      }
-    }
-  }, [session?.status, session?.winner_id, user?.id, opponent?.full_name, victoryByResignModal]);
 
 
 
