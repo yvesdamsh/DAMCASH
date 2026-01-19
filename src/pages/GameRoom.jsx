@@ -209,18 +209,18 @@ export default function GameRoom() {
         console.log('Polling - user.id:', user?.id);
         console.log('Polling - isCurrentUserWinner:', currentSession?.winner_id === user?.id);
 
-        // Si la partie est terminée et que le joueur actuel N'EST PAS le gagnant
+        // Si la partie est terminée et que le joueur actuel EST le gagnant
         if (currentSession.status === 'finished' && currentSession.winner_id) {
           const isCurrentUserWinner = currentSession.winner_id === user.id;
           
-          if (!isCurrentUserWinner && !victoryByResignModal) {
-            // Le joueur a PERDU - afficher "Victoire" du gagnant (l'autre joueur)
-            const winnerName = user.id === currentSession.player1_id 
+          if (isCurrentUserWinner && !victoryByResignModal) {
+            // Je suis le GAGNANT - afficher la victoire
+            const loserName = user.id === currentSession.player1_id 
               ? (currentSession.player2_name || opponent?.full_name || 'Votre adversaire')
               : (currentSession.player1_name || opponent?.full_name || 'Votre adversaire');
 
-            console.log('Modal affichage pour joueur qui a perdu. Gagnant:', winnerName);
-            setResignationMessage(winnerName);
+            console.log('Modal victoire pour gagnant. Perdant:', loserName);
+            setResignationMessage(loserName);
             setVictoryByResignModal(true);
           }
         }
