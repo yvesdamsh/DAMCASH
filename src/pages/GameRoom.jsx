@@ -792,6 +792,23 @@ export default function GameRoom() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const activateMyCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: true
+      });
+      setLocalStream(stream);
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
+        localVideoRef.current.play().catch(err => console.log('Play error:', err));
+      }
+    } catch (error) {
+      console.error('Erreur activation caméra:', error);
+      toast.error('Caméra non disponible');
+    }
+  };
+
   const updatePlayerStats = async (playerId, username, result, gameType) => {
     if (!playerId) return;
     const ratingField = gameType === 'chess' ? 'chess_rating' : 'checkers_rating';
