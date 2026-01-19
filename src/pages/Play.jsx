@@ -1,102 +1,135 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { createPageUrl } from '../utils';
-import { Crown, Circle, ArrowRight, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import HeroSection from '@/components/play/HeroSection';
+import GameCard from '@/components/play/GameCard';
+import GameModesSection from '@/components/play/GameModesSection';
+import DailyChallengesSection from '@/components/play/DailyChallengesSection';
+import TopPlayersSection from '@/components/play/TopPlayersSection';
 
 export default function Play() {
-  const modes = [
+  const [sessionCount, setSessionCount] = useState(0);
+
+  const games = [
     {
-      id: 'solo',
-      name: 'Jouer seul',
-      description: 'Affrontez l\'IA',
-      icon: <Circle className="w-8 h-8" />,
-      gradient: 'from-purple-600 to-purple-800',
-      iconColor: 'text-purple-300',
-      action: null
+      page: 'Chess',
+      gameType: 'chess',
+      title: '♟️ Échecs',
+      description: 'Stratégie et tactique pour les maîtres',
+      gradient: 'from-orange-600 via-amber-600 to-red-600',
+      pattern: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)',
+      difficulty: 'Expert',
+      defaultPlayers: 512,
+      rewards: '10-1000 gemmes',
+      buttonClass: 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600'
     },
     {
-      id: 'multiplayer',
-      name: 'Multijoueur',
-      description: 'Rejoignez des salons en ligne',
-      icon: <Users className="w-8 h-8" />,
-      gradient: 'from-green-600 to-green-800',
-      iconColor: 'text-green-300',
-      action: 'RoomLobby'
+      page: 'Checkers',
+      gameType: 'checkers',
+      title: '⚫ Dames',
+      description: 'Classique et passionnant pour tous',
+      gradient: 'from-cyan-600 via-blue-600 to-indigo-600',
+      pattern: 'linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%)',
+      difficulty: 'Accessible',
+      defaultPlayers: 324,
+      rewards: '5-500 gemmes',
+      buttonClass: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600'
     }
   ];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      <h1 className="text-3xl font-bold text-[#F5E6D3] mb-2">Mode de jeu</h1>
-      <p className="text-[#D4A574] mb-8">Choisissez comment vous voulez jouer</p>
-      
-      <div className="space-y-4 mb-8">
-        {modes.map((mode) => (
-          <div
-            key={mode.id}
-            className={`p-6 rounded-2xl bg-gradient-to-r ${mode.gradient} border border-white/20 hover:border-white/40 transition-all hover:scale-[1.02] hover:shadow-2xl backdrop-blur-lg shadow-lg`}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className={`w-16 h-16 rounded-xl bg-white/10 flex items-center justify-center ${mode.iconColor}`}>
-                  {mode.icon}
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-white">{mode.name}</h2>
-                  <p className="text-sm text-white/70">{mode.description}</p>
-                </div>
-              </div>
-              {mode.action && (
-                <Link to={createPageUrl(mode.action)}>
-                  <Button className="bg-white/20 hover:bg-white/30 text-white border border-white/30">
-                    Accéder
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-              )}
-            </div>
-          </div>
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-[#F5E6D3] overflow-hidden">
+      {/* Animated background particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(3)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full mix-blend-screen"
+            animate={{
+              x: [0, Math.random() * 100 - 50],
+              y: [0, Math.random() * 100 - 50],
+              opacity: [0.3, 0.1, 0.3],
+            }}
+            transition={{
+              duration: Math.random() * 8 + 8,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            style={{
+              width: Math.random() * 300 + 100,
+              height: Math.random() * 300 + 100,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              background: `radial-gradient(circle, ${['#8b5cf6', '#d946ef', '#3b82f6'][Math.floor(Math.random() * 3)]} 0%, transparent 70%)`,
+            }}
+          />
         ))}
       </div>
 
-      <div className="mt-12">
-        <h2 className="text-2xl font-bold text-[#F5E6D3] mb-4">Choisir un jeu</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[
-            {
-              name: 'Échecs',
-              icon: Crown,
-              page: 'Chess',
-              color: 'from-amber-600 to-amber-800',
-              iconColor: 'text-amber-300'
-            },
-            {
-              name: 'Dames',
-              icon: Circle,
-              page: 'Checkers',
-              color: 'from-blue-600 to-blue-800',
-              iconColor: 'text-blue-300'
-            }
-          ].map((game) => (
-            <Link
-              key={game.page}
-              to={createPageUrl(game.page)}
-              className="block group"
-            >
-              <div className={`p-6 rounded-2xl bg-gradient-to-r ${game.color} border border-white/20 hover:border-white/40 transition-all hover:scale-[1.02] hover:shadow-xl backdrop-blur-lg shadow-lg`}>
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center ${game.iconColor}`}>
-                    <game.icon className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-lg font-bold text-white">{game.name}</h3>
-                  <ArrowRight className="w-5 h-5 text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all ml-auto" />
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+      {/* Main content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 py-8 md:py-12">
+        {/* Hero Section */}
+        <HeroSection />
+
+        {/* Games Section */}
+        <section className="mb-16">
+          <h2 className="text-3xl md:text-4xl font-black text-[#F5E6D3] mb-2">
+            🎮 Choisir un jeu
+          </h2>
+          <p className="text-[#D4A574] text-lg mb-8">Sélectionnez votre jeu préféré et commencez à jouer</p>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+            {games.map((game, idx) => {
+              const isPopular = idx === 0;
+              return (
+                <motion.div
+                  key={game.page}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.2 }}
+                >
+                  <GameCard game={game} isPopular={isPopular} />
+                </motion.div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Game Modes Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          viewport={{ once: true }}
+          className="mb-16"
+        >
+          <GameModesSection />
+        </motion.section>
+
+        {/* Daily Challenges Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          viewport={{ once: true }}
+          className="mb-16"
+        >
+          <DailyChallengesSection />
+        </motion.section>
+
+        {/* Top Players Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          viewport={{ once: true }}
+          className="mb-12"
+        >
+          <TopPlayersSection />
+        </motion.section>
       </div>
+
+      {/* Footer gradient */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-purple-950 to-transparent pointer-events-none" />
     </div>
   );
 }
