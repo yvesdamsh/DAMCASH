@@ -53,6 +53,8 @@ export default function GameRoom() {
   const [showResignConfirm, setShowResignConfirm] = useState(false);
   const [drawAcceptedModal, setDrawAcceptedModal] = useState(false);
   const [opponentNameForDraw, setOpponentNameForDraw] = useState('');
+  const [victoryByResignModal, setVictoryByResignModal] = useState(false);
+  const [resignationMessage, setResignationMessage] = useState('');
 
   // Charger les données initiales
   useEffect(() => {
