@@ -32,24 +32,46 @@ export default function Shop() {
 
   // Mock shop items
   const mockItems = {
+    gems: [
+      { id: '9', name: '50 Gemmes', description: 'Pack starter', price_gems: 0, real_price: '0.49€', category: 'gems', image_url: '💎' },
+      { id: '10', name: '100 Gemmes', description: 'Pack petit', price_gems: 0, real_price: '0.99€', category: 'gems', image_url: '💎' },
+      { id: '11', name: '500 Gemmes', description: 'Pack moyen', price_gems: 0, real_price: '2.99€', category: 'gems', image_url: '💎💎' },
+      { id: '12', name: '1500 Gemmes (+300 BONUS)', description: 'Pack grand', price_gems: 0, real_price: '6.99€', category: 'gems', image_url: '💎💎💎' }
+    ],
     themes: [
       { id: '1', name: 'Thème Royal', description: 'Un thème doré élégant', price_gems: 100, category: 'theme', image_url: '🏰' },
       { id: '2', name: 'Thème Néon', description: 'Couleurs vives et modernes', price_gems: 150, category: 'theme', image_url: '🌈' },
-      { id: '3', name: 'Thème Classique', description: 'Style bois traditionnel', price_gems: 80, category: 'theme', image_url: '🪵' }
+      { id: '3', name: 'Thème Classique', description: 'Style bois traditionnel', price_gems: 80, category: 'theme', image_url: '🪵' },
+      { id: '13', name: 'Thème Espace', description: 'Galaxie étoilée', price_gems: 120, category: 'theme', image_url: '🌌' },
+      { id: '14', name: 'Thème Océan', description: 'Bleu aquatique', price_gems: 100, category: 'theme', image_url: '🌊' },
+      { id: '15', name: 'Thème Feu', description: 'Rouge flammes', price_gems: 130, category: 'theme', image_url: '🔥' },
+      { id: '16', name: 'Thème Or', description: 'Doré luxueux', price_gems: 200, category: 'theme', image_url: '✨' },
+      { id: '17', name: 'Thème Rétro', description: 'Style vintage', price_gems: 90, category: 'theme', image_url: '📼' }
     ],
     avatars: [
       { id: '4', name: 'Roi Légendaire', description: 'Avatar exclusif', price_gems: 200, category: 'avatar', image_url: '👑' },
       { id: '5', name: 'Chevalier', description: 'Noble guerrier', price_gems: 120, category: 'avatar', image_url: '⚔️' },
-      { id: '6', name: 'Magicien', description: 'Maître des stratégies', price_gems: 150, category: 'avatar', image_url: '🧙' }
+      { id: '6', name: 'Magicien', description: 'Maître des stratégies', price_gems: 150, category: 'avatar', image_url: '🧙' },
+      { id: '18', name: 'Dragon Légendaire', description: 'Créature mythique puissante', price_gems: 250, category: 'avatar', image_url: '🐉' },
+      { id: '19', name: 'Ninja Furtif', description: 'Maître de l\'ombre', price_gems: 180, category: 'avatar', image_url: '🥷' },
+      { id: '20', name: 'Princesse Royale', description: 'Grâce et élégance', price_gems: 150, category: 'avatar', image_url: '👸' },
+      { id: '21', name: 'Pirate Aventurier', description: 'Navigateur des mers', price_gems: 140, category: 'avatar', image_url: '🏴‍☠️' },
+      { id: '22', name: 'Robot Futuriste', description: 'Intelligence artificielle', price_gems: 160, category: 'avatar', image_url: '🤖' },
+      { id: '23', name: 'Sorcier Mystique', description: 'Maître de la magie', price_gems: 170, category: 'avatar', image_url: '🧝' },
+      { id: '24', name: 'Champion Sportif', description: 'Athlète d\'élite', price_gems: 130, category: 'avatar', image_url: '⚽' }
     ],
     boards: [
       { id: '7', name: 'Plateau Marbre', description: 'Élégance intemporelle', price_gems: 180, category: 'board', image_url: '🪨' },
-      { id: '8', name: 'Plateau Jade', description: 'Pierre précieuse', price_gems: 250, category: 'board', image_url: '💎' }
+      { id: '8', name: 'Plateau Jade', description: 'Pierre précieuse', price_gems: 250, category: 'board', image_url: '💎' },
+      { id: '25', name: 'Plateau Cristal', description: 'Transparent brillant', price_gems: 220, category: 'board', image_url: '🔮' },
+      { id: '26', name: 'Plateau Obsidienne', description: 'Noir profond', price_gems: 200, category: 'board', image_url: '⚫' },
+      { id: '27', name: 'Plateau Arc-en-ciel', description: 'Multicolore', price_gems: 280, category: 'board', image_url: '🌈' },
+      { id: '28', name: 'Plateau Bois Précieux', description: 'Acajou sculpté', price_gems: 190, category: 'board', image_url: '🪵' }
     ],
-    gems: [
-      { id: '9', name: '100 Gemmes', description: 'Pack petit', price_gems: 0, real_price: '0.99€', category: 'gems', image_url: '💎' },
-      { id: '10', name: '500 Gemmes', description: 'Pack moyen', price_gems: 0, real_price: '3.99€', category: 'gems', image_url: '💎💎' },
-      { id: '11', name: '1200 Gemmes', description: 'Pack grand', price_gems: 0, real_price: '7.99€', category: 'gems', image_url: '💎💎💎' }
+    bundles: [
+      { id: '29', name: 'Pack Débutant', description: '1 thème + 1 avatar + 1 plateau', price_gems: 350, real_value: 450, category: 'bundle', image_url: '🎁', discount: '-22%' },
+      { id: '30', name: 'Pack VIP', description: 'Tous les thèmes actuels', price_gems: 600, real_value: 820, category: 'bundle', image_url: '👑', discount: '-27%' },
+      { id: '31', name: 'Pack Complet', description: 'Tout débloquer', price_gems: 1500, real_value: 3000, category: 'bundle', image_url: '🌟', discount: '-50%' }
     ]
   };
 
