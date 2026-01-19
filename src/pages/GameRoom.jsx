@@ -939,16 +939,7 @@ export default function GameRoom() {
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
         </div>
 
-        {/* DEBUG: Force start pour tester */}
-        <Button
-          onClick={() => {
-            console.log('FORCE START - gameStarted:', gameStarted);
-            setGameStarted(true);
-          }}
-          className="mt-4 bg-purple-600 hover:bg-purple-700"
-        >
-          🔧 DEBUG: Forcer démarrage
-        </Button>
+
 
         <Button
           onClick={() => navigate('/Search')}
