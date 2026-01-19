@@ -1336,7 +1336,7 @@ export default function GameRoom() {
               <span className="text-xs text-[#D4A574]">Chargement...</span>
             )}
           </div>
-          <ScrollArea className="h-40 w-full rounded-md bg-white/5 p-3">
+          <ScrollArea className="h-32 md:h-40 w-full rounded-md bg-white/5 p-3">
             <div className="space-y-2">
               {messages.length === 0 ? (
                 <p className="text-xs text-[#D4A574]">Aucun message</p>
