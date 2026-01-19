@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import UserAvatar from '@/components/ui/UserAvatar';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
@@ -83,9 +83,7 @@ export default function HistoryTab({ user }) {
               >
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3 flex-1">
-                    <Avatar className="w-10 h-10">
-                      <AvatarFallback className="bg-[#8B5A2B] text-xs">{opponent.name?.charAt(0)}</AvatarFallback>
-                    </Avatar>
+                    <UserAvatar user={{ full_name: opponent.name }} size="default" />
                     <div className="flex-1">
                       <p className="font-semibold">{opponent.name}</p>
                       <p className="text-xs text-[#D4A574]/70">{gameDate}</p>
