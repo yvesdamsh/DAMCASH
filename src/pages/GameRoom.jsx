@@ -272,13 +272,6 @@ export default function GameRoom() {
   const handleResign = async () => {
     if (!session || !user || isSpectator) return;
 
-    const winnerId = user.id === session.player1_id ? session.player2_id : session.player1_id;
-    const winnerName = user.id === session.player1_id ? (session.player2_name || opponent?.full_name) : session.player1_name;
-    
-    if (!window.confirm(`Voulez-vous vraiment abandonner ? ${winnerName} remportera la victoire.`)) {
-      return;
-    }
-
     try {
       const gameType = session.game_type || 'checkers';
       
