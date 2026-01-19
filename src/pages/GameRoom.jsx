@@ -209,19 +209,34 @@ export default function GameRoom() {
 
   // Realtime: écouter les propositions de nul
   useEffect(() => {
-    if (!roomId || !user || isSpectator) return;
+    if (!roomId || !user || isSpectator) {
+      console.log('DrawOffer listener non activé - roomId:', roomId, 'user:', user?.id, 'isSpectator:', isSpectator);
+      return;
+    }
+
+    console.log('DrawOffer listener activé pour roomId:', roomId, 'userId:', user.id);
 
     const unsubscribe = base44.entities.DrawOffer?.subscribe?.((event) => {
-      if (event?.type !== 'create') return;
-      if (!event?.data || event.data.room_id !== roomId) return;
+      console.log('DrawOffer event reçu:', event);
+      
+      if (event?.type !== 'create') {
+        console.log('Event ignoré - type:', event?.type);
+        return;
+      }
+      if (!event?.data || event.data.room_id !== roomId) {
+        console.log('Event ignoré - roomId ne correspond pas');
+        return;
+      }
       
       // Si je reçois une proposition
       if (event.data.to_player_id === user.id && event.data.status === 'pending') {
+        console.log('Proposition reçue! setIncomingDrawOffer:', event.data);
         setIncomingDrawOffer(event.data);
       }
       
       // Si ma proposition est acceptée ou refusée
       if (event.data.from_player_id === user.id) {
+        console.log('Ma proposition a été traitée:', event.data.status);
         if (event.data.status === 'accepted' || event.data.status === 'declined') {
           setDrawOfferSent(false);
         }
@@ -312,20 +327,34 @@ export default function GameRoom() {
   };
 
   const handleOfferDraw = async () => {
-    if (!session || !user || isSpectator) return;
+    console.log('handleOfferDraw appelé');
+    console.log('session:', session);
+    console.log('user:', user);
+    console.log('isSpectator:', isSpectator);
+    
+    if (!session || !user || isSpectator) {
+      console.log('Fonction stoppée - conditions non remplies');
+      return;
+    }
 
     try {
       const opponentId = user.id === session.player1_id ? session.player2_id : session.player1_id;
+      console.log('opponentId:', opponentId);
       
-      await base44.entities.DrawOffer.create({
+      const drawOfferData = {
         room_id: roomId,
         from_player_id: user.id,
         from_player_name: user.full_name,
         to_player_id: opponentId,
         status: 'pending'
-      });
+      };
+      console.log('Création DrawOffer avec:', drawOfferData);
+      
+      const result = await base44.entities.DrawOffer.create(drawOfferData);
+      console.log('DrawOffer créé:', result);
       
       setDrawOfferSent(true);
+      console.log('drawOfferSent mis à true');
       
       toast.success('Proposition envoyée', {
         description: 'En attente de la réponse de l\'adversaire',
@@ -334,6 +363,7 @@ export default function GameRoom() {
       });
     } catch (e) {
       console.log('Erreur proposition nul:', e?.message || e);
+      console.error('Erreur complète:', e);
       toast.error('Erreur lors de l\'envoi de la proposition');
     }
   };
