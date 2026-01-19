@@ -180,18 +180,51 @@ export default function GameRoom() {
 
   // Écouter les changements de status pour montrer le modal victoire par abandon
   useEffect(() => {
-  if (!session || !user || session.status !== 'finished') return;
+    if (!session || !user || session.status !== 'finished') return;
 
-  const isCurrentUserWinner = session.winner_id === user.id;
-  if (!isCurrentUserWinner) return;
+    const isCurrentUserWinner = session.winner_id === user.id;
+    if (!isCurrentUserWinner) return;
 
-  const loserName = user.id === session.player1_id 
-    ? (session.player2_name || opponent?.full_name || 'Votre adversaire')
-    : (session.player1_name || 'Votre adversaire');
+    const loserName = user.id === session.player1_id 
+      ? (session.player2_name || opponent?.full_name || 'Votre adversaire')
+      : (session.player1_name || 'Votre adversaire');
 
-  setResignationMessage(loserName);
-  setVictoryByResignModal(true);
+    setResignationMessage(loserName);
+    setVictoryByResignModal(true);
   }, [session?.status, session?.winner_id, user?.id]);
+
+  // Polling: vérifier toutes les 2 secondes si la partie est terminée
+  useEffect(() => {
+    if (!roomId || !user || isSpectator || !gameStarted) return;
+
+    const checkSessionStatus = async () => {
+      try {
+        const sessions = await base44.entities.GameSession.filter({ room_id: roomId });
+        if (sessions.length === 0) return;
+
+        const currentSession = sessions[0];
+
+        // Si la partie est terminée et que le joueur actuel n'est pas le gagnant
+        if (currentSession.status === 'finished' && currentSession.winner_id) {
+          const isCurrentUserWinner = currentSession.winner_id === user.id;
+          if (!isCurrentUserWinner && !victoryByResignModal) {
+            // L'autre joueur a gagné = on a perdu par abandon
+            const loserName = user.id === currentSession.player1_id 
+              ? (currentSession.player2_name || opponent?.full_name || 'Votre adversaire')
+              : (currentSession.player1_name || 'Votre adversaire');
+
+            setResignationMessage(loserName);
+            setVictoryByResignModal(true);
+          }
+        }
+      } catch (e) {
+        console.log('Erreur polling session:', e?.message || e);
+      }
+    };
+
+    const interval = setInterval(checkSessionStatus, 2000);
+    return () => clearInterval(interval);
+  }, [roomId, user?.id, isSpectator, gameStarted, victoryByResignModal]);
 
   // Chat: charger + realtime messages
   useEffect(() => {
