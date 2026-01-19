@@ -905,8 +905,19 @@ export default function GameRoom() {
     (effectivePlayerColor === 'black' && session?.current_turn === 'black')
   );
 
+  console.log('DEBUG GAMEMODE:', {
+    gameMode,
+    urlMode: urlParams.get('mode'),
+    session: session?.id,
+    opponent: opponent?.full_name,
+    isMultiplayer: gameMode !== 'ai'
+  });
+
   // Mode IA: afficher directement le plateau
-  if (gameMode === 'ai') {
+  // ATTENTION: Ne jamais afficher ce mode si on a une session multijoueur
+  const isActuallyMultiplayer = session && session.player1_id && (session.player2_id || session.invited_player_id);
+  
+  if (gameMode === 'ai' && !isActuallyMultiplayer) {
     return (
       <div className="w-full min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] flex flex-col">
         {/* Header */}
