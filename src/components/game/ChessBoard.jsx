@@ -265,11 +265,11 @@ export default function ChessBoard({
 
   const getPieceSymbol = (piece) => {
     if (!piece) return '';
+    const type = piece.toUpperCase();
     const symbols = {
-      'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟',
-      'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'
+      'R': '♜', 'N': '♞', 'B': '♝', 'Q': '♛', 'K': '♚', 'P': '♟'
     };
-    return symbols[piece] || '';
+    return symbols[type] || '';
   };
 
   const rows = ['8', '7', '6', '5', '4', '3', '2', '1'];
