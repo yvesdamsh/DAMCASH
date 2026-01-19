@@ -795,8 +795,29 @@ export default function GameRoom() {
         )}
       </div>
 
-      {/* Chat */}
-      <div className="px-6 pb-4">
+      {/* Actions de jeu et Chat */}
+      <div className="px-6 pb-4 space-y-4">
+        {/* Boutons d'action */}
+        {!isSpectator && gameStarted && session?.status === 'in_progress' && (
+          <div className="flex gap-3 justify-center">
+            <Button
+              onClick={handleOfferDraw}
+              variant="outline"
+              className="bg-blue-500/20 border-blue-500/50 text-blue-300 hover:bg-blue-500/30"
+            >
+              🤝 Proposer nul
+            </Button>
+            <Button
+              onClick={handleResign}
+              variant="outline"
+              className="bg-red-500/20 border-red-500/50 text-red-300 hover:bg-red-500/30"
+            >
+              🏳️ Abandonner
+            </Button>
+          </div>
+        )}
+
+        {/* Chat */}
         <div className="bg-[#2C1810] border border-[#D4A574]/30 rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-[#F5E6D3]">Chat</h3>
