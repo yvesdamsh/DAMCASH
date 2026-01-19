@@ -269,12 +269,15 @@ export default function GameRoom() {
     }
   };
 
-  const handleResign = async () => {
+  const handleConfirmResign = async () => {
     if (!session || !user || isSpectator) return;
+
+    const winnerId = user.id === session.player1_id ? session.player2_id : session.player1_id;
+    const winnerName = user.id === session.player1_id ? (session.player2_name || opponent?.full_name) : session.player1_name;
 
     try {
       const gameType = session.game_type || 'checkers';
-      
+
       await base44.entities.GameSession.update(session.id, {
         status: 'finished',
         winner_id: winnerId,
