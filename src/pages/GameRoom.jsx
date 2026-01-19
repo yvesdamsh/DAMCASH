@@ -301,29 +301,29 @@ export default function GameRoom() {
         final_board_state: session.board_state,
         moves_count: session.move_count || 0,
         duration_seconds: duration
-      });
-      
-      await base44.entities.Notification?.create?.({
+        });
+
+        await base44.entities.Notification?.create?.({
         user_email: winnerId,
         type: 'game_result',
         title: '🎉 Victoire par abandon',
         message: `${user.full_name} a abandonné la partie`,
         link: `GameRoom?roomId=${roomId}`
-      });
+        });
 
-      setSession(prev => ({ ...prev, status: 'finished', winner_id: winnerId }));
-      
-      toast.success('Partie abandonnée', {
+        setSession(prev => ({ ...prev, status: 'finished', winner_id: winnerId }));
+        setShowResignConfirm(false);
+
+        toast.success('Partie abandonnée', {
         description: `${winnerName} remporte la victoire`,
-        duration: 5000
-      });
-      
-      setTimeout(() => navigate('/Play'), 2000);
-    } catch (e) {
-      console.log('Erreur abandon:', e?.message || e);
-      toast.error('Erreur lors de l\'abandon');
-    }
-  };
+        duration: 3000
+        });
+
+        setTimeout(() => navigate('/Play'), 2000);
+        } catch (e) {
+        toast.error('Erreur lors de l\'abandon');
+        }
+        };
 
   const handleOfferDraw = async () => {
     if (!session || !user || isSpectator) return;
