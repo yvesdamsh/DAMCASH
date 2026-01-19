@@ -1168,29 +1168,22 @@ export default function GameRoom() {
 
       {/* Actions de jeu et Chat */}
       <div className="px-6 pb-4 space-y-4">
-        {/* Boutons d'action */}
-        {!isSpectator && gameStarted && session?.status === 'in_progress' && (
+        {/* Boutons d'action - Si roomId existe, c'est une partie multijoueur */}
+        {roomId && !isSpectator && (
           <div className="flex gap-3 justify-center">
             <Button
-              onClick={() => {
-                alert('BOUTON MULTIJOUEUR CLIQUÉ!');
-                console.log('=== CLIC DÉTECTÉ ===');
-                console.log('drawOfferSent:', drawOfferSent);
-                console.log('user:', user);
-                console.log('session:', session);
-                console.log('isSpectator:', isSpectator);
-                handleOfferDraw();
-              }}
+              onClick={handleOfferDraw}
               variant="outline"
               className="bg-blue-500/20 border-blue-500/50 text-blue-300 hover:bg-blue-500/30"
-              disabled={drawOfferSent}
+              disabled={drawOfferSent || !gameStarted || session?.status !== 'in_progress'}
             >
-              {drawOfferSent ? '⏳ En attente...' : '🤝 Proposer nul (MULTI)'}
+              {drawOfferSent ? '⏳ En attente...' : '🤝 Proposer nul'}
             </Button>
             <Button
               onClick={handleResign}
               variant="outline"
               className="bg-red-500/20 border-red-500/50 text-red-300 hover:bg-red-500/30"
+              disabled={!gameStarted || session?.status !== 'in_progress'}
             >
               🏳️ Abandonner
             </Button>
