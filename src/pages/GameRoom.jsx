@@ -1039,6 +1039,26 @@ export default function GameRoom() {
         </DialogContent>
       </Dialog>
 
+      {/* Modal: Victoire par abandon */}
+      <Dialog open={victoryByResignModal} onOpenChange={(open) => { if (!open) { setVictoryByResignModal(false); setTimeout(() => navigate('/Home'), 500); } }}>
+        <DialogContent className="bg-[#2C1810] border-[#D4A574]/50 text-[#F5E6D3] max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-green-400">🎉 Victoire!</DialogTitle>
+            <DialogDescription className="text-[#D4A574] mt-3">
+              {resignationMessage} a abandonné la partie. Vous gagnez!
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-3 mt-6 flex">
+            <Button
+              onClick={() => { setVictoryByResignModal(false); setTimeout(() => navigate('/Home'), 500); }}
+              className="flex-1 bg-green-700 hover:bg-green-800"
+            >
+              ✅ Retour à l'accueil
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <div className="w-full min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-[#D4A574]/30 bg-gradient-to-b from-[#5D3A1A] to-[#2C1810]">
