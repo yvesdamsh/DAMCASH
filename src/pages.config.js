@@ -1,3 +1,4 @@
+import Admin from './pages/Admin';
 import Checkers from './pages/Checkers';
 import Chess from './pages/Chess';
 import Clubs from './pages/Clubs';
@@ -18,11 +19,11 @@ import Search from './pages/Search';
 import Shop from './pages/Shop';
 import Spectate from './pages/Spectate';
 import Tournaments from './pages/Tournaments';
-import Admin from './pages/Admin';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "Admin": Admin,
     "Checkers": Checkers,
     "Chess": Chess,
     "Clubs": Clubs,
@@ -43,7 +44,6 @@ export const PAGES = {
     "Shop": Shop,
     "Spectate": Spectate,
     "Tournaments": Tournaments,
-    "Admin": Admin,
 }
 
 export const pagesConfig = {

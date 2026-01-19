@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, Lock, Users, Clock, ArrowLeft, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CreateRoomModal from '../components/room/CreateRoomModal';
+import OnlinePlayers from '../components/room/OnlinePlayers';
 import { toast } from 'sonner';
 
 const TIME_CONTROL_LABELS = {
@@ -25,6 +26,7 @@ export default function RoomLobby() {
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [joiningRoom, setJoiningRoom] = useState(null);
+  const [activeTab, setActiveTab] = useState('rooms');
 
   useEffect(() => {
     loadData();
@@ -200,45 +202,95 @@ export default function RoomLobby() {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Retour
             </Button>
-            <h1 className="text-3xl font-bold">Salons multijoueur</h1>
+            <h1 className="text-3xl font-bold">Multijoueur</h1>
           </div>
-          <Button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-amber-600 hover:bg-amber-700"
+          {activeTab === 'rooms' && (
+            <Button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-amber-600 hover:bg-amber-700"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Créer un salon
+            </Button>
+          )}
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6 border-b border-[#D4A574]/20">
+          <button
+            onClick={() => setActiveTab('rooms')}
+            className={`px-6 py-3 font-semibold transition-all relative ${
+              activeTab === 'rooms'
+                ? 'text-[#D4A574]'
+                : 'text-[#D4A574]/60 hover:text-[#D4A574]'
+            }`}
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Créer un salon
-          </Button>
+            Salons
+            {activeTab === 'rooms' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 to-orange-600"
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('players')}
+            className={`px-6 py-3 font-semibold transition-all relative ${
+              activeTab === 'players'
+                ? 'text-[#D4A574]'
+                : 'text-[#D4A574]/60 hover:text-[#D4A574]'
+            }`}
+          >
+            Joueurs en ligne
+            {activeTab === 'players' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 to-orange-600"
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              />
+            )}
+          </button>
         </div>
 
-        {/* Filtres */}
-        <div className="mb-6 space-y-4">
-          <div className="flex gap-2 flex-wrap">
-            {['all', 'public', 'my'].map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-4 py-2 rounded-lg transition-all ${
-                  filter === f
-                    ? 'bg-amber-600 text-white'
-                    : 'bg-[#5D3A1A] text-[#D4A574] hover:bg-[#6D4A2A]'
-                }`}
-              >
-                {f === 'all' ? 'Tous' : f === 'public' ? 'Publics' : 'Mes salons'}
-              </button>
-            ))}
-          </div>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Rechercher un salon..."
-            className="w-full bg-[#5D3A1A] border border-[#D4A574]/30 rounded-lg px-4 py-2 text-[#F5E6D3] focus:outline-none focus:border-[#D4A574]"
-          />
-        </div>
+        {/* Tab Content */}
+        <AnimatePresence mode="wait">
+          {activeTab === 'rooms' ? (
+            <motion.div
+              key="rooms"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              {/* Filtres */}
+              <div className="mb-6 space-y-4">
+                <div className="flex gap-2 flex-wrap">
+                  {['all', 'public', 'my'].map((f) => (
+                    <button
+                      key={f}
+                      onClick={() => setFilter(f)}
+                      className={`px-4 py-2 rounded-lg transition-all ${
+                        filter === f
+                          ? 'bg-amber-600 text-white'
+                          : 'bg-[#5D3A1A] text-[#D4A574] hover:bg-[#6D4A2A]'
+                      }`}
+                    >
+                      {f === 'all' ? 'Tous' : f === 'public' ? 'Publics' : 'Mes salons'}
+                    </button>
+                  ))}
+                </div>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Rechercher un salon..."
+                  className="w-full bg-[#5D3A1A] border border-[#D4A574]/30 rounded-lg px-4 py-2 text-[#F5E6D3] focus:outline-none focus:border-[#D4A574]"
+                />
+              </div>
 
-        {/* Salons */}
-        <div className="grid gap-4">
+              {/* Salons */}
+              <div className="grid gap-4">
           <AnimatePresence mode="popLayout">
             {filteredRooms.length > 0 ? (
               filteredRooms.map((room) => (
@@ -320,8 +372,21 @@ export default function RoomLobby() {
                 </Button>
               </div>
             )}
-          </AnimatePresence>
-        </div>
+              </AnimatePresence>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="players"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <OnlinePlayers />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <CreateRoomModal
