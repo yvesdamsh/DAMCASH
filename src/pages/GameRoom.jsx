@@ -1169,7 +1169,6 @@ export default function GameRoom() {
 
             {/* COLONNE DROITE - Joueur 2 */}
             <div className="flex flex-col gap-2">
-              {/* Haut: Avatar + Nom + Timer */}
               <div className="flex items-center gap-2">
                 <Avatar className="w-10 h-10 border-2 border-[#D4A574] flex-shrink-0">
                   <AvatarImage src={session.player2_id === user?.id ? user?.avatar_url : opponent?.avatar_url} />
@@ -1210,26 +1209,6 @@ export default function GameRoom() {
                   {formatTime(blackTime)}
                 </motion.div>
               </div>
-              {/* Caméra Joueur 2 */}
-              {!isSpectator && (
-                <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black shadow-lg border border-[#D4A574]/50 group">
-                  {session.player2_id === user?.id && localCameraActive ? (
-                    <video autoPlay playsInline muted className="w-full h-full object-cover scaleX-[-1]" id="local-video-p2" />
-                  ) : session.player2_id !== user?.id && remoteCameraActive ? (
-                    <video autoPlay playsInline className="w-full h-full object-cover" id="remote-video-p2" />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800">
-                      <span className="text-lg">🚫📹</span>
-                      <p className="text-xs text-white/60 mt-1">Caméra désactivée</p>
-                      {session.player2_id === user?.id && (
-                        <button onClick={() => setLocalCameraActive(true)} className="mt-2 px-2 py-1 bg-blue-600/90 hover:bg-blue-700/90 text-white text-xs rounded">
-                          Activer
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           </div>
 
