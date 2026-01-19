@@ -1010,6 +1010,26 @@ export default function GameRoom() {
         </DialogContent>
       </Dialog>
 
+      {/* Modal: Nul accepté par l'adversaire */}
+      <Dialog open={drawAcceptedModal} onOpenChange={(open) => { if (!open) { setDrawAcceptedModal(false); setTimeout(() => navigate('/Home'), 500); } }}>
+        <DialogContent className="bg-[#2C1810] border-[#D4A574]/50 text-[#F5E6D3] max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-green-400">🤝 Match nul accepté!</DialogTitle>
+            <DialogDescription className="text-[#D4A574] mt-3">
+              {opponentNameForDraw} a accepté votre proposition de match nul.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-3 mt-6 flex">
+            <Button
+              onClick={() => { setDrawAcceptedModal(false); setTimeout(() => navigate('/Home'), 500); }}
+              className="flex-1 bg-green-700 hover:bg-green-800"
+            >
+              ✅ Continuer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <div className="w-full min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-[#D4A574]/30 bg-gradient-to-b from-[#5D3A1A] to-[#2C1810]">
