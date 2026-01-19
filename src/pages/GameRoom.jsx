@@ -10,6 +10,7 @@ import { ArrowLeft, Clock, AlertTriangle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import SpectatorManager from '../components/game/SpectatorManager';
 
 const TIME_CONTROLS = {
   bullet: 60,
@@ -403,6 +404,37 @@ export default function GameRoom() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+
+      // Vérifier si l'utilisateur est banni en tant que spectateur
+      if (isSpectator) {
+        const banned = await base44.entities.BannedSpectator.filter({
+          room_id: roomId,
+          banned_user_id: currentUser.id
+        });
+        if (banned.length > 0) {
+          toast.error('Accès refusé', {
+            description: 'Vous avez été banni de cette partie',
+            duration: 5000
+          });
+          setTimeout(() => navigate('/Play'), 2000);
+          return;
+        }
+
+        // Vérifier si la demande est acceptée
+        const requests = await base44.entities.SpectatorRequest.filter({
+          room_id: roomId,
+          requester_id: currentUser.id,
+          status: 'accepted'
+        });
+        if (requests.length === 0) {
+          toast.error('Accès non autorisé', {
+            description: 'Vous devez être accepté pour observer cette partie',
+            duration: 5000
+          });
+          setTimeout(() => navigate('/Play'), 2000);
+          return;
+        }
+      }
 
       const sessions = await base44.entities.GameSession.filter({
         room_id: roomId
@@ -967,6 +999,9 @@ export default function GameRoom() {
             >
               🏳️ Abandonner
             </Button>
+            {user && session && user.id === session.player1_id && (
+              <SpectatorManager roomId={roomId} hostId={user.id} session={session} />
+            )}
           </div>
         )}
 
