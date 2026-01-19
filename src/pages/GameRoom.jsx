@@ -290,97 +290,66 @@ export default function GameRoom() {
     const winnerId = user.id === session.player1_id ? session.player2_id : session.player1_id;
     const winnerName = user.id === session.player1_id ? (session.player2_name || opponent?.full_name) : session.player1_name;
     
-    toast.custom(
-      (t) => (
-        <motion.div
-          initial={{ opacity: 0, y: -20, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          className="bg-gradient-to-br from-red-900 to-red-950 border-2 border-red-500/50 rounded-xl shadow-2xl p-6 max-w-md"
-        >
-          <div className="flex items-start gap-4">
-            <div className="bg-red-500/20 p-3 rounded-full">
-              <AlertTriangle className="w-8 h-8 text-red-400" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-xl font-bold text-white mb-2">Abandonner la partie ?</h3>
-              <p className="text-red-200 mb-4">
-                Vous êtes sur le point d'abandonner. {winnerName} remportera la victoire.
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={async () => {
-                    try {
-                      const gameType = session.game_type || 'checkers';
-                      
-                      await base44.entities.GameSession.update(session.id, {
-                        status: 'finished',
-                        winner_id: winnerId,
-                        finished_at: new Date().toISOString()
-                      });
+    if (!window.confirm(`Voulez-vous vraiment abandonner ? ${winnerName} remportera la victoire.`)) {
+      return;
+    }
 
-                      const duration = session.last_move_timestamp 
-                        ? Math.floor((new Date() - new Date(session.created_date)) / 1000)
-                        : null;
+    try {
+      const gameType = session.game_type || 'checkers';
+      
+      await base44.entities.GameSession.update(session.id, {
+        status: 'finished',
+        winner_id: winnerId,
+        finished_at: new Date().toISOString()
+      });
 
-                      await base44.entities.GameResult?.create?.({
-                        room_id: roomId,
-                        game_type: gameType,
-                        winner_id: winnerId,
-                        loser_id: user.id,
-                        player1_id: session.player1_id,
-                        player1_name: session.player1_name,
-                        player2_id: session.player2_id,
-                        player2_name: session.player2_name || session.invited_player_name,
-                        result: user.id === session.player1_id ? 'black' : 'white',
-                        final_board_state: session.board_state,
-                        moves_count: session.move_count || 0,
-                        duration_seconds: duration
-                      });
-                      
-                      await base44.entities.Notification?.create?.({
-                        user_email: winnerId,
-                        type: 'game_result',
-                        title: '🎉 Victoire par abandon',
-                        message: `${user.full_name} a abandonné la partie`,
-                        link: `GameRoom?roomId=${roomId}`
-                      });
+      const duration = session.last_move_timestamp 
+        ? Math.floor((new Date() - new Date(session.created_date)) / 1000)
+        : null;
 
-                      setSession(prev => ({ ...prev, status: 'finished', winner_id: winnerId }));
-                      toast.dismiss(t);
-                      
-                      toast.success('Partie abandonnée', {
-                        description: `${winnerName} remporte la victoire`,
-                        duration: 5000
-                      });
-                      
-                      setTimeout(() => navigate('/Play'), 2000);
-                    } catch (e) {
-                      console.log('Erreur abandon:', e?.message || e);
-                      toast.error('Erreur lors de l\'abandon');
-                    }
-                  }}
-                  className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
-                >
-                  Oui, abandonner
-                </button>
-                <button
-                  onClick={() => toast.dismiss(t)}
-                  className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
-                >
-                  Annuler
-                </button>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      ),
-      { duration: Infinity }
-    );
+      await base44.entities.GameResult?.create?.({
+        room_id: roomId,
+        game_type: gameType,
+        winner_id: winnerId,
+        loser_id: user.id,
+        player1_id: session.player1_id,
+        player1_name: session.player1_name,
+        player2_id: session.player2_id,
+        player2_name: session.player2_name || session.invited_player_name,
+        result: user.id === session.player1_id ? 'black' : 'white',
+        final_board_state: session.board_state,
+        moves_count: session.move_count || 0,
+        duration_seconds: duration
+      });
+      
+      await base44.entities.Notification?.create?.({
+        user_email: winnerId,
+        type: 'game_result',
+        title: '🎉 Victoire par abandon',
+        message: `${user.full_name} a abandonné la partie`,
+        link: `GameRoom?roomId=${roomId}`
+      });
+
+      setSession(prev => ({ ...prev, status: 'finished', winner_id: winnerId }));
+      
+      toast.success('Partie abandonnée', {
+        description: `${winnerName} remporte la victoire`,
+        duration: 5000
+      });
+      
+      setTimeout(() => navigate('/Play'), 2000);
+    } catch (e) {
+      console.log('Erreur abandon:', e?.message || e);
+      toast.error('Erreur lors de l\'abandon');
+    }
   };
 
   const handleOfferDraw = async () => {
     if (!session || !user || isSpectator) return;
+
+    if (!window.confirm('Voulez-vous proposer un match nul à votre adversaire ?')) {
+      return;
+    }
 
     try {
       const opponentId = user.id === session.player1_id ? session.player2_id : session.player1_id;
