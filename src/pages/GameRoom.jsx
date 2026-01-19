@@ -330,44 +330,26 @@ export default function GameRoom() {
   };
 
   const handleOfferDraw = async () => {
-    console.log('handleOfferDraw appelé');
-    console.log('session:', session);
-    console.log('user:', user);
-    console.log('isSpectator:', isSpectator);
-    
-    if (!session || !user || isSpectator) {
-      console.log('Fonction stoppée - conditions non remplies');
-      return;
-    }
+    if (!session || !user || isSpectator) return;
 
     try {
       const opponentId = user.id === session.player1_id ? session.player2_id : session.player1_id;
-      console.log('opponentId:', opponentId);
-      
-      const drawOfferData = {
+
+      await base44.entities.DrawOffer.create({
         room_id: roomId,
         from_player_id: user.id,
         from_player_name: user.full_name,
         to_player_id: opponentId,
         status: 'pending'
-      };
-      console.log('Création DrawOffer avec:', drawOfferData);
-      
-      const result = await base44.entities.DrawOffer.create(drawOfferData);
-      console.log('DrawOffer créé:', result);
-      
+      });
+
       setDrawOfferSent(true);
-      console.log('drawOfferSent mis à true');
-      
-      toast.success('Proposition envoyée', {
-        description: 'En attente de la réponse de l\'adversaire',
-        duration: 4000,
-        icon: '🤝'
+      toast.success('Proposition de nul envoyée', {
+        description: 'En attente de la réponse...',
+        duration: 3000
       });
     } catch (e) {
-      console.log('Erreur proposition nul:', e?.message || e);
-      console.error('Erreur complète:', e);
-      toast.error('Erreur lors de l\'envoi de la proposition');
+      toast.error('Erreur lors de l\'envoi');
     }
   };
 
