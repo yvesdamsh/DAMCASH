@@ -161,15 +161,23 @@ export default function Shop() {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-amber-500/30 transition-all"
+                  className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-amber-500/30 transition-all relative"
                 >
-                  <div className="flex items-center gap-4">
+                  {item.discount && (
+                    <Badge className="absolute -top-2 -right-2 bg-red-500/90 text-white border-red-400">
+                      {item.discount}
+                    </Badge>
+                  )}
+                  <div className="flex items-center gap-4 flex-1">
                     <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-700/20 flex items-center justify-center text-2xl">
                       {item.image_url}
                     </div>
                     <div>
                       <h3 className="font-semibold text-white">{item.name}</h3>
                       <p className="text-sm text-gray-400">{item.description}</p>
+                      {item.real_value && (
+                        <p className="text-xs text-gray-500 line-through">Valeur: {item.real_value} gemmes</p>
+                      )}
                     </div>
                   </div>
 
@@ -181,7 +189,7 @@ export default function Shop() {
                   ) : (
                     <Button
                       onClick={() => handlePurchase(item)}
-                      className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500"
+                      className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 whitespace-nowrap"
                     >
                       {item.real_price ? (
                         <span>{item.real_price}</span>
