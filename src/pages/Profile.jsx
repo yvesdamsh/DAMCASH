@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import UserAvatar from '@/components/ui/UserAvatar';
 import { ArrowLeft, MessageSquare, BarChart3, History, Award, Settings, Camera, Loader } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -113,12 +113,7 @@ export default function Profile() {
         >
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="relative group">
-              <Avatar className="w-32 h-32 border-4 border-[#D4A574] flex-shrink-0">
-                <AvatarImage src={user?.avatar_url} />
-                <AvatarFallback className="bg-[#8B5A2B] text-2xl font-bold">
-                  {user?.full_name?.charAt(0) || 'U'}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar user={user} size="3xl" className="border-4" />
               
               <button
                 onClick={() => fileInputRef.current?.click()}
