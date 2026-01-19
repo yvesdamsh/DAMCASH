@@ -143,13 +143,11 @@ export default function OnlinePlayers() {
                   {/* Player info */}
                   <div className="flex items-center gap-4 flex-1">
                     {/* Online indicator */}
-                    <div className="relative">
-                      <UserAvatar 
-                        user={{ full_name: player.username, avatar_url: player.avatar_url }}
-                        size="sm"
-                      />
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-[#2C1810]" />
-                    </div>
+                    <UserAvatar 
+                    user={{ full_name: player.username, photoURL: player.avatar_url }}
+                    size="sm"
+                    showOnlineIndicator={true}
+                  />
 
                     {/* Player details */}
                     <div className="flex-1 min-w-0">

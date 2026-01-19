@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import UserAvatar from '@/components/ui/UserAvatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Trophy, Crown, Circle, Medal, TrendingUp } from 'lucide-react';
 
@@ -102,15 +103,15 @@ export default function Leaderboard() {
       </div>
 
       {/* User Rank Banner */}
-      {user && (
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 to-amber-600/10 border border-amber-500/30 mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Avatar className="w-10 h-10 border-2 border-amber-500/50">
-                <AvatarFallback className="bg-amber-900 text-amber-200">
-                  {user.full_name?.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
+       {user && (
+         <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 to-amber-600/10 border border-amber-500/30 mb-6">
+           <div className="flex items-center justify-between">
+             <div className="flex items-center gap-3">
+               <UserAvatar 
+                 user={user}
+                 size="default"
+                 className="border-2 border-amber-500/50"
+               />
               <div>
                 <p className="text-sm text-gray-400">Votre classement</p>
                 <p className="font-bold text-white">{user.full_name}</p>
@@ -184,12 +185,17 @@ export default function Leaderboard() {
                       {getRankIcon(player.rank)}
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xl">{player.avatar}</span>
-                      <div>
-                        <h3 className="font-semibold text-white">{player.name}</h3>
-                        <p className="text-sm text-gray-400">{player.games_won} victoires</p>
-                      </div>
-                    </div>
+                       <Avatar className="w-8 h-8 border border-white/20">
+                         <AvatarImage src={player.avatar_url} />
+                         <AvatarFallback className="bg-[#8B5A2B] text-white text-xs">
+                           {player.name?.charAt(0) || '?'}
+                         </AvatarFallback>
+                       </Avatar>
+                       <div>
+                         <h3 className="font-semibold text-white">{player.name}</h3>
+                         <p className="text-sm text-gray-400">{player.games_won} victoires</p>
+                       </div>
+                     </div>
                   </div>
                   <div className="text-right">
                     <div className="font-bold text-amber-400">{player.rating}</div>

@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { ArrowLeft, Clock, AlertTriangle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import UserAvatar from '@/components/ui/UserAvatar';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import SpectatorManager from '../components/game/SpectatorManager';
@@ -1149,14 +1150,12 @@ export default function GameRoom() {
           {/* Desktop: 2 colonnes */}
           <div className="hidden md:grid grid-cols-2 gap-4">
             {/* COLONNE GAUCHE - Joueur 1 */}
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <Avatar className="w-10 h-10 border-2 border-[#D4A574] flex-shrink-0">
-                  <AvatarImage src={session.player1_id === user?.id ? user?.avatar_url : opponent?.avatar_url} />
-                  <AvatarFallback className="bg-[#8B5A2B] text-[#F5E6D3] text-sm font-bold">
-                    {(session.player1_id === user?.id ? user?.full_name : opponent?.full_name)?.charAt(0) || '?'}
-                  </AvatarFallback>
-                </Avatar>
+             <div className="flex flex-col gap-3">
+               <div className="flex items-center gap-2">
+                 <UserAvatar 
+                   user={session.player1_id === user?.id ? user : opponent}
+                   size="sm"
+                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-sm text-[#F5E6D3] truncate">
                     {session.player1_id === user?.id ? user?.full_name : opponent?.full_name}
@@ -1214,14 +1213,12 @@ export default function GameRoom() {
             </div>
 
             {/* COLONNE DROITE - Joueur 2 */}
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <Avatar className="w-10 h-10 border-2 border-[#D4A574] flex-shrink-0">
-                  <AvatarImage src={session.player2_id === user?.id ? user?.avatar_url : opponent?.avatar_url} />
-                  <AvatarFallback className="bg-[#8B5A2B] text-[#F5E6D3] text-sm font-bold">
-                    {(session.player2_id === user?.id ? user?.full_name : opponent?.full_name)?.charAt(0) || '?'}
-                  </AvatarFallback>
-                </Avatar>
+             <div className="flex flex-col gap-3">
+               <div className="flex items-center gap-2">
+                 <UserAvatar 
+                   user={session.player2_id === user?.id ? user : opponent}
+                   size="sm"
+                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-sm text-[#F5E6D3] truncate">
                     {session.player2_id === user?.id ? user?.full_name : opponent?.full_name}
@@ -1287,12 +1284,10 @@ export default function GameRoom() {
           <div className="md:hidden flex flex-col gap-2">
             {/* Ligne 1: Joueur 1 */}
             <div className="flex items-center gap-2">
-              <Avatar className="w-9 h-9 border-2 border-[#D4A574] flex-shrink-0">
-                <AvatarImage src={session.player1_id === user?.id ? user?.avatar_url : opponent?.avatar_url} />
-                <AvatarFallback className="bg-[#8B5A2B] text-[#F5E6D3] text-xs font-bold">
-                  {(session.player1_id === user?.id ? user?.full_name : opponent?.full_name)?.charAt(0) || '?'}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar 
+                user={session.player1_id === user?.id ? user : opponent}
+                size="sm"
+              />
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-xs text-[#F5E6D3] truncate">
                   {session.player1_id === user?.id ? user?.full_name : opponent?.full_name}
@@ -1374,12 +1369,10 @@ export default function GameRoom() {
 
             {/* Ligne 3: Joueur 2 */}
             <div className="flex items-center gap-2">
-              <Avatar className="w-9 h-9 border-2 border-[#D4A574] flex-shrink-0">
-                <AvatarImage src={session.player2_id === user?.id ? user?.avatar_url : opponent?.avatar_url} />
-                <AvatarFallback className="bg-[#8B5A2B] text-[#F5E6D3] text-xs font-bold">
-                  {(session.player2_id === user?.id ? user?.full_name : opponent?.full_name)?.charAt(0) || '?'}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar 
+                user={session.player2_id === user?.id ? user : opponent}
+                size="sm"
+              />
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-xs text-[#F5E6D3] truncate">
                   {session.player2_id === user?.id ? user?.full_name : opponent?.full_name}
@@ -1525,12 +1518,10 @@ export default function GameRoom() {
         <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-t-2 border-[#D4A574]/40 px-4 py-3 shadow-lg">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 flex-1">
-              <Avatar className="w-10 h-10 border-2 border-[#D4A574] flex-shrink-0">
-                <AvatarImage src={user.avatar_url} />
-                <AvatarFallback className="bg-[#8B5A2B] text-[#F5E6D3] text-sm font-bold">
-                  {user.full_name?.charAt(0) || 'U'}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar 
+                user={user}
+                size="sm"
+              />
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-sm text-[#F5E6D3] truncate">{user.full_name}</p>
                 <p className={`text-xs font-semibold ${
