@@ -44,9 +44,14 @@ export default function VideoCall({
         // Gérer les streams distants quand l'adversaire active sa caméra
         peerConnection.ontrack = (event) => {
           if (event.streams && event.streams[0]) {
+            console.log('✅ Stream distant reçu:', event.streams[0]);
             setRemoteStream(event.streams[0]);
             if (remoteVideoRef.current) {
               remoteVideoRef.current.srcObject = event.streams[0];
+              remoteVideoRef.current.play().catch(err => {
+                console.log('Play error (remote):', err);
+              });
+              console.log('✅ Stream distant attaché');
             }
           }
         };
