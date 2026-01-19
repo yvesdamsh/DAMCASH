@@ -1173,7 +1173,7 @@ export default function GameRoom() {
 
 
 
-      {/* Vidéo appel */}
+      {/* Vidéo appel - juste avant le plateau */}
             {!isSpectator && (
               <VideoCall 
                 roomId={roomId}
