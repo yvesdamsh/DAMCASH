@@ -1154,16 +1154,16 @@ export default function GameRoom() {
                 scale: (isPlayerWhite ? blackTime : whiteTime) < 60 && session.current_turn === (isPlayerWhite ? 'black' : 'white') ? [1, 1.05, 1] : 1
               }}
               transition={{ repeat: (isPlayerWhite ? blackTime : whiteTime) < 60 && session.current_turn === (isPlayerWhite ? 'black' : 'white') ? Infinity : 0, duration: 1 }}
-              className={`text-4xl font-bold font-mono px-6 py-2 rounded-lg transition-all ${
+              className={`text-lg font-bold font-mono px-3 py-1 rounded transition-all ${
                 (isPlayerWhite ? blackTime : whiteTime) < 60 && (isPlayerWhite ? blackTime : whiteTime) > 0
-                  ? 'bg-red-500/30 border-2 border-red-500 text-red-400 shadow-lg shadow-red-500/50 animate-pulse'
+                  ? 'bg-red-500/30 border border-red-500 text-red-400 shadow-lg shadow-red-500/50 animate-pulse'
                   : session.current_turn === (isPlayerWhite ? 'black' : 'white') 
-                    ? 'bg-orange-500/20 border-2 border-orange-500 text-orange-400' 
-                    : 'bg-[#2C1810] border-2 border-[#D4A574]/50 text-[#F5E6D3]'
+                    ? 'bg-orange-500/20 border border-orange-500 text-orange-400' 
+                    : 'text-[#F5E6D3]'
               }`}
             >
               {(isPlayerWhite ? blackTime : whiteTime) < 60 && (isPlayerWhite ? blackTime : whiteTime) > 0 && (
-                <AlertTriangle className="inline w-6 h-6 mr-2 animate-bounce" />
+                <AlertTriangle className="inline w-4 h-4 mr-1 animate-bounce" />
               )}
               {formatTime(isPlayerWhite ? blackTime : whiteTime)}
             </motion.div>
