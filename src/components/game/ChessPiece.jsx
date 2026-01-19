@@ -28,9 +28,11 @@ const ChessPiece = ({ type, isSelected, set = 'standard', onDragEnd, dragConstra
         ${isSelected ? 'z-50' : 'z-10'}
       `}
       style={{
-        color: isWhite ? '#FFFFFF' : '#1a1a1a',
-        WebkitTextStroke: isWhite ? '1px #000000' : '1px #666666',
-        filter: isWhite ? 'drop-shadow(0 2px 3px rgba(0,0,0,0.6))' : 'drop-shadow(0 1px 2px rgba(255,255,255,0.4))',
+        color: isWhite ? '#FFFFFF' : '#000000',
+        WebkitTextStroke: isWhite ? '2px #000000' : '2px #FFFFFF',
+        filter: isWhite 
+          ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))' 
+          : 'drop-shadow(0 2px 4px rgba(255,255,255,0.6))',
         fontWeight: 'bold',
         userSelect: 'none',
         WebkitUserSelect: 'none',
