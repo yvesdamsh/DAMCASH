@@ -1129,14 +1129,15 @@ export default function GameRoom() {
       </div>
 
       {/* Actions de jeu et Chat */}
-      <div className="px-6 pb-4 space-y-4">
+      <div className="px-6 pb-4 space-y-4" style={{ pointerEvents: 'auto' }}>
         {/* Boutons d'action */}
         {!isSpectator && (
-          <div className="flex gap-3 justify-center">
+          <div className="flex gap-3 justify-center" style={{ pointerEvents: 'auto' }}>
             <Button
               onClick={() => { alert('CLIC DÉTECTÉ SUR BOUTON PROPOSER NUL!'); handleOfferDraw(); }}
               variant="outline"
               className="bg-blue-500/20 border-blue-500/50 text-blue-300 hover:bg-blue-500/30"
+              style={{ pointerEvents: 'auto' }}
               disabled={drawOfferSent}
             >
               {drawOfferSent ? '⏳ En attente...' : '🤝 Proposer nul'}
@@ -1145,6 +1146,7 @@ export default function GameRoom() {
               onClick={() => { alert('CLIC DÉTECTÉ SUR ABANDONNER!'); handleResign(); }}
               variant="outline"
               className="bg-red-500/20 border-red-500/50 text-red-300 hover:bg-red-500/30"
+              style={{ pointerEvents: 'auto' }}
             >
               🏳️ Abandonner
             </Button>
