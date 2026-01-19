@@ -182,98 +182,91 @@ export default function VideoCall({
     return (
       <motion.button
         onClick={() => setIsMinimized(false)}
-        className="fixed bottom-20 right-4 w-10 h-10 rounded-full bg-amber-500/80 hover:bg-amber-600 shadow-lg z-40 flex items-center justify-center"
+        className="absolute top-20 left-1/2 transform -translate-x-1/2 w-8 h-8 rounded-full bg-amber-500/80 hover:bg-amber-600 shadow-lg z-30 flex items-center justify-center"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
       >
-        <Video className="w-5 h-5 text-white" />
+        <Video className="w-4 h-4 text-white" />
       </motion.button>
     );
   }
 
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="fixed bottom-20 right-4 z-40 space-y-2"
-      >
-        <div className="flex gap-2">
-          {/* Vidéo Adversaire */}
-          <div className="relative w-32 h-24 rounded-lg overflow-hidden bg-black shadow-lg border border-[#D4A574]/50 group">
-            {remoteStream ? (
-              <video
-                ref={remoteVideoRef}
-                autoPlay
-                playsInline
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-700">
-                <span className="text-white/40 text-xs text-center">🚫</span>
-              </div>
-            )}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-0.5">
-              <p className="text-white text-xs font-semibold truncate">{opponentName}</p>
+      <div className="flex gap-2 justify-center px-4 py-2 bg-[#2C1810]/50 border-b border-[#D4A574]/20">
+        {/* Vidéo Adversaire */}
+        <div className="relative w-20 h-16 rounded-lg overflow-hidden bg-black shadow-lg border border-[#D4A574]/50 group flex-shrink-0">
+          {remoteStream ? (
+            <video
+              ref={remoteVideoRef}
+              autoPlay
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gray-700">
+              <span className="text-white/40 text-xs">🚫</span>
             </div>
-            
-            {/* Boutons flottants */}
-            <div className="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button
-                onClick={toggleCamera}
-                className={`w-6 h-6 rounded flex items-center justify-center text-xs ${
-                  isCameraOn
-                    ? 'bg-green-500/70 text-white'
-                    : 'bg-red-500/70 text-white'
-                }`}
-              >
-                {isCameraOn ? '📹' : '📹️'}
-              </button>
-            </div>
+          )}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent px-1 py-0.5">
+            <p className="text-white text-xs font-semibold truncate">{opponentName}</p>
           </div>
-
-          {/* Vidéo Utilisateur */}
-          <div className="relative w-32 h-24 rounded-lg overflow-hidden bg-black shadow-lg border border-[#D4A574]/50 group">
-            {localStream && !cameraError ? (
-              <video
-                ref={localVideoRef}
-                autoPlay
-                playsInline
-                muted
-                className="w-full h-full object-cover scaleX-[-1]"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-700">
-                <span className="text-white/40 text-xs">🚫</span>
-              </div>
-            )}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-0.5">
-              <p className="text-white text-xs font-semibold">Vous</p>
-            </div>
-
-            {/* Boutons flottants */}
-            <div className="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button
-                onClick={toggleMic}
-                className={`w-6 h-6 rounded flex items-center justify-center text-xs ${
-                  isMicOn
-                    ? 'bg-green-500/70 text-white'
-                    : 'bg-red-500/70 text-white'
-                }`}
-              >
-                {isMicOn ? '🎤' : '🔇'}
-              </button>
-              <button
-                onClick={() => setIsMinimized(true)}
-                className="w-6 h-6 rounded bg-gray-700/70 flex items-center justify-center text-xs text-white hover:bg-gray-600/70"
-              >
-                −
-              </button>
-            </div>
+          
+          {/* Boutons overlay */}
+          <div className="absolute inset-0 flex items-center justify-center gap-0.5 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={toggleCamera}
+              className={`w-5 h-5 rounded flex items-center justify-center text-xs font-bold ${
+                isCameraOn
+                  ? 'bg-green-500/90 text-white'
+                  : 'bg-red-500/90 text-white'
+              }`}
+            >
+              {isCameraOn ? '📹' : '✕'}
+            </button>
           </div>
         </div>
-      </motion.div>
+
+        {/* Vidéo Utilisateur */}
+        <div className="relative w-20 h-16 rounded-lg overflow-hidden bg-black shadow-lg border border-[#D4A574]/50 group flex-shrink-0">
+          {localStream && !cameraError ? (
+            <video
+              ref={localVideoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-full h-full object-cover scaleX-[-1]"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gray-700">
+              <span className="text-white/40 text-xs">🚫</span>
+            </div>
+          )}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent px-1 py-0.5">
+            <p className="text-white text-xs font-semibold">Vous</p>
+          </div>
+
+          {/* Boutons overlay */}
+          <div className="absolute inset-0 flex items-center justify-center gap-0.5 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={toggleMic}
+              className={`w-5 h-5 rounded flex items-center justify-center text-xs font-bold ${
+                isMicOn
+                  ? 'bg-green-500/90 text-white'
+                  : 'bg-red-500/90 text-white'
+              }`}
+            >
+              {isMicOn ? '🎤' : '✕'}
+            </button>
+            <button
+              onClick={() => setIsMinimized(true)}
+              className="w-5 h-5 rounded bg-gray-700/90 flex items-center justify-center text-xs text-white hover:bg-gray-600/90 font-bold"
+            >
+              −
+            </button>
+          </div>
+        </div>
+      </div>
     </AnimatePresence>
   );
 }
