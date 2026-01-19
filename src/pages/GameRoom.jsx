@@ -1132,6 +1132,10 @@ export default function GameRoom() {
 
       {/* Actions de jeu et Chat */}
       <div className="px-6 pb-4 space-y-4">
+        <div className="bg-yellow-400 text-black p-3 font-bold text-center rounded">
+          DEBUG v2 - Zone boutons chargee
+        </div>
+
         {/* Boutons d'action */}
         {!isSpectator && (
           <div className="flex gap-3 justify-center my-4">
@@ -1141,6 +1145,7 @@ export default function GameRoom() {
                 alert('🤝 Proposer nul CLIQUÉ!');
                 handleOfferDraw();
               }}
+              style={{ position: 'relative', zIndex: 9999 }}
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
               🤝 Proposer nul
@@ -1151,6 +1156,7 @@ export default function GameRoom() {
                 alert('🏳️ Abandonner CLIQUÉ!');
                 handleResign();
               }}
+              style={{ position: 'relative', zIndex: 9999 }}
               className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
             >
               🏳️ Abandonner
