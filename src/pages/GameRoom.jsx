@@ -1146,7 +1146,7 @@ export default function GameRoom() {
           {/* Desktop: 2 colonnes */}
           <div className="hidden md:grid grid-cols-2 gap-4">
             {/* COLONNE GAUCHE - Joueur 1 */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2">
                 <Avatar className="w-10 h-10 border-2 border-[#D4A574] flex-shrink-0">
                   <AvatarImage src={session.player1_id === user?.id ? user?.avatar_url : opponent?.avatar_url} />
@@ -1182,6 +1182,31 @@ export default function GameRoom() {
                   )}
                   {formatTime(whiteTime)}
                 </motion.div>
+              </div>
+              <div className="w-full aspect-video rounded-lg overflow-hidden bg-gray-900 shadow-lg border border-[#D4A574]/50 flex flex-col items-center justify-center">
+                {session.player1_id === user?.id && localStream ? (
+                  <video
+                    ref={localVideoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <>
+                    <span className="text-4xl mb-2">📹</span>
+                    <p className="text-[#D4A574] text-sm font-semibold">Caméra désactivée</p>
+                    {session.player1_id === user?.id && (
+                      <Button
+                        onClick={activateMyCamera}
+                        className="mt-3 bg-blue-600 hover:bg-blue-700 text-white"
+                        size="sm"
+                      >
+                        🎥 Activer ma caméra
+                      </Button>
+                    )}
+                  </>
+                )}
               </div>
             </div>
 
