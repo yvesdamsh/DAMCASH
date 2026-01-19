@@ -255,6 +255,13 @@ export default function Layout({ children, currentPageName }) {
                         Profil
                       </Link>
                     </DropdownMenuItem>
+                    {user?.email === 'yves.ahipo@gmail.com' && (
+                      <DropdownMenuItem asChild>
+                        <Link to={createPageUrl('Admin')} className="flex items-center gap-2 cursor-pointer text-red-400">
+                          🔒 Admin
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem asChild>
                       <Link to={createPageUrl('Notifications')} className="flex items-center gap-2 cursor-pointer">
                         <Bell className="w-4 h-4" />
