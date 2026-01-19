@@ -1153,23 +1153,19 @@ export default function GameRoom() {
           <div className="flex gap-3 justify-center my-4">
             <button 
               onClick={() => {
-                console.log('DRAW BUTTON CLICKED');
-                alert('🤝 Proposer nul CLIQUÉ!');
-                handleOfferDraw();
+                alert('✅ CLICK FONCTIONNE - PROPOSER NUL!');
               }}
-              style={{ position: 'relative', zIndex: 9999 }}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              style={{ position: 'relative', zIndex: 9999, pointerEvents: 'auto' }}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer"
             >
               🤝 Proposer nul
             </button>
             <button 
               onClick={() => {
-                console.log('RESIGN BUTTON CLICKED');
-                alert('🏳️ Abandonner CLIQUÉ!');
-                handleResign();
+                alert('✅ CLICK FONCTIONNE - ABANDONNER!');
               }}
-              style={{ position: 'relative', zIndex: 9999 }}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              style={{ position: 'relative', zIndex: 9999, pointerEvents: 'auto' }}
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 cursor-pointer"
             >
               🏳️ Abandonner
             </button>
