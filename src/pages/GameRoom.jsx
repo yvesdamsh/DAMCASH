@@ -1301,18 +1301,18 @@ export default function GameRoom() {
 
       {/* Barre Joueur Courant - EN BAS */}
       {user && (
-        <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-t-2 border-[#D4A574]/40 px-6 py-4 shadow-lg">
-          <div className="max-w-6xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-4 flex-1">
-              <Avatar className="w-14 h-14 border-3 border-[#D4A574]">
+        <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-t-2 border-[#D4A574]/40 px-4 py-3 shadow-lg">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 flex-1">
+              <Avatar className="w-10 h-10 border-2 border-[#D4A574] flex-shrink-0">
                 <AvatarImage src={user.avatar_url} />
-                <AvatarFallback className="bg-[#8B5A2B] text-[#F5E6D3] text-lg font-bold">
+                <AvatarFallback className="bg-[#8B5A2B] text-[#F5E6D3] text-sm font-bold">
                   {user.full_name?.charAt(0) || 'U'}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex-1">
-                <p className="font-bold text-lg text-[#F5E6D3]">{user.full_name}</p>
-                <p className={`text-sm font-semibold ${
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-sm text-[#F5E6D3] truncate">{user.full_name}</p>
+                <p className={`text-xs font-semibold ${
                   canMove ? 'text-lime-400' : 'text-[#D4A574]'
                 }`}>
                   {canMove ? 'Votre tour' : 'En attente'}
