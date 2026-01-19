@@ -220,29 +220,27 @@ export default function GameRoom() {
     console.log('DrawOffer listener activé pour roomId:', roomId, 'userId:', user.id);
 
     const unsubscribe = base44.entities.DrawOffer?.subscribe?.((event) => {
-      console.log('DrawOffer event reçu:', event);
+      if (!event?.data || event.data.room_id !== roomId) return;
       
-      if (event?.type !== 'create') {
-        console.log('Event ignoré - type:', event?.type);
-        return;
-      }
-      if (!event?.data || event.data.room_id !== roomId) {
-        console.log('Event ignoré - roomId ne correspond pas');
-        return;
-      }
-      
-      // Si je reçois une proposition
-      if (event.data.to_player_id === user.id && event.data.status === 'pending') {
-        console.log('Proposition reçue! setIncomingDrawOffer:', event.data);
+      // RECEIVER: J'ai reçu une nouvelle proposition
+      if (event?.type === 'create' && event.data.to_player_id === user.id && event.data.status === 'pending') {
         setIncomingDrawOffer(event.data);
       }
       
-      // Si ma proposition est acceptée ou refusée
-      if (event.data.from_player_id === user.id) {
-        console.log('Ma proposition a été traitée:', event.data.status);
-        if (event.data.status === 'accepted' || event.data.status === 'declined') {
-          setDrawOfferSent(false);
-        }
+      // PROPOSER: Ma proposition a été acceptée
+      if (event.data.from_player_id === user.id && event.data.status === 'accepted') {
+        setDrawOfferSent(false);
+        setOpponentNameForDraw(event.data.to_player_id ? opponent?.full_name || 'Votre adversaire' : '');
+        setDrawAcceptedModal(true);
+      }
+      
+      // PROPOSER: Ma proposition a été refusée
+      if (event.data.from_player_id === user.id && event.data.status === 'declined') {
+        setDrawOfferSent(false);
+        setIncomingDrawOffer(null);
+        toast.info('Proposition refusée', {
+          description: `${event.data.to_player_id ? opponent?.full_name || 'Votre adversaire' : 'Votre adversaire'} a refusé votre proposition`
+        });
       }
     });
 
