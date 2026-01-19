@@ -50,6 +50,7 @@ export default function GameRoom() {
   const [showResignDialog, setShowResignDialog] = useState(false);
   const [drawOfferSent, setDrawOfferSent] = useState(false);
   const [incomingDrawOffer, setIncomingDrawOffer] = useState(null);
+  const [showResignConfirm, setShowResignConfirm] = useState(false);
 
   // Charger les données initiales
   useEffect(() => {
