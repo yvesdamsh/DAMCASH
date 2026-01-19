@@ -1126,7 +1126,7 @@ export default function GameRoom() {
       {/* Header 2 Colonnes Symétriques avec Caméras Opt-in */}
       {opponent && session && (
         <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-b-2 border-[#D4A574]/40 px-4 py-3 shadow-lg">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
             {/* COLONNE GAUCHE - Joueur 1 */}
             <div className="flex flex-col gap-2">
               {/* Haut: Avatar + Nom + Timer */}
