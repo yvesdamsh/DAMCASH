@@ -124,7 +124,91 @@ export default function Shop() {
     }
   };
 
-  const isOwned = (itemId) => user?.purchased_items?.includes(itemId);
+  const isOwned = (itemId) => inventory.some(inv => inv.item_id === itemId);
+  const isEquipped = (itemId) => inventory.some(inv => inv.item_id === itemId && inv.is_equipped);
+
+  const handlePurchaseClick = (item) => {
+    if (!user) {
+      base44.auth.redirectToLogin();
+      return;
+    }
+    setPurchaseDialog(item);
+  };
+
+  const handleConfirmPurchase = async () => {
+    if (!purchaseDialog || !user) return;
+    const item = purchaseDialog;
+
+    if (item.category !== 'gems' && (user.gems || 0) < item.price_gems) {
+      toast.error('Solde insuffisant!', {
+        description: 'Achetez des gemmes pour continuer.'
+      });
+      return;
+    }
+
+    try {
+      if (item.category !== 'gems') {
+        // Déduire les gemmes
+        const newGems = (user.gems || 100) - item.price_gems;
+        await base44.auth.updateMe({ gems: newGems });
+
+        // Ajouter à l'inventaire
+        await base44.entities.UserInventory.create({
+          user_id: user.id,
+          item_id: item.id,
+          item_name: item.name,
+          item_type: item.category,
+          purchase_date: new Date().toISOString(),
+          is_equipped: false
+        });
+
+        setUser(prev => ({ ...prev, gems: newGems }));
+        await loadInventory(user.id);
+
+        toast.success('Achat réussi!', {
+          description: `${item.name} a été ajouté à votre inventaire.`
+        });
+      } else {
+        toast.info('Redirection vers le paiement...', {
+          description: 'Vous allez être redirigé vers la page de paiement.'
+        });
+      }
+    } catch (error) {
+      console.error('Erreur achat:', error);
+      toast.error('Erreur lors de l\'achat');
+    }
+
+    setPurchaseDialog(null);
+  };
+
+  const handleEquipItem = async (itemId) => {
+    if (!user) return;
+
+    try {
+      // Récupérer l'item
+      const inventoryItem = inventory.find(inv => inv.item_id === itemId);
+      if (!inventoryItem) return;
+
+      // Déséquiper les autres items du même type
+      const sameTypeItems = inventory.filter(inv => inv.item_type === inventoryItem.item_type);
+      await Promise.all(
+        sameTypeItems.map(inv =>
+          base44.entities.UserInventory.update(inv.id, { is_equipped: false })
+        )
+      );
+
+      // Équiper le nouvel item
+      await base44.entities.UserInventory.update(inventoryItem.id, { is_equipped: true });
+
+      await loadInventory(user.id);
+      toast.success('Item équipé!', {
+        description: `${inventoryItem.item_name} est maintenant actif.`
+      });
+    } catch (error) {
+      console.error('Erreur équipement:', error);
+      toast.error('Erreur lors de l\'équipement');
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
