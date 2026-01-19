@@ -1136,13 +1136,21 @@ export default function GameRoom() {
         {!isSpectator && (
           <div className="flex gap-3 justify-center my-4">
             <button 
-              id="btn-offer-draw"
+              onClick={() => {
+                console.log('DRAW BUTTON CLICKED');
+                alert('🤝 Proposer nul CLIQUÉ!');
+                handleOfferDraw();
+              }}
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
               🤝 Proposer nul
             </button>
             <button 
-              id="btn-resign"
+              onClick={() => {
+                console.log('RESIGN BUTTON CLICKED');
+                alert('🏳️ Abandonner CLIQUÉ!');
+                handleResign();
+              }}
               className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
             >
               🏳️ Abandonner
