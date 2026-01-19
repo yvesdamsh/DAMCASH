@@ -216,6 +216,54 @@ export default function GameRoom() {
     }
   };
 
+  const handleResign = async () => {
+    if (!session || !user || isSpectator) return;
+    if (!confirm('Voulez-vous vraiment abandonner cette partie ?')) return;
+
+    try {
+      const winnerId = user.id === session.player1_id ? session.player2_id : session.player1_id;
+      await base44.entities.GameSession.update(session.id, {
+        status: 'finished',
+        winner_id: winnerId
+      });
+      setGameStatus('finished');
+    } catch (e) {
+      console.log('Erreur abandon:', e?.message || e);
+    }
+  };
+
+  const handleOfferDraw = async () => {
+    if (!session || !user || isSpectator) return;
+
+    try {
+      const opponentId = user.id === session.player1_id ? session.player2_id : session.player1_id;
+      await base44.entities.Notification?.create?.({
+        user_email: opponentId,
+        type: 'game_draw_offer',
+        title: 'Proposition de match nul',
+        message: `${user.full_name} propose un match nul`,
+        link: `GameRoom?roomId=${roomId}`
+      });
+      alert('Proposition de match nul envoyée');
+    } catch (e) {
+      console.log('Erreur proposition nul:', e?.message || e);
+    }
+  };
+
+  const handleAcceptDraw = async () => {
+    if (!session) return;
+
+    try {
+      await base44.entities.GameSession.update(session.id, {
+        status: 'finished',
+        winner_id: null
+      });
+      setGameStatus('draw');
+    } catch (e) {
+      console.log('Erreur accepter nul:', e?.message || e);
+    }
+  };
+
   // Timer qui décrémente chaque seconde pour le joueur dont c'est le tour
   useEffect(() => {
     if (!session || !gameStarted || session.status !== 'in_progress') return;
