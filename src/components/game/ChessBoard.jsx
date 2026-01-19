@@ -120,7 +120,9 @@ const ChessBoard = ({ board, onSquareClick, onPieceDrop, selectedSquare, validMo
     // Target Map for O(1) lookup
     const targetMap = useMemo(() => {
         const map = new Set();
-        validMoves.forEach(m => map.add(`${m.to.r},${m.to.c}`));
+        if (validMoves && Array.isArray(validMoves)) {
+            validMoves.forEach(m => map.add(`${m.to.r},${m.to.c}`));
+        }
         return map;
     }, [validMoves]);
 
