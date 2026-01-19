@@ -182,11 +182,11 @@ export default function VideoCall({
     return (
       <motion.button
         onClick={() => setIsMinimized(false)}
-        className="fixed bottom-24 right-6 w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 shadow-lg hover:shadow-xl z-40 flex items-center justify-center"
+        className="fixed bottom-20 right-4 w-10 h-10 rounded-full bg-amber-500/80 hover:bg-amber-600 shadow-lg z-40 flex items-center justify-center"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
       >
-        <Video className="w-6 h-6 text-white" />
+        <Video className="w-5 h-5 text-white" />
       </motion.button>
     );
   }
@@ -194,15 +194,14 @@ export default function VideoCall({
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 20 }}
-        className="fixed top-24 right-6 z-40 space-y-3"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="fixed bottom-20 right-4 z-40 space-y-2"
       >
-        {/* Conteneur vidéos */}
-        <div className="bg-[#2C1810]/80 backdrop-blur-md p-3 rounded-2xl border border-[#D4A574]/30 shadow-xl space-y-3">
+        <div className="flex gap-2">
           {/* Vidéo Adversaire */}
-          <div className="relative w-40 h-40 rounded-xl overflow-hidden bg-black shadow-lg border border-[#D4A574]/50">
+          <div className="relative w-32 h-24 rounded-lg overflow-hidden bg-black shadow-lg border border-[#D4A574]/50 group">
             {remoteStream ? (
               <video
                 ref={remoteVideoRef}
@@ -212,18 +211,30 @@ export default function VideoCall({
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gray-700">
-                <span className="text-white/50 text-center text-xs">
-                  {cameraError ? '🚫 Caméra\ndésactivée' : 'En attente...'}
-                </span>
+                <span className="text-white/40 text-xs text-center">🚫</span>
               </div>
             )}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-2 py-1">
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-0.5">
               <p className="text-white text-xs font-semibold truncate">{opponentName}</p>
+            </div>
+            
+            {/* Boutons flottants */}
+            <div className="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={toggleCamera}
+                className={`w-6 h-6 rounded flex items-center justify-center text-xs ${
+                  isCameraOn
+                    ? 'bg-green-500/70 text-white'
+                    : 'bg-red-500/70 text-white'
+                }`}
+              >
+                {isCameraOn ? '📹' : '📹️'}
+              </button>
             </div>
           </div>
 
           {/* Vidéo Utilisateur */}
-          <div className="relative w-40 h-40 rounded-xl overflow-hidden bg-black shadow-lg border border-[#D4A574]/50">
+          <div className="relative w-32 h-24 rounded-lg overflow-hidden bg-black shadow-lg border border-[#D4A574]/50 group">
             {localStream && !cameraError ? (
               <video
                 ref={localVideoRef}
@@ -234,58 +245,32 @@ export default function VideoCall({
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gray-700">
-                <span className="text-white/50 text-center text-xs">
-                  {cameraError ? '🚫 Caméra\ndésactivée' : 'Connexion...'}
-                </span>
+                <span className="text-white/40 text-xs">🚫</span>
               </div>
             )}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-2 py-1">
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-0.5">
               <p className="text-white text-xs font-semibold">Vous</p>
             </div>
-          </div>
 
-          {/* Contrôles */}
-          <div className="flex gap-2 justify-center pt-2 border-t border-[#D4A574]/20">
-            <Button
-              onClick={toggleCamera}
-              size="icon"
-              className={`w-10 h-10 rounded-lg transition-all ${
-                isCameraOn
-                  ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30 border border-green-500/50'
-                  : 'bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/50'
-              }`}
-            >
-              {isCameraOn ? (
-                <Video className="w-5 h-5" />
-              ) : (
-                <VideoOff className="w-5 h-5" />
-              )}
-            </Button>
-
-            <Button
-              onClick={toggleMic}
-              size="icon"
-              className={`w-10 h-10 rounded-lg transition-all ${
-                isMicOn
-                  ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30 border border-green-500/50'
-                  : 'bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/50'
-              }`}
-            >
-              {isMicOn ? (
-                <Mic className="w-5 h-5" />
-              ) : (
-                <MicOff className="w-5 h-5" />
-              )}
-            </Button>
-
-            <Button
-              onClick={() => setIsMinimized(true)}
-              size="icon"
-              variant="ghost"
-              className="w-10 h-10 text-[#D4A574] hover:bg-white/10"
-            >
-              <Minimize2 className="w-5 h-5" />
-            </Button>
+            {/* Boutons flottants */}
+            <div className="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={toggleMic}
+                className={`w-6 h-6 rounded flex items-center justify-center text-xs ${
+                  isMicOn
+                    ? 'bg-green-500/70 text-white'
+                    : 'bg-red-500/70 text-white'
+                }`}
+              >
+                {isMicOn ? '🎤' : '🔇'}
+              </button>
+              <button
+                onClick={() => setIsMinimized(true)}
+                className="w-6 h-6 rounded bg-gray-700/70 flex items-center justify-center text-xs text-white hover:bg-gray-600/70"
+              >
+                −
+              </button>
+            </div>
           </div>
         </div>
       </motion.div>
