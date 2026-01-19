@@ -44,6 +44,7 @@ export default function GameRoom() {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const endGameSentRef = useRef(false);
   const spectatorJoinedRef = useRef(false);
+  const [drawOffer, setDrawOffer] = useState(null);
 
   // Charger les données initiales
   useEffect(() => {
@@ -201,6 +202,67 @@ export default function GameRoom() {
     };
   }, [roomId]);
 
+  // Realtime: écouter les propositions de nul
+  useEffect(() => {
+    if (!roomId || !user || isSpectator) return;
+
+    const unsubscribe = base44.entities.DrawOffer?.subscribe?.((event) => {
+      if (event?.type !== 'create') return;
+      if (!event?.data || event.data.room_id !== roomId) return;
+      if (event.data.to_player_id !== user.id || event.data.status !== 'pending') return;
+
+      setDrawOffer(event.data);
+
+      toast.custom(
+        (t) => (
+          <motion.div
+            initial={{ opacity: 0, x: 300 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 300 }}
+            className="bg-gradient-to-br from-blue-900 to-blue-950 border-2 border-blue-500/50 rounded-xl shadow-2xl p-6 max-w-md"
+          >
+            <div className="flex items-start gap-4">
+              <div className="bg-blue-500/20 p-3 rounded-full">
+                <span className="text-4xl">🤝</span>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-white mb-2">Proposition de match nul</h3>
+                <p className="text-blue-200 mb-4">
+                  {event.data.from_player_name} propose de terminer la partie par un match nul
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      toast.dismiss(t);
+                      handleAcceptDraw();
+                    }}
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+                  >
+                    ✅ Accepter
+                  </button>
+                  <button
+                    onClick={() => {
+                      toast.dismiss(t);
+                      handleDeclineDraw();
+                    }}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+                  >
+                    ❌ Refuser
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        ),
+        { duration: 30000 }
+      );
+    });
+
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
+  }, [roomId, user?.id, isSpectator]);
+
   const handleSendMessage = async () => {
     const text = newMessage.trim();
     if (!text || !user || !roomId) return;
@@ -246,10 +308,31 @@ export default function GameRoom() {
                 <button
                   onClick={async () => {
                     try {
+                      const gameType = session.game_type || 'checkers';
+                      
                       await base44.entities.GameSession.update(session.id, {
                         status: 'finished',
                         winner_id: winnerId,
                         finished_at: new Date().toISOString()
+                      });
+
+                      const duration = session.last_move_timestamp 
+                        ? Math.floor((new Date() - new Date(session.created_date)) / 1000)
+                        : null;
+
+                      await base44.entities.GameResult?.create?.({
+                        room_id: roomId,
+                        game_type: gameType,
+                        winner_id: winnerId,
+                        loser_id: user.id,
+                        player1_id: session.player1_id,
+                        player1_name: session.player1_name,
+                        player2_id: session.player2_id,
+                        player2_name: session.player2_name || session.invited_player_name,
+                        result: user.id === session.player1_id ? 'black' : 'white',
+                        final_board_state: session.board_state,
+                        moves_count: session.move_count || 0,
+                        duration_seconds: duration
                       });
                       
                       await base44.entities.Notification?.create?.({
@@ -298,20 +381,17 @@ export default function GameRoom() {
 
     try {
       const opponentId = user.id === session.player1_id ? session.player2_id : session.player1_id;
-      const opponentName = user.id === session.player1_id ? (session.player2_name || opponent?.full_name) : session.player1_name;
       
-      await base44.entities.Notification?.create?.({
-        user_email: opponentId,
-        type: 'game_draw_offer',
-        title: '🤝 Proposition de match nul',
-        message: `${user.full_name} propose de terminer la partie par un match nul`,
-        link: `GameRoom?roomId=${roomId}`,
-        from_user: user.email,
-        icon: '🤝'
+      await base44.entities.DrawOffer.create({
+        room_id: roomId,
+        from_player_id: user.id,
+        from_player_name: user.full_name,
+        to_player_id: opponentId,
+        status: 'pending'
       });
       
       toast.success('Proposition envoyée', {
-        description: `${opponentName} a reçu votre proposition de match nul`,
+        description: 'En attente de la réponse de l\'adversaire',
         duration: 4000,
         icon: '🤝'
       });
@@ -322,17 +402,37 @@ export default function GameRoom() {
   };
 
   const handleAcceptDraw = async () => {
-    if (!session) return;
+    if (!session || !drawOffer) return;
 
     try {
+      const gameType = session.game_type || 'checkers';
+      
       await base44.entities.GameSession.update(session.id, {
         status: 'finished',
         winner_id: null,
         finished_at: new Date().toISOString()
       });
-      
-      const player1Name = session.player1_name;
-      const player2Name = session.player2_name || session.invited_player_name;
+
+      const duration = session.last_move_timestamp 
+        ? Math.floor((new Date() - new Date(session.created_date)) / 1000)
+        : null;
+
+      await base44.entities.GameResult?.create?.({
+        room_id: roomId,
+        game_type: gameType,
+        winner_id: null,
+        loser_id: null,
+        player1_id: session.player1_id,
+        player1_name: session.player1_name,
+        player2_id: session.player2_id,
+        player2_name: session.player2_name || session.invited_player_name,
+        result: 'draw',
+        final_board_state: session.board_state,
+        moves_count: session.move_count || 0,
+        duration_seconds: duration
+      });
+
+      await base44.entities.DrawOffer.update(drawOffer.id, { status: 'accepted' });
       
       await Promise.all([
         base44.entities.Notification?.create?.({
@@ -352,6 +452,7 @@ export default function GameRoom() {
       ]);
       
       setSession(prev => ({ ...prev, status: 'finished', winner_id: null }));
+      setDrawOffer(null);
       
       toast.success('Match nul', {
         description: 'La partie se termine par un accord mutuel',
@@ -363,6 +464,32 @@ export default function GameRoom() {
     } catch (e) {
       console.log('Erreur accepter nul:', e?.message || e);
       toast.error('Erreur lors de l\'acceptation');
+    }
+  };
+
+  const handleDeclineDraw = async () => {
+    if (!drawOffer) return;
+
+    try {
+      await base44.entities.DrawOffer.update(drawOffer.id, { status: 'declined' });
+      
+      await base44.entities.Notification?.create?.({
+        user_email: drawOffer.from_player_id,
+        type: 'draw_declined',
+        title: '❌ Proposition refusée',
+        message: 'Votre proposition de match nul a été refusée',
+        icon: '❌'
+      });
+      
+      setDrawOffer(null);
+      
+      toast.info('Proposition refusée', {
+        description: 'La partie continue',
+        icon: '❌'
+      });
+    } catch (e) {
+      console.log('Erreur refuser nul:', e?.message || e);
+      toast.error('Erreur lors du refus');
     }
   };
 
