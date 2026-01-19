@@ -974,14 +974,31 @@ export default function GameRoom() {
         <div className="px-6 pb-6">
           <div className="flex gap-3 justify-center">
             <Button
-              onClick={() => setShowDrawDialog(true)}
+              onClick={() => {
+                if (window.confirm('Voulez-vous proposer un match nul ? L\'IA acceptera automatiquement.')) {
+                  toast.success('Match nul', {
+                    description: 'La partie se termine par un match nul',
+                    duration: 3000,
+                    icon: '🤝'
+                  });
+                  setTimeout(() => navigate('/Checkers'), 2000);
+                }
+              }}
               variant="outline"
               className="bg-blue-500/20 border-blue-500/50 text-blue-300 hover:bg-blue-500/30 text-lg px-6 py-3"
             >
               🤝 Proposer nul
             </Button>
             <Button
-              onClick={() => setShowResignDialog(true)}
+              onClick={() => {
+                if (window.confirm('Voulez-vous vraiment abandonner ? L\'IA remportera la victoire.')) {
+                  toast.success('Partie abandonnée', {
+                    description: 'L\'IA remporte la victoire',
+                    duration: 3000
+                  });
+                  setTimeout(() => navigate('/Checkers'), 2000);
+                }
+              }}
               variant="outline"
               className="bg-red-500/20 border-red-500/50 text-red-300 hover:bg-red-500/30 text-lg px-6 py-3"
             >
@@ -989,75 +1006,6 @@ export default function GameRoom() {
             </Button>
           </div>
         </div>
-
-        {/* Dialog Proposer Nul */}
-        <Dialog open={showDrawDialog} onOpenChange={setShowDrawDialog}>
-          <DialogContent className="bg-[#2C1810] border-[#D4A574]/50 text-[#F5E6D3]">
-            <DialogHeader>
-              <DialogTitle className="text-2xl">🤝 Proposer un match nul ?</DialogTitle>
-              <DialogDescription className="text-[#D4A574]">
-                L'IA acceptera automatiquement votre proposition de match nul.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowDrawDialog(false)}
-                className="border-[#D4A574]/50 text-[#F5E6D3]"
-              >
-                Annuler
-              </Button>
-              <Button
-                onClick={() => {
-                  setShowDrawDialog(false);
-                  toast.success('Match nul', {
-                    description: 'La partie se termine par un match nul',
-                    duration: 3000,
-                    icon: '🤝'
-                  });
-                  setTimeout(() => navigate('/Checkers'), 2000);
-                }}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                Confirmer
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Dialog Abandonner */}
-        <Dialog open={showResignDialog} onOpenChange={setShowResignDialog}>
-          <DialogContent className="bg-[#2C1810] border-[#D4A574]/50 text-[#F5E6D3]">
-            <DialogHeader>
-              <DialogTitle className="text-2xl">🏳️ Abandonner la partie ?</DialogTitle>
-              <DialogDescription className="text-[#D4A574]">
-                Vous êtes sur le point d'abandonner. L'IA remportera la victoire.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowResignDialog(false)}
-                className="border-[#D4A574]/50 text-[#F5E6D3]"
-              >
-                Annuler
-              </Button>
-              <Button
-                onClick={() => {
-                  setShowResignDialog(false);
-                  toast.success('Partie abandonnée', {
-                    description: 'L\'IA remporte la victoire',
-                    duration: 3000
-                  });
-                  setTimeout(() => navigate('/Checkers'), 2000);
-                }}
-                className="bg-red-600 hover:bg-red-700"
-              >
-                Oui, abandonner
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </div>
     );
   }
