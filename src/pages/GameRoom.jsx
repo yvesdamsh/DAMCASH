@@ -56,6 +56,8 @@ export default function GameRoom() {
   const [opponentNameForDraw, setOpponentNameForDraw] = useState('');
   const [victoryByResignModal, setVictoryByResignModal] = useState(false);
   const [resignationMessage, setResignationMessage] = useState('');
+  const [localCameraActive, setLocalCameraActive] = useState(false);
+  const [remoteCameraActive, setRemoteCameraActive] = useState(false);
 
   // Charger les données initiales
   useEffect(() => {
