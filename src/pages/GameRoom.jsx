@@ -248,36 +248,7 @@ export default function GameRoom() {
     };
   }, [roomId, user?.id, isSpectator]);
 
-  // Attacher les événements des boutons manuellement
-  useEffect(() => {
-    const drawButton = document.getElementById('btn-offer-draw');
-    const resignButton = document.getElementById('btn-resign');
 
-    if (drawButton) {
-      drawButton.addEventListener('click', () => {
-        console.log('✓ CLICK DETECTED ON DRAW BUTTON');
-        alert('🤝 Proposer nul - CLICK DETECTED!');
-        handleOfferDraw();
-      });
-    }
-
-    if (resignButton) {
-      resignButton.addEventListener('click', () => {
-        console.log('✓ CLICK DETECTED ON RESIGN BUTTON');
-        alert('🏳️ Abandonner - CLICK DETECTED!');
-        handleResign();
-      });
-    }
-
-    return () => {
-      if (drawButton) {
-        drawButton.removeEventListener('click', () => {});
-      }
-      if (resignButton) {
-        resignButton.removeEventListener('click', () => {});
-      }
-    };
-  }, [handleOfferDraw, handleResign]);
 
   const handleSendMessage = async () => {
     const text = newMessage.trim();
