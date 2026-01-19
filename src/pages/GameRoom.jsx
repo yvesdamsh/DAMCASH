@@ -965,31 +965,55 @@ export default function GameRoom() {
   // Interface multijoueur complète
   return (
     <>
-      {/* Modal de proposition de nul reçue */}
+      {/* Modal: Proposition de nul reçue */}
       <Dialog open={!!incomingDrawOffer} onOpenChange={(open) => { if (!open) handleDeclineDraw(); }}>
-        <DialogContent className="bg-gradient-to-br from-blue-900 to-blue-950 border-2 border-blue-500/50 text-white max-w-md">
+        <DialogContent className="bg-[#2C1810] border-[#D4A574]/50 text-[#F5E6D3] max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold flex items-center gap-3">
-              <span className="text-4xl">🤝</span>
-              Proposition de match nul
-            </DialogTitle>
-            <DialogDescription className="text-blue-200 text-base mt-4">
-              {incomingDrawOffer?.from_player_name || 'Votre adversaire'} propose de terminer la partie par un match nul.
+            <DialogTitle className="text-2xl font-bold">🤝 Proposition de match nul</DialogTitle>
+            <DialogDescription className="text-[#D4A574] mt-3">
+              {incomingDrawOffer?.from_player_name} propose un match nul. Acceptez-vous?
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-3 mt-6">
+          <DialogFooter className="gap-3 mt-6 flex">
             <Button
               onClick={handleDeclineDraw}
               variant="outline"
-              className="flex-1 bg-red-600/20 border-red-500 text-red-300 hover:bg-red-600/40"
+              className="flex-1"
             >
               ❌ Refuser
             </Button>
             <Button
               onClick={handleAcceptDraw}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              className="flex-1 bg-green-700 hover:bg-green-800"
             >
               ✅ Accepter
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal: Confirmation abandon */}
+      <Dialog open={showResignConfirm} onOpenChange={setShowResignConfirm}>
+        <DialogContent className="bg-[#2C1810] border-[#D4A574]/50 text-[#F5E6D3] max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-red-400">⚠️ Abandonner la partie?</DialogTitle>
+            <DialogDescription className="text-[#D4A574] mt-3">
+              Votre adversaire remportera la victoire. Cette action est irréversible.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-3 mt-6 flex">
+            <Button
+              onClick={() => setShowResignConfirm(false)}
+              variant="outline"
+              className="flex-1"
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={handleConfirmResign}
+              className="flex-1 bg-red-700 hover:bg-red-800"
+            >
+              🏳️ Confirmer abandon
             </Button>
           </DialogFooter>
         </DialogContent>
