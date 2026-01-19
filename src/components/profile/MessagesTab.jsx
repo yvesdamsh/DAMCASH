@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import UserAvatar from '@/components/ui/UserAvatar';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, X } from 'lucide-react';
 
@@ -116,10 +116,7 @@ export default function MessagesTab({ user }) {
                   }`}
                   whileHover={{ x: 4 }}
                 >
-                  <Avatar className="w-8 h-8 flex-shrink-0">
-                    <AvatarImage src={conv.avatar} />
-                    <AvatarFallback className="bg-[#8B5A2B] text-xs">{conv.name?.charAt(0)}</AvatarFallback>
-                  </Avatar>
+                  <UserAvatar user={{ full_name: conv.name, avatar_url: conv.avatar }} size="sm" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold truncate">{conv.name}</p>
                     <p className="text-xs text-[#D4A574]/50 truncate">{conv.lastMessage}</p>
@@ -143,10 +140,7 @@ export default function MessagesTab({ user }) {
             {/* Header */}
             <div className="p-4 border-b border-[#D4A574]/20 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src={selectedConversation.avatar} />
-                  <AvatarFallback className="bg-[#8B5A2B] text-xs">{selectedConversation.name?.charAt(0)}</AvatarFallback>
-                </Avatar>
+                <UserAvatar user={{ full_name: selectedConversation.name, avatar_url: selectedConversation.avatar }} size="sm" />
                 <p className="font-semibold">{selectedConversation.name}</p>
               </div>
               <button onClick={() => setSelectedConversation(null)} className="hover:bg-white/10 p-2 rounded">
