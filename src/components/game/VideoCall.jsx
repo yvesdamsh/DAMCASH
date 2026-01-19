@@ -26,13 +26,18 @@ export default function VideoCall({
   const peerConnectionRef = useRef(null);
   const signalCheckIntervalRef = useRef(null);
 
-  // Initialiser la connexion WebRTC mais SANS demander les permissions
+  // Démarrer la caméra automatiquement
+  useEffect(() => {
+    if (!gameStarted || isSpectator) return;
+    activateCamera();
+  }, [gameStarted, isSpectator]);
+
+  // Initialiser la connexion WebRTC
   useEffect(() => {
     if (!gameStarted || isSpectator || !opponentId) return;
 
     const initWebRTC = async () => {
       try {
-        // Créer RTCPeerConnection SANS activer la caméra
         const peerConnection = new RTCPeerConnection({
           iceServers: [
             { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] }
@@ -41,7 +46,7 @@ export default function VideoCall({
 
         peerConnectionRef.current = peerConnection;
 
-        // Gérer les streams distants quand l'adversaire active sa caméra
+        // Gérer les streams distants
         peerConnection.ontrack = (event) => {
           if (event.streams && event.streams[0]) {
             console.log('✅ Stream distant reçu:', event.streams[0]);
@@ -63,7 +68,6 @@ export default function VideoCall({
           }
         };
 
-        // Vérifier les signaux reçus
         checkForSignals(peerConnection);
       } catch (error) {
         console.log('Erreur initialisation WebRTC:', error);
