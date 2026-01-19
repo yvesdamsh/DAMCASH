@@ -132,7 +132,11 @@ export default function Shop() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-4 bg-white/5 border border-white/10">
+        <TabsList className="grid grid-cols-5 bg-white/5 border border-white/10">
+          <TabsTrigger value="gems" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-300">
+            <Gem className="w-4 h-4 mr-1" />
+            Gemmes
+          </TabsTrigger>
           <TabsTrigger value="themes" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-300">
             <Palette className="w-4 h-4 mr-1" />
             Thèmes
@@ -145,9 +149,9 @@ export default function Shop() {
             <Crown className="w-4 h-4 mr-1" />
             Plateaux
           </TabsTrigger>
-          <TabsTrigger value="gems" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-300">
-            <Gem className="w-4 h-4 mr-1" />
-            Gemmes
+          <TabsTrigger value="bundles" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-300">
+            <Sparkles className="w-4 h-4 mr-1" />
+            Packs
           </TabsTrigger>
         </TabsList>
 
