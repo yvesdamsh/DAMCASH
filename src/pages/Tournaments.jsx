@@ -178,6 +178,12 @@ export default function Tournaments() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3]">
+      <CreateTournamentModal 
+        open={showCreateModal} 
+        onOpenChange={setShowCreateModal}
+        onSuccess={handleTournamentCreated}
+        user={user}
+      />
       {/* HEADER PREMIUM */}
       <div className="bg-gradient-to-r from-yellow-600 via-orange-600 to-red-600 relative overflow-hidden pt-8 pb-12">
         <div className="absolute inset-0 opacity-20">
