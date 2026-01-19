@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ShoppingBag, Gem, Palette, User, Crown, Circle, Check } from 'lucide-react';
+import { ShoppingBag, Gem, Palette, User, Crown, Circle, Check, Sparkles } from 'lucide-react';
 
 export default function Shop() {
   const [user, setUser] = useState(null);
