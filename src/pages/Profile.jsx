@@ -459,13 +459,21 @@ export default function Profile() {
               <Shield className="w-5 h-5 text-[#D4A574]" />
               Compte
             </h3>
-            <Button
-              onClick={handleLogout}
-              className="w-full bg-red-600 hover:bg-red-700 text-white"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Déconnexion
-            </Button>
+            <div className="space-y-3">
+              <Button
+                onClick={() => window.location.href = '/History'}
+                className="w-full bg-amber-600 hover:bg-amber-700"
+              >
+                📜 Voir l'historique complet
+              </Button>
+              <Button
+                onClick={handleLogout}
+                className="w-full bg-red-600 hover:bg-red-700 text-white"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Déconnexion
+              </Button>
+            </div>
           </Card>
         </TabsContent>
       </Tabs>
