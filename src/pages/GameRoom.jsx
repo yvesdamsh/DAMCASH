@@ -51,6 +51,8 @@ export default function GameRoom() {
   const [drawOfferSent, setDrawOfferSent] = useState(false);
   const [incomingDrawOffer, setIncomingDrawOffer] = useState(null);
   const [showResignConfirm, setShowResignConfirm] = useState(false);
+  const [drawAcceptedModal, setDrawAcceptedModal] = useState(false);
+  const [opponentNameForDraw, setOpponentNameForDraw] = useState('');
 
   // Charger les données initiales
   useEffect(() => {
