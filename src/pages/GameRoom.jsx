@@ -420,23 +420,21 @@ export default function GameRoom() {
 
     try {
       await base44.entities.DrawOffer.update(incomingDrawOffer.id, { status: 'declined' });
-      
+
       await base44.entities.Notification?.create?.({
         user_email: incomingDrawOffer.from_player_id,
-        type: 'draw_declined',
+        type: 'game_result',
         title: '❌ Proposition refusée',
-        message: 'Votre proposition de match nul a été refusée',
-        icon: '❌'
+        message: 'Votre proposition de match nul a été refusée'
       });
-      
+
       setIncomingDrawOffer(null);
-      
+      setDrawOfferSent(false);
+
       toast.info('Proposition refusée', {
-        description: 'La partie continue',
-        icon: '❌'
+        description: 'La partie continue'
       });
     } catch (e) {
-      console.log('Erreur refuser nul:', e?.message || e);
       toast.error('Erreur lors du refus');
     }
   };
