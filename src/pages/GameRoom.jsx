@@ -293,6 +293,26 @@ export default function GameRoom() {
     };
   }, [roomId, user?.id, isSpectator]);
 
+  // Realtime: écouter les événements de jeu (abandon)
+  useEffect(() => {
+    if (!roomId || !user || isSpectator) return;
+
+    const unsubscribe = base44.entities.GameEvent?.subscribe?.((event) => {
+      if (!event?.data || event.data.room_id !== roomId) return;
+
+      // ADVERSAIRE ABANDONNE: Je suis le gagnant
+      if (event?.type === 'create' && event.data.type === 'resign' && event.data.winner_id === user.id && !victoryByResignModal) {
+        console.log('Abandon détecté - gagnant:', user.id, 'abandon de:', event.data.player_name);
+        setResignationMessage(event.data.player_name);
+        setVictoryByResignModal(true);
+      }
+    });
+
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
+  }, [roomId, user?.id, isSpectator, victoryByResignModal]);
+
 
 
   const handleSendMessage = async () => {
