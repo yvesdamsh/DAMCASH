@@ -16,6 +16,8 @@ export default function Tournaments() {
   const [gameFilter, setGameFilter] = useState('all');
   const [difficultyFilter, setDifficultyFilter] = useState('all');
   const [sortBy, setSortBy] = useState('date');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     loadUser();
