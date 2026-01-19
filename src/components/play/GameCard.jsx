@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
 export default function GameCard({ game, isPopular }) {
+  const navigate = useNavigate();
   const [playerCount, setPlayerCount] = useState(0);
 
   useEffect(() => {
@@ -25,12 +26,18 @@ export default function GameCard({ game, isPopular }) {
     loadStats();
   }, [game.gameType]);
 
+  const handlePlayNow = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(createPageUrl('RoomLobby') + `?game=${game.gameType}`);
+  };
+
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
       className="relative group h-full"
     >
-      <Link to={createPageUrl(game.page)} className="block h-full">
+      <div className="block h-full">
         <div className={`relative h-full rounded-3xl overflow-hidden border-2 border-white/20 hover:border-white/40 transition-all backdrop-blur-sm shadow-xl hover:shadow-2xl cursor-pointer group`}>
           {/* Background gradient */}
           <div className={`absolute inset-0 bg-gradient-to-br ${game.gradient}`} />
@@ -78,10 +85,8 @@ export default function GameCard({ game, isPopular }) {
 
             {/* Button */}
             <Button 
-              onClick={(e) => {
-                e.preventDefault();
-              }}
-              className={`w-full font-bold text-lg py-6 ${game.buttonClass} group-hover:shadow-lg group-hover:shadow-orange-500/50 transition-all`}
+              onClick={handlePlayNow}
+              className={`w-full font-bold text-lg py-6 ${game.buttonClass} group-hover:shadow-lg group-hover:shadow-orange-500/50 transition-all hover:scale-105`}
             >
               🎮 Jouer maintenant
               <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
@@ -93,7 +98,7 @@ export default function GameCard({ game, isPopular }) {
             <div className={`absolute inset-0 bg-gradient-to-br ${game.gradient} opacity-20`} />
           </div>
         </div>
-      </Link>
+      </div>
     </motion.div>
   );
 }
