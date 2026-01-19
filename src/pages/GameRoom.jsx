@@ -12,6 +12,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import SpectatorManager from '../components/game/SpectatorManager';
+import DrawProposalModal from '../components/game/DrawProposalModal';
+import DrawResponseModal from '../components/game/DrawResponseModal';
 
 const TIME_CONTROLS = {
   bullet: 60,
