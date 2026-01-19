@@ -48,6 +48,8 @@ export default function GameRoom() {
   const [drawOffer, setDrawOffer] = useState(null);
   const [showDrawDialog, setShowDrawDialog] = useState(false);
   const [showResignDialog, setShowResignDialog] = useState(false);
+  const [drawOfferSent, setDrawOfferSent] = useState(false);
+  const [incomingDrawOffer, setIncomingDrawOffer] = useState(null);
 
   // Charger les données initiales
   useEffect(() => {
@@ -212,53 +214,18 @@ export default function GameRoom() {
     const unsubscribe = base44.entities.DrawOffer?.subscribe?.((event) => {
       if (event?.type !== 'create') return;
       if (!event?.data || event.data.room_id !== roomId) return;
-      if (event.data.to_player_id !== user.id || event.data.status !== 'pending') return;
-
-      setDrawOffer(event.data);
-
-      toast.custom(
-        (t) => (
-          <motion.div
-            initial={{ opacity: 0, x: 300 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 300 }}
-            className="bg-gradient-to-br from-blue-900 to-blue-950 border-2 border-blue-500/50 rounded-xl shadow-2xl p-6 max-w-md"
-          >
-            <div className="flex items-start gap-4">
-              <div className="bg-blue-500/20 p-3 rounded-full">
-                <span className="text-4xl">🤝</span>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-white mb-2">Proposition de match nul</h3>
-                <p className="text-blue-200 mb-4">
-                  {event.data.from_player_name} propose de terminer la partie par un match nul
-                </p>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => {
-                      toast.dismiss(t);
-                      handleAcceptDraw();
-                    }}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
-                  >
-                    ✅ Accepter
-                  </button>
-                  <button
-                    onClick={() => {
-                      toast.dismiss(t);
-                      handleDeclineDraw();
-                    }}
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
-                  >
-                    ❌ Refuser
-                  </button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        ),
-        { duration: 30000 }
-      );
+      
+      // Si je reçois une proposition
+      if (event.data.to_player_id === user.id && event.data.status === 'pending') {
+        setIncomingDrawOffer(event.data);
+      }
+      
+      // Si ma proposition est acceptée ou refusée
+      if (event.data.from_player_id === user.id) {
+        if (event.data.status === 'accepted' || event.data.status === 'declined') {
+          setDrawOfferSent(false);
+        }
+      }
     });
 
     return () => {
@@ -347,10 +314,6 @@ export default function GameRoom() {
   const handleOfferDraw = async () => {
     if (!session || !user || isSpectator) return;
 
-    if (!window.confirm('Voulez-vous proposer un match nul à votre adversaire ?')) {
-      return;
-    }
-
     try {
       const opponentId = user.id === session.player1_id ? session.player2_id : session.player1_id;
       
@@ -361,6 +324,8 @@ export default function GameRoom() {
         to_player_id: opponentId,
         status: 'pending'
       });
+      
+      setDrawOfferSent(true);
       
       toast.success('Proposition envoyée', {
         description: 'En attente de la réponse de l\'adversaire',
@@ -374,7 +339,7 @@ export default function GameRoom() {
   };
 
   const handleAcceptDraw = async () => {
-    if (!session || !drawOffer) return;
+    if (!session || !incomingDrawOffer) return;
 
     try {
       const gameType = session.game_type || 'checkers';
@@ -404,7 +369,7 @@ export default function GameRoom() {
         duration_seconds: duration
       });
 
-      await base44.entities.DrawOffer.update(drawOffer.id, { status: 'accepted' });
+      await base44.entities.DrawOffer.update(incomingDrawOffer.id, { status: 'accepted' });
       
       await Promise.all([
         base44.entities.Notification?.create?.({
@@ -424,7 +389,7 @@ export default function GameRoom() {
       ]);
       
       setSession(prev => ({ ...prev, status: 'finished', winner_id: null }));
-      setDrawOffer(null);
+      setIncomingDrawOffer(null);
       
       toast.success('Match nul', {
         description: 'La partie se termine par un accord mutuel',
@@ -440,20 +405,20 @@ export default function GameRoom() {
   };
 
   const handleDeclineDraw = async () => {
-    if (!drawOffer) return;
+    if (!incomingDrawOffer) return;
 
     try {
-      await base44.entities.DrawOffer.update(drawOffer.id, { status: 'declined' });
+      await base44.entities.DrawOffer.update(incomingDrawOffer.id, { status: 'declined' });
       
       await base44.entities.Notification?.create?.({
-        user_email: drawOffer.from_player_id,
+        user_email: incomingDrawOffer.from_player_id,
         type: 'draw_declined',
         title: '❌ Proposition refusée',
         message: 'Votre proposition de match nul a été refusée',
         icon: '❌'
       });
       
-      setDrawOffer(null);
+      setIncomingDrawOffer(null);
       
       toast.info('Proposition refusée', {
         description: 'La partie continue',
@@ -1010,7 +975,38 @@ export default function GameRoom() {
 
   // Interface multijoueur complète
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] flex flex-col">
+    <>
+      {/* Modal de proposition de nul reçue */}
+      <Dialog open={!!incomingDrawOffer} onOpenChange={(open) => { if (!open) handleDeclineDraw(); }}>
+        <DialogContent className="bg-gradient-to-br from-blue-900 to-blue-950 border-2 border-blue-500/50 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-3">
+              <span className="text-4xl">🤝</span>
+              Proposition de match nul
+            </DialogTitle>
+            <DialogDescription className="text-blue-200 text-base mt-4">
+              {incomingDrawOffer?.from_player_name || 'Votre adversaire'} propose de terminer la partie par un match nul.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-3 mt-6">
+            <Button
+              onClick={handleDeclineDraw}
+              variant="outline"
+              className="flex-1 bg-red-600/20 border-red-500 text-red-300 hover:bg-red-600/40"
+            >
+              ❌ Refuser
+            </Button>
+            <Button
+              onClick={handleAcceptDraw}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+            >
+              ✅ Accepter
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <div className="w-full min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-[#D4A574]/30 bg-gradient-to-b from-[#5D3A1A] to-[#2C1810]">
         <div className="flex items-center justify-between">
@@ -1132,8 +1128,9 @@ export default function GameRoom() {
               onClick={handleOfferDraw}
               variant="outline"
               className="bg-blue-500/20 border-blue-500/50 text-blue-300 hover:bg-blue-500/30"
+              disabled={drawOfferSent}
             >
-              🤝 Proposer nul
+              {drawOfferSent ? '⏳ En attente...' : '🤝 Proposer nul'}
             </Button>
             <Button
               onClick={handleResign}
@@ -1232,6 +1229,7 @@ export default function GameRoom() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
