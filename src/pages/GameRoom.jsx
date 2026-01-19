@@ -1088,16 +1088,7 @@ export default function GameRoom() {
         </div>
       )}
 
-      {/* DEBUG INFO */}
-      <div className="p-4 bg-red-500/20 border border-red-500 text-white text-xs">
-        <div>gameMode URL: {gameMode}</div>
-        <div>actualGameMode: {actualGameMode}</div>
-        <div>session.player2_id: {session?.player2_id || 'null'}</div>
-        <div>isActuallyMultiplayer: {isActuallyMultiplayer ? 'YES' : 'NO'}</div>
-        <div>gameStarted: {gameStarted ? 'YES' : 'NO'}</div>
-        <div>session.status: {session?.status || 'null'}</div>
-        <div>isSpectator: {isSpectator ? 'YES' : 'NO'}</div>
-      </div>
+
 
       {/* Plateau de jeu */}
       <div className="flex-1 flex items-center justify-center p-6 relative">
