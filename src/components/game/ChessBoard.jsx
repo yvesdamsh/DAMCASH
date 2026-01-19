@@ -24,7 +24,7 @@ const createInitialBoard = () => {
 
 const ChessSquare = memo(({ 
     r, c, piece, isDark, isSelected, isTarget, isLastMove, isLastMoveTarget, isPremoveSource, isPremoveTarget, isCheck,
-    theme, canInteract, onSquareClick, onPieceDrop, pieceSet, currentTurn, animDelta, isFlipped, boardRef
+    theme, canInteract, onSquareClick, onPieceDrop, pieceSet, currentTurn, animDelta, isFlipped, boardRef, playerColor, isMultiplayer
 }) => {
 
     const handleDragEnd = (e, info) => {
@@ -421,6 +421,8 @@ export default function ChessBoard({
                   animDelta={animDelta}
                   isFlipped={isFlipped}
                   boardRef={boardRef}
+                  playerColor={playerColor}
+                  isMultiplayer={isMultiplayer}
                 />
               );
             })
