@@ -910,7 +910,7 @@ export default function GameRoom() {
     (effectivePlayerColor === 'black' && session?.current_turn === 'black')
   );
 
-  // Mode IA: afficher directement le plateau
+  // Mode IA: afficher directement le plateau (SANS boutons car ils sont en bas)
   if (actualGameMode === 'ai') {
     return (
       <div className="w-full min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] flex flex-col">
@@ -937,44 +937,6 @@ export default function GameRoom() {
               aiLevel={aiLevel}
               onGameEnd={() => {}}
             />
-        </div>
-
-        {/* Boutons d'action pour mode IA */}
-        <div className="px-6 pb-6">
-          <div className="flex gap-3 justify-center">
-            <Button
-              onClick={() => {
-                alert('BOUTON MODE IA CLIQUÉ!');
-                if (window.confirm('Voulez-vous proposer un match nul ? L\'IA acceptera automatiquement.')) {
-                  toast.success('Match nul', {
-                    description: 'La partie se termine par un match nul',
-                    duration: 3000,
-                    icon: '🤝'
-                  });
-                  setTimeout(() => navigate('/Checkers'), 2000);
-                }
-              }}
-              variant="outline"
-              className="bg-blue-500/20 border-blue-500/50 text-blue-300 hover:bg-blue-500/30 text-lg px-6 py-3"
-            >
-              🤝 Proposer nul (MODE IA)
-            </Button>
-            <Button
-              onClick={() => {
-                if (window.confirm('Voulez-vous vraiment abandonner ? L\'IA remportera la victoire.')) {
-                  toast.success('Partie abandonnée', {
-                    description: 'L\'IA remporte la victoire',
-                    duration: 3000
-                  });
-                  setTimeout(() => navigate('/Checkers'), 2000);
-                }
-              }}
-              variant="outline"
-              className="bg-red-500/20 border-red-500/50 text-red-300 hover:bg-red-500/30 text-lg px-6 py-3"
-            >
-              🏳️ Abandonner
-            </Button>
-          </div>
         </div>
       </div>
     );
@@ -1168,14 +1130,14 @@ export default function GameRoom() {
 
       {/* Actions de jeu et Chat */}
       <div className="px-6 pb-4 space-y-4">
-        {/* Boutons d'action - Si roomId existe, c'est une partie multijoueur */}
-        {roomId && !isSpectator && (
+        {/* Boutons d'action */}
+        {!isSpectator && (
           <div className="flex gap-3 justify-center">
             <Button
               onClick={handleOfferDraw}
               variant="outline"
               className="bg-blue-500/20 border-blue-500/50 text-blue-300 hover:bg-blue-500/30"
-              disabled={drawOfferSent || !gameStarted || session?.status !== 'in_progress'}
+              disabled={drawOfferSent}
             >
               {drawOfferSent ? '⏳ En attente...' : '🤝 Proposer nul'}
             </Button>
@@ -1183,7 +1145,6 @@ export default function GameRoom() {
               onClick={handleResign}
               variant="outline"
               className="bg-red-500/20 border-red-500/50 text-red-300 hover:bg-red-500/30"
-              disabled={!gameStarted || session?.status !== 'in_progress'}
             >
               🏳️ Abandonner
             </Button>
