@@ -1136,9 +1136,6 @@ export default function GameRoom() {
 
       {/* Actions de jeu et Chat */}
       <div className="px-6 pb-4 space-y-4">
-        <div className="bg-yellow-400 text-black p-3 font-bold text-center rounded">
-          DEBUG v2 - Zone boutons chargee
-        </div>
 
         {/* Boutons d'action */}
         {!isSpectator && (
