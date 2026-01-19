@@ -939,6 +939,7 @@ export default function GameRoom() {
           <div className="flex gap-3 justify-center">
             <Button
               onClick={() => {
+                alert('BOUTON MODE IA CLIQUÉ!');
                 if (window.confirm('Voulez-vous proposer un match nul ? L\'IA acceptera automatiquement.')) {
                   toast.success('Match nul', {
                     description: 'La partie se termine par un match nul',
@@ -951,7 +952,7 @@ export default function GameRoom() {
               variant="outline"
               className="bg-blue-500/20 border-blue-500/50 text-blue-300 hover:bg-blue-500/30 text-lg px-6 py-3"
             >
-              🤝 Proposer nul
+              🤝 Proposer nul (MODE IA)
             </Button>
             <Button
               onClick={() => {
@@ -1156,7 +1157,7 @@ export default function GameRoom() {
           <div className="flex gap-3 justify-center">
             <Button
               onClick={() => {
-                alert('BOUTON CLIQUÉ!');
+                alert('BOUTON MULTIJOUEUR CLIQUÉ!');
                 console.log('=== CLIC DÉTECTÉ ===');
                 console.log('drawOfferSent:', drawOfferSent);
                 console.log('user:', user);
@@ -1168,7 +1169,7 @@ export default function GameRoom() {
               className="bg-blue-500/20 border-blue-500/50 text-blue-300 hover:bg-blue-500/30"
               disabled={drawOfferSent}
             >
-              {drawOfferSent ? '⏳ En attente...' : '🤝 Proposer nul'}
+              {drawOfferSent ? '⏳ En attente...' : '🤝 Proposer nul (MULTI)'}
             </Button>
             <Button
               onClick={handleResign}
