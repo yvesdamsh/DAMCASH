@@ -1038,34 +1038,22 @@ export default function GameRoom() {
   }
 
   // Interface multijoueur complète
-  return (
-    <>
-      {/* Modal: Proposition de nul reçue */}
-      <Dialog open={!!incomingDrawOffer} onOpenChange={(open) => { if (!open) handleDeclineDraw(); }}>
-        <DialogContent className="bg-[#2C1810] border-[#D4A574]/50 text-[#F5E6D3] max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">🤝 Proposition de match nul</DialogTitle>
-            <DialogDescription className="text-[#D4A574] mt-3">
-              {incomingDrawOffer?.from_player_name} propose un match nul. Acceptez-vous?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-3 mt-6 flex">
-            <Button
-              onClick={handleDeclineDraw}
-              variant="outline"
-              className="flex-1"
-            >
-              ❌ Refuser
-            </Button>
-            <Button
-              onClick={handleAcceptDraw}
-              className="flex-1 bg-green-700 hover:bg-green-800"
-            >
-              ✅ Accepter
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+  {/* Modal: Proposition de nul à envoyer */}
+  <DrawProposalModal
+    open={showDrawProposalModal}
+    onConfirm={confirmDrawProposal}
+    onCancel={() => setShowDrawProposalModal(false)}
+    isLoading={drawProposalLoading}
+  />
+
+  {/* Modal: Proposition de nul reçue */}
+  <DrawResponseModal
+    open={!!incomingDrawOffer}
+    onAccept={handleAcceptDraw}
+    onReject={handleDeclineDraw}
+    opponentName={incomingDrawOffer?.from_player_name}
+    isLoading={false}
+  />
 
       {/* Modal: Confirmation abandon */}
       <Dialog open={showResignConfirm} onOpenChange={setShowResignConfirm}>
