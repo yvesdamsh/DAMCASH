@@ -347,6 +347,16 @@ export default function GameRoom() {
         duration_seconds: duration
         });
 
+        // Créer un GameEvent pour notifier l'adversaire en realtime
+        await base44.entities.GameEvent?.create?.({
+          room_id: roomId,
+          type: 'resign',
+          player_id: user.id,
+          player_name: user.full_name,
+          winner_id: winnerId,
+          winner_name: winnerName
+        });
+
         await base44.entities.Notification?.create?.({
         user_email: winnerId,
         type: 'game_result',
