@@ -141,42 +141,57 @@ export default function GameRoom() {
 
   // Realtime dédié aux coups: écouter les créations de GameMove
   useEffect(() => {
-    if (!roomId) return;
+  if (!roomId) return;
 
-    const unsubscribe = base44.entities.GameMove?.subscribe?.((event) => {
-      if (event?.type !== 'create') return;
-      const matchesRoom = event?.data?.room_id === roomId;
-      if (!matchesRoom) return;
+  const unsubscribe = base44.entities.GameMove?.subscribe?.((event) => {
+    if (event?.type !== 'create') return;
+    const matchesRoom = event?.data?.room_id === roomId;
+    if (!matchesRoom) return;
 
-      const move = event.data;
+    const move = event.data;
 
-      if (move.board_state) {
-        try {
-          setBoardState(JSON.parse(move.board_state));
-        } catch (e) {
-          console.log('Erreur parsing board_state (move)');
-        }
+    if (move.board_state) {
+      try {
+        setBoardState(JSON.parse(move.board_state));
+      } catch (e) {
+        console.log('Erreur parsing board_state (move)');
       }
+    }
 
-      if (typeof move.white_time !== 'undefined') {
-        setWhiteTime(move.white_time);
-      }
-      if (typeof move.black_time !== 'undefined') {
-        setBlackTime(move.black_time);
-      }
+    if (typeof move.white_time !== 'undefined') {
+      setWhiteTime(move.white_time);
+    }
+    if (typeof move.black_time !== 'undefined') {
+      setBlackTime(move.black_time);
+    }
 
-      if (move.next_turn) {
-        setSession(prev => ({ ...prev, current_turn: move.next_turn }));
-      }
-      if (move.created_date || move.created_at) {
-        setSession(prev => ({ ...prev, last_move_timestamp: move.created_date || move.created_at }));
-      }
-    });
+    if (move.next_turn) {
+      setSession(prev => ({ ...prev, current_turn: move.next_turn }));
+    }
+    if (move.created_date || move.created_at) {
+      setSession(prev => ({ ...prev, last_move_timestamp: move.created_date || move.created_at }));
+    }
+  });
 
-    return () => {
-      if (typeof unsubscribe === 'function') unsubscribe();
-    };
+  return () => {
+    if (typeof unsubscribe === 'function') unsubscribe();
+  };
   }, [roomId]);
+
+  // Écouter les changements de status pour montrer le modal victoire par abandon
+  useEffect(() => {
+  if (!session || !user || session.status !== 'finished') return;
+
+  const isCurrentUserWinner = session.winner_id === user.id;
+  if (!isCurrentUserWinner) return;
+
+  const loserName = user.id === session.player1_id 
+    ? (session.player2_name || opponent?.full_name || 'Votre adversaire')
+    : (session.player1_name || 'Votre adversaire');
+
+  setResignationMessage(loserName);
+  setVictoryByResignModal(true);
+  }, [session?.status, session?.winner_id, user?.id]);
 
   // Chat: charger + realtime messages
   useEffect(() => {
