@@ -6,6 +6,7 @@ import ChessBoard from '../components/game/ChessBoard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { ArrowLeft, Clock, AlertTriangle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
@@ -45,6 +46,8 @@ export default function GameRoom() {
   const endGameSentRef = useRef(false);
   const spectatorJoinedRef = useRef(false);
   const [drawOffer, setDrawOffer] = useState(null);
+  const [showDrawDialog, setShowDrawDialog] = useState(false);
+  const [showResignDialog, setShowResignDialog] = useState(false);
 
   // Charger les données initiales
   useEffect(() => {
@@ -971,105 +974,14 @@ export default function GameRoom() {
         <div className="px-6 pb-6">
           <div className="flex gap-3 justify-center">
             <Button
-              onClick={() => {
-                toast.custom(
-                  (t) => (
-                    <motion.div
-                      initial={{ opacity: 0, y: -20, scale: 0.9 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      className="bg-gradient-to-br from-blue-900 to-blue-950 border-2 border-blue-500/50 rounded-xl shadow-2xl p-6 max-w-md"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="bg-blue-500/20 p-3 rounded-full">
-                          <span className="text-4xl">🤝</span>
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-xl font-bold text-white mb-2">Proposer un match nul ?</h3>
-                          <p className="text-blue-200 mb-4">
-                            L'IA acceptera automatiquement votre proposition de match nul.
-                          </p>
-                          <div className="flex gap-3">
-                            <button
-                              onClick={() => {
-                                toast.dismiss(t);
-                                toast.success('Match nul', {
-                                  description: 'La partie se termine par un match nul',
-                                  duration: 3000,
-                                  icon: '🤝'
-                                });
-                                setTimeout(() => navigate('/Checkers'), 2000);
-                              }}
-                              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
-                            >
-                              Confirmer
-                            </button>
-                            <button
-                              onClick={() => toast.dismiss(t)}
-                              className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
-                            >
-                              Annuler
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ),
-                  { duration: Infinity }
-                );
-              }}
+              onClick={() => setShowDrawDialog(true)}
               variant="outline"
               className="bg-blue-500/20 border-blue-500/50 text-blue-300 hover:bg-blue-500/30 text-lg px-6 py-3"
             >
               🤝 Proposer nul
             </Button>
             <Button
-              onClick={() => {
-                toast.custom(
-                  (t) => (
-                    <motion.div
-                      initial={{ opacity: 0, y: -20, scale: 0.9 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      className="bg-gradient-to-br from-red-900 to-red-950 border-2 border-red-500/50 rounded-xl shadow-2xl p-6 max-w-md"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="bg-red-500/20 p-3 rounded-full">
-                          <AlertTriangle className="w-8 h-8 text-red-400" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-xl font-bold text-white mb-2">Abandonner la partie ?</h3>
-                          <p className="text-red-200 mb-4">
-                            Vous êtes sur le point d'abandonner. L'IA remportera la victoire.
-                          </p>
-                          <div className="flex gap-3">
-                            <button
-                              onClick={() => {
-                                toast.dismiss(t);
-                                toast.success('Partie abandonnée', {
-                                  description: 'L\'IA remporte la victoire',
-                                  duration: 3000
-                                });
-                                setTimeout(() => navigate('/Checkers'), 2000);
-                              }}
-                              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
-                            >
-                              Oui, abandonner
-                            </button>
-                            <button
-                              onClick={() => toast.dismiss(t)}
-                              className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
-                            >
-                              Annuler
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ),
-                  { duration: Infinity }
-                );
-              }}
+              onClick={() => setShowResignDialog(true)}
               variant="outline"
               className="bg-red-500/20 border-red-500/50 text-red-300 hover:bg-red-500/30 text-lg px-6 py-3"
             >
@@ -1077,6 +989,75 @@ export default function GameRoom() {
             </Button>
           </div>
         </div>
+
+        {/* Dialog Proposer Nul */}
+        <Dialog open={showDrawDialog} onOpenChange={setShowDrawDialog}>
+          <DialogContent className="bg-[#2C1810] border-[#D4A574]/50 text-[#F5E6D3]">
+            <DialogHeader>
+              <DialogTitle className="text-2xl">🤝 Proposer un match nul ?</DialogTitle>
+              <DialogDescription className="text-[#D4A574]">
+                L'IA acceptera automatiquement votre proposition de match nul.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowDrawDialog(false)}
+                className="border-[#D4A574]/50 text-[#F5E6D3]"
+              >
+                Annuler
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowDrawDialog(false);
+                  toast.success('Match nul', {
+                    description: 'La partie se termine par un match nul',
+                    duration: 3000,
+                    icon: '🤝'
+                  });
+                  setTimeout(() => navigate('/Checkers'), 2000);
+                }}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                Confirmer
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialog Abandonner */}
+        <Dialog open={showResignDialog} onOpenChange={setShowResignDialog}>
+          <DialogContent className="bg-[#2C1810] border-[#D4A574]/50 text-[#F5E6D3]">
+            <DialogHeader>
+              <DialogTitle className="text-2xl">🏳️ Abandonner la partie ?</DialogTitle>
+              <DialogDescription className="text-[#D4A574]">
+                Vous êtes sur le point d'abandonner. L'IA remportera la victoire.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowResignDialog(false)}
+                className="border-[#D4A574]/50 text-[#F5E6D3]"
+              >
+                Annuler
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowResignDialog(false);
+                  toast.success('Partie abandonnée', {
+                    description: 'L\'IA remporte la victoire',
+                    duration: 3000
+                  });
+                  setTimeout(() => navigate('/Checkers'), 2000);
+                }}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Oui, abandonner
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
