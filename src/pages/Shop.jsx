@@ -22,10 +22,21 @@ export default function Shop() {
     try {
       const isAuth = await base44.auth.isAuthenticated();
       if (isAuth) {
-        setUser(await base44.auth.me());
+        const currentUser = await base44.auth.me();
+        setUser(currentUser);
+        loadInventory(currentUser.id);
       }
     } catch (error) {
       console.log('Not authenticated');
+    }
+  };
+
+  const loadInventory = async (userId) => {
+    try {
+      const items = await base44.entities.UserInventory.filter({ user_id: userId });
+      setInventory(items || []);
+    } catch (error) {
+      console.log('Erreur chargement inventaire:', error);
     }
   };
 
