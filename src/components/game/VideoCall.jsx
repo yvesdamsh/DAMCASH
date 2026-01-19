@@ -15,6 +15,7 @@ export default function VideoCall({
 }) {
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
+  const [isCameraActivated, setIsCameraActivated] = useState(false);
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [isMicOn, setIsMicOn] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -25,26 +26,13 @@ export default function VideoCall({
   const peerConnectionRef = useRef(null);
   const signalCheckIntervalRef = useRef(null);
 
-  // Initialiser la connexion WebRTC
+  // Initialiser la connexion WebRTC mais SANS demander les permissions
   useEffect(() => {
     if (!gameStarted || isSpectator || !opponentId) return;
 
     const initWebRTC = async () => {
       try {
-        // Demander accès caméra/micro
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: { ideal: 320 } },
-          audio: true
-        });
-
-        setLocalStream(stream);
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = stream;
-        }
-        setIsCameraOn(true);
-        setIsMicOn(true);
-
-        // Créer RTCPeerConnection
+        // Créer RTCPeerConnection SANS activer la caméra
         const peerConnection = new RTCPeerConnection({
           iceServers: [
             { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] }
@@ -53,12 +41,7 @@ export default function VideoCall({
 
         peerConnectionRef.current = peerConnection;
 
-        // Ajouter les tracks locaux
-        stream.getTracks().forEach(track => {
-          peerConnection.addTrack(track, stream);
-        });
-
-        // Gérer les streams distants
+        // Gérer les streams distants quand l'adversaire active sa caméra
         peerConnection.ontrack = (event) => {
           if (event.streams && event.streams[0]) {
             setRemoteStream(event.streams[0]);
@@ -75,16 +58,10 @@ export default function VideoCall({
           }
         };
 
-        // Faire une offre
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        sendSignal('offer', offer);
-
         // Vérifier les signaux reçus
         checkForSignals(peerConnection);
       } catch (error) {
-        console.log('Erreur caméra:', error);
-        setCameraError(true);
+        console.log('Erreur initialisation WebRTC:', error);
       }
     };
 
