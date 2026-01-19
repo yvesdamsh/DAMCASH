@@ -897,27 +897,21 @@ export default function GameRoom() {
   }
 
   const computedPlayerColor = user && session && user.id === session.player1_id ? 'white' : 'black';
-  const effectivePlayerColor = gameMode === 'ai' ? playerColor : computedPlayerColor;
-  const isPlayerWhite = gameMode === 'ai' ? playerColor === 'white' : user?.id === session?.player1_id;
+  
+  // Forcer le mode multijoueur si on a une vraie session avec deux joueurs
+  const isActuallyMultiplayer = session && session.player1_id && (session.player2_id || session.invited_player_id);
+  const actualGameMode = isActuallyMultiplayer ? 'online' : gameMode;
+  
+  const effectivePlayerColor = actualGameMode === 'ai' ? playerColor : computedPlayerColor;
+  const isPlayerWhite = actualGameMode === 'ai' ? playerColor === 'white' : user?.id === session?.player1_id;
   const gameType = session?.game_type;
-  const canMove = gameMode !== 'ai' && !isSpectator && (
+  const canMove = actualGameMode !== 'ai' && !isSpectator && (
     (effectivePlayerColor === 'white' && session?.current_turn === 'white') || 
     (effectivePlayerColor === 'black' && session?.current_turn === 'black')
   );
 
-  console.log('DEBUG GAMEMODE:', {
-    gameMode,
-    urlMode: urlParams.get('mode'),
-    session: session?.id,
-    opponent: opponent?.full_name,
-    isMultiplayer: gameMode !== 'ai'
-  });
-
   // Mode IA: afficher directement le plateau
-  // ATTENTION: Ne jamais afficher ce mode si on a une session multijoueur
-  const isActuallyMultiplayer = session && session.player1_id && (session.player2_id || session.invited_player_id);
-  
-  if (gameMode === 'ai' && !isActuallyMultiplayer) {
+  if (actualGameMode === 'ai') {
     return (
       <div className="w-full min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] flex flex-col">
         {/* Header */}
@@ -1116,6 +1110,17 @@ export default function GameRoom() {
           </div>
         </div>
       )}
+
+      {/* DEBUG INFO */}
+      <div className="p-4 bg-red-500/20 border border-red-500 text-white text-xs">
+        <div>gameMode URL: {gameMode}</div>
+        <div>actualGameMode: {actualGameMode}</div>
+        <div>session.player2_id: {session?.player2_id || 'null'}</div>
+        <div>isActuallyMultiplayer: {isActuallyMultiplayer ? 'YES' : 'NO'}</div>
+        <div>gameStarted: {gameStarted ? 'YES' : 'NO'}</div>
+        <div>session.status: {session?.status || 'null'}</div>
+        <div>isSpectator: {isSpectator ? 'YES' : 'NO'}</div>
+      </div>
 
       {/* Plateau de jeu */}
       <div className="flex-1 flex items-center justify-center overflow-auto p-6 relative">
