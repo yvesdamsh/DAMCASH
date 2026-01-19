@@ -135,6 +135,52 @@ export default function VideoCall({
     }
   };
 
+  const activateCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 320 } },
+        audio: true
+      });
+
+      setLocalStream(stream);
+      setIsCameraActivated(true);
+      setIsCameraOn(true);
+      setIsMicOn(true);
+
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
+      }
+
+      // Ajouter les tracks au peer connection existant
+      if (peerConnectionRef.current) {
+        stream.getTracks().forEach(track => {
+          peerConnectionRef.current.addTrack(track, stream);
+        });
+
+        // Faire une offre ou envoyer les tracks existants
+        const offer = await peerConnectionRef.current.createOffer({ iceRestart: true });
+        await peerConnectionRef.current.setLocalDescription(offer);
+        sendSignal('offer', offer);
+      }
+    } catch (error) {
+      console.log('Erreur activation caméra:', error);
+      setCameraError(true);
+    }
+  };
+
+  const deactivateCamera = () => {
+    if (localStream) {
+      localStream.getTracks().forEach(track => track.stop());
+      setLocalStream(null);
+      setIsCameraActivated(false);
+      setIsCameraOn(false);
+      setIsMicOn(false);
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = null;
+      }
+    }
+  };
+
   const toggleCamera = () => {
     if (localStream) {
       const videoTrack = localStream.getVideoTracks()[0];
