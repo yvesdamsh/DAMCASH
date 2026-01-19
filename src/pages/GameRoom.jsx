@@ -1350,7 +1350,7 @@ export default function GameRoom() {
               )}
             </div>
           </ScrollArea>
-          <div className="flex gap-2 mt-3">
+          <div className="flex flex-col md:flex-row gap-2 mt-3">
             <Input
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
@@ -1362,7 +1362,7 @@ export default function GameRoom() {
             />
             <Button
               onClick={handleSendMessage}
-              className="bg-amber-600 hover:bg-amber-700"
+              className="bg-amber-600 hover:bg-amber-700 w-full md:w-auto min-h-[44px]"
               disabled={isSpectator || !newMessage.trim()}
             >
               Envoyer
