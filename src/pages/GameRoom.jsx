@@ -6,8 +6,10 @@ import ChessBoard from '../components/game/ChessBoard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ArrowLeft, Clock } from 'lucide-react';
+import { ArrowLeft, Clock, AlertTriangle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const TIME_CONTROLS = {
   bullet: 60,
@@ -218,18 +220,76 @@ export default function GameRoom() {
 
   const handleResign = async () => {
     if (!session || !user || isSpectator) return;
-    if (!confirm('Voulez-vous vraiment abandonner cette partie ?')) return;
 
-    try {
-      const winnerId = user.id === session.player1_id ? session.player2_id : session.player1_id;
-      await base44.entities.GameSession.update(session.id, {
-        status: 'finished',
-        winner_id: winnerId
-      });
-      setGameStatus('finished');
-    } catch (e) {
-      console.log('Erreur abandon:', e?.message || e);
-    }
+    const winnerId = user.id === session.player1_id ? session.player2_id : session.player1_id;
+    const winnerName = user.id === session.player1_id ? (session.player2_name || opponent?.full_name) : session.player1_name;
+    
+    toast.custom(
+      (t) => (
+        <motion.div
+          initial={{ opacity: 0, y: -20, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          className="bg-gradient-to-br from-red-900 to-red-950 border-2 border-red-500/50 rounded-xl shadow-2xl p-6 max-w-md"
+        >
+          <div className="flex items-start gap-4">
+            <div className="bg-red-500/20 p-3 rounded-full">
+              <AlertTriangle className="w-8 h-8 text-red-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-white mb-2">Abandonner la partie ?</h3>
+              <p className="text-red-200 mb-4">
+                Vous êtes sur le point d'abandonner. {winnerName} remportera la victoire.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={async () => {
+                    try {
+                      await base44.entities.GameSession.update(session.id, {
+                        status: 'finished',
+                        winner_id: winnerId,
+                        finished_at: new Date().toISOString()
+                      });
+                      
+                      await base44.entities.Notification?.create?.({
+                        user_email: winnerId,
+                        type: 'game_result',
+                        title: '🎉 Victoire par abandon',
+                        message: `${user.full_name} a abandonné la partie`,
+                        link: `GameRoom?roomId=${roomId}`
+                      });
+
+                      setSession(prev => ({ ...prev, status: 'finished', winner_id: winnerId }));
+                      toast.dismiss(t);
+                      
+                      toast.success('Partie abandonnée', {
+                        description: `${winnerName} remporte la victoire`,
+                        duration: 5000
+                      });
+                      
+                      setTimeout(() => navigate('/Play'), 2000);
+                    } catch (e) {
+                      console.log('Erreur abandon:', e?.message || e);
+                      toast.error('Erreur lors de l\'abandon');
+                    }
+                  }}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+                >
+                  Oui, abandonner
+                </button>
+                <button
+                  onClick={() => toast.dismiss(t)}
+                  className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      ),
+      { duration: Infinity }
+    );
   };
 
   const handleOfferDraw = async () => {
@@ -237,16 +297,26 @@ export default function GameRoom() {
 
     try {
       const opponentId = user.id === session.player1_id ? session.player2_id : session.player1_id;
+      const opponentName = user.id === session.player1_id ? (session.player2_name || opponent?.full_name) : session.player1_name;
+      
       await base44.entities.Notification?.create?.({
         user_email: opponentId,
         type: 'game_draw_offer',
-        title: 'Proposition de match nul',
-        message: `${user.full_name} propose un match nul`,
-        link: `GameRoom?roomId=${roomId}`
+        title: '🤝 Proposition de match nul',
+        message: `${user.full_name} propose de terminer la partie par un match nul`,
+        link: `GameRoom?roomId=${roomId}`,
+        from_user: user.email,
+        icon: '🤝'
       });
-      alert('Proposition de match nul envoyée');
+      
+      toast.success('Proposition envoyée', {
+        description: `${opponentName} a reçu votre proposition de match nul`,
+        duration: 4000,
+        icon: '🤝'
+      });
     } catch (e) {
       console.log('Erreur proposition nul:', e?.message || e);
+      toast.error('Erreur lors de l\'envoi de la proposition');
     }
   };
 
@@ -256,11 +326,42 @@ export default function GameRoom() {
     try {
       await base44.entities.GameSession.update(session.id, {
         status: 'finished',
-        winner_id: null
+        winner_id: null,
+        finished_at: new Date().toISOString()
       });
-      setGameStatus('draw');
+      
+      const player1Name = session.player1_name;
+      const player2Name = session.player2_name || session.invited_player_name;
+      
+      await Promise.all([
+        base44.entities.Notification?.create?.({
+          user_email: session.player1_id,
+          type: 'game_result',
+          title: '🤝 Match nul accepté',
+          message: 'La partie se termine par un match nul',
+          link: `GameRoom?roomId=${roomId}`
+        }),
+        base44.entities.Notification?.create?.({
+          user_email: session.player2_id,
+          type: 'game_result',
+          title: '🤝 Match nul accepté',
+          message: 'La partie se termine par un match nul',
+          link: `GameRoom?roomId=${roomId}`
+        })
+      ]);
+      
+      setSession(prev => ({ ...prev, status: 'finished', winner_id: null }));
+      
+      toast.success('Match nul', {
+        description: 'La partie se termine par un accord mutuel',
+        duration: 5000,
+        icon: '🤝'
+      });
+      
+      setTimeout(() => navigate('/Play'), 2000);
     } catch (e) {
       console.log('Erreur accepter nul:', e?.message || e);
+      toast.error('Erreur lors de l\'acceptation');
     }
   };
 
@@ -470,17 +571,58 @@ export default function GameRoom() {
   };
 
   const handleTimeOut = async (playerColor) => {
-    if (!session) return;
+    if (!session || endGameSentRef.current) return;
+    endGameSentRef.current = true;
     
     try {
-      const winner = playerColor === 'white' ? session.player2_id : session.player1_id;
+      const winnerId = playerColor === 'white' ? session.player2_id : session.player1_id;
+      const loserId = playerColor === 'white' ? session.player1_id : session.player2_id;
+      const winnerName = playerColor === 'white' ? (session.player2_name || opponent?.full_name) : session.player1_name;
+      const loserName = playerColor === 'white' ? session.player1_name : (session.player2_name || opponent?.full_name);
+      
       await base44.entities.GameSession.update(session.id, {
         status: 'finished',
-        winner: winner
+        winner_id: winnerId,
+        finished_at: new Date().toISOString()
       });
-      setSession(prev => ({ ...prev, status: 'finished', winner }));
+      
+      await Promise.all([
+        base44.entities.Notification?.create?.({
+          user_email: winnerId,
+          type: 'game_result',
+          title: '⏱️ Victoire au temps',
+          message: `${loserName} a dépassé le temps imparti`,
+          link: `GameRoom?roomId=${roomId}`
+        }),
+        base44.entities.Notification?.create?.({
+          user_email: loserId,
+          type: 'game_result',
+          title: '⏱️ Défaite au temps',
+          message: 'Votre temps est écoulé',
+          link: `GameRoom?roomId=${roomId}`
+        })
+      ]);
+      
+      setSession(prev => ({ ...prev, status: 'finished', winner_id: winnerId }));
+      
+      if (user?.id === loserId) {
+        toast.error('Temps écoulé !', {
+          description: 'Vous avez perdu au temps',
+          duration: 5000,
+          icon: '⏱️'
+        });
+      } else {
+        toast.success('Victoire !', {
+          description: `${loserName} a dépassé le temps`,
+          duration: 5000,
+          icon: '⏱️'
+        });
+      }
+      
+      setTimeout(() => navigate('/Play'), 3000);
     } catch (error) {
       console.error('Erreur time out:', error);
+      endGameSentRef.current = false;
     }
   };
 
@@ -740,13 +882,24 @@ export default function GameRoom() {
                 </p>
               </div>
             </div>
-            <div className={`text-4xl font-bold font-mono px-6 py-2 rounded-lg ${
-              session.current_turn === (isPlayerWhite ? 'black' : 'white') 
-                ? 'bg-red-500/20 border-2 border-red-500 text-red-400' 
-                : 'bg-[#2C1810] border-2 border-[#D4A574]/50 text-[#F5E6D3]'
-            }`}>
+            <motion.div 
+              animate={{
+                scale: (isPlayerWhite ? blackTime : whiteTime) < 60 && session.current_turn === (isPlayerWhite ? 'black' : 'white') ? [1, 1.05, 1] : 1
+              }}
+              transition={{ repeat: (isPlayerWhite ? blackTime : whiteTime) < 60 && session.current_turn === (isPlayerWhite ? 'black' : 'white') ? Infinity : 0, duration: 1 }}
+              className={`text-4xl font-bold font-mono px-6 py-2 rounded-lg transition-all ${
+                (isPlayerWhite ? blackTime : whiteTime) < 60 && (isPlayerWhite ? blackTime : whiteTime) > 0
+                  ? 'bg-red-500/30 border-2 border-red-500 text-red-400 shadow-lg shadow-red-500/50 animate-pulse'
+                  : session.current_turn === (isPlayerWhite ? 'black' : 'white') 
+                    ? 'bg-orange-500/20 border-2 border-orange-500 text-orange-400' 
+                    : 'bg-[#2C1810] border-2 border-[#D4A574]/50 text-[#F5E6D3]'
+              }`}
+            >
+              {(isPlayerWhite ? blackTime : whiteTime) < 60 && (isPlayerWhite ? blackTime : whiteTime) > 0 && (
+                <AlertTriangle className="inline w-6 h-6 mr-2 animate-bounce" />
+              )}
               {formatTime(isPlayerWhite ? blackTime : whiteTime)}
-            </div>
+            </motion.div>
           </div>
         </div>
       )}
@@ -880,13 +1033,24 @@ export default function GameRoom() {
                 </p>
               </div>
             </div>
-            <div className={`text-4xl font-bold font-mono px-6 py-2 rounded-lg ${
-              canMove 
-                ? 'bg-green-500/20 border-2 border-green-500 text-green-400' 
-                : 'bg-[#2C1810] border-2 border-[#D4A574]/50 text-[#F5E6D3]'
-            }`}>
+            <motion.div
+              animate={{
+                scale: (isPlayerWhite ? whiteTime : blackTime) < 60 && canMove ? [1, 1.05, 1] : 1
+              }}
+              transition={{ repeat: (isPlayerWhite ? whiteTime : blackTime) < 60 && canMove ? Infinity : 0, duration: 1 }}
+              className={`text-4xl font-bold font-mono px-6 py-2 rounded-lg transition-all ${
+                (isPlayerWhite ? whiteTime : blackTime) < 60 && (isPlayerWhite ? whiteTime : blackTime) > 0
+                  ? 'bg-red-500/30 border-2 border-red-500 text-red-400 shadow-lg shadow-red-500/50 animate-pulse'
+                  : canMove 
+                    ? 'bg-green-500/20 border-2 border-green-500 text-green-400' 
+                    : 'bg-[#2C1810] border-2 border-[#D4A574]/50 text-[#F5E6D3]'
+              }`}
+            >
+              {(isPlayerWhite ? whiteTime : blackTime) < 60 && (isPlayerWhite ? whiteTime : blackTime) > 0 && (
+                <AlertTriangle className="inline w-6 h-6 mr-2 animate-bounce" />
+              )}
               {formatTime(isPlayerWhite ? whiteTime : blackTime)}
-            </div>
+            </motion.div>
           </div>
         </div>
       )}
