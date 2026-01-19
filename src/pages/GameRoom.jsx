@@ -1129,27 +1129,28 @@ export default function GameRoom() {
       </div>
 
       {/* Actions de jeu et Chat */}
-      <div className="px-6 pb-4 space-y-4" style={{ pointerEvents: 'auto' }}>
+      <div className="px-6 pb-4 space-y-4">
         {/* Boutons d'action */}
         {!isSpectator && (
-          <div className="flex gap-3 justify-center" style={{ pointerEvents: 'auto' }}>
-            <Button
-              onClick={() => { alert('CLIC DÉTECTÉ SUR BOUTON PROPOSER NUL!'); handleOfferDraw(); }}
-              variant="outline"
-              className="bg-blue-500/20 border-blue-500/50 text-blue-300 hover:bg-blue-500/30"
-              style={{ pointerEvents: 'auto' }}
-              disabled={drawOfferSent}
+          <div className="flex gap-3 justify-center my-4">
+            <button 
+              onClick={() => {
+                alert('Proposer nul cliqué!');
+                // handleOfferDraw();
+              }}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
-              {drawOfferSent ? '⏳ En attente...' : '🤝 Proposer nul'}
-            </Button>
-            <Button
-              onClick={() => { alert('CLIC DÉTECTÉ SUR ABANDONNER!'); handleResign(); }}
-              variant="outline"
-              className="bg-red-500/20 border-red-500/50 text-red-300 hover:bg-red-500/30"
-              style={{ pointerEvents: 'auto' }}
+              🤝 Proposer nul
+            </button>
+            <button 
+              onClick={() => {
+                alert('Abandonner cliqué!');
+                // handleResign();
+              }}
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
             >
               🏳️ Abandonner
-            </Button>
+            </button>
             {user && session && user.id === session.player1_id && (
               <SpectatorManager roomId={roomId} hostId={user.id} session={session} />
             )}
