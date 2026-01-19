@@ -1134,7 +1134,7 @@ export default function GameRoom() {
         {!isSpectator && (
           <div className="flex gap-3 justify-center">
             <Button
-              onClick={handleOfferDraw}
+              onClick={() => { alert('CLIC DÉTECTÉ SUR BOUTON PROPOSER NUL!'); handleOfferDraw(); }}
               variant="outline"
               className="bg-blue-500/20 border-blue-500/50 text-blue-300 hover:bg-blue-500/30"
               disabled={drawOfferSent}
@@ -1142,7 +1142,7 @@ export default function GameRoom() {
               {drawOfferSent ? '⏳ En attente...' : '🤝 Proposer nul'}
             </Button>
             <Button
-              onClick={handleResign}
+              onClick={() => { alert('CLIC DÉTECTÉ SUR ABANDONNER!'); handleResign(); }}
               variant="outline"
               className="bg-red-500/20 border-red-500/50 text-red-300 hover:bg-red-500/30"
             >
