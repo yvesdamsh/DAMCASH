@@ -16,7 +16,7 @@ const PIECE_IMAGES = {
     'k': 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg'
 };
 
-const ChessPiece = memo(({ type, isSelected, animateFrom, set = 'standard', onDragEnd, dragConstraints, canDrag = true }) => {
+function ChessPiece({ type, isSelected, animateFrom, set = 'standard', onDragEnd, dragConstraints, canDrag = true }) {
     if (!type) return null;
 
     // Map for unicode pieces
@@ -71,6 +71,6 @@ const ChessPiece = memo(({ type, isSelected, animateFrom, set = 'standard', onDr
             />
         </motion.div>
     );
-});
+}
 
-export default ChessPiece;
+export default memo(ChessPiece);
