@@ -12,7 +12,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import SpectatorManager from '../components/game/SpectatorManager';
-import VideoCall from '../components/game/VideoCall';
 
 const TIME_CONTROLS = {
   bullet: 60,
