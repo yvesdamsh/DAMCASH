@@ -227,66 +227,87 @@ export default function VideoCall({
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-700">
-              <span className="text-white/40 text-xs">🚫</span>
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800">
+              <span className="text-lg">🚫📹</span>
+              <p className="text-xs text-white/60 mt-1 text-center px-1">Caméra désactivée</p>
             </div>
           )}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent px-1 py-0.5">
             <p className="text-white text-xs font-semibold truncate">{opponentName}</p>
           </div>
-          
-          {/* Boutons overlay */}
-          <div className="absolute inset-0 flex items-center justify-center gap-0.5 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              onClick={toggleCamera}
-              className={`w-5 h-5 rounded flex items-center justify-center text-xs font-bold ${
-                isCameraOn
-                  ? 'bg-green-500/90 text-white'
-                  : 'bg-red-500/90 text-white'
-              }`}
-            >
-              {isCameraOn ? '📹' : '✕'}
-            </button>
-          </div>
         </div>
 
         {/* Vidéo Utilisateur */}
         <div className="relative w-20 h-16 rounded-lg overflow-hidden bg-black shadow-lg border border-[#D4A574]/50 group flex-shrink-0">
-          {localStream && !cameraError ? (
-            <video
-              ref={localVideoRef}
-              autoPlay
-              playsInline
-              muted
-              className="w-full h-full object-cover scaleX-[-1]"
-            />
+          {isCameraActivated && localStream && !cameraError ? (
+            <>
+              <video
+                ref={localVideoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-full object-cover scaleX-[-1]"
+              />
+              {/* Boutons visibles uniquement si caméra activée */}
+              <div className="absolute inset-0 flex items-center justify-center gap-0.5 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={toggleMic}
+                  className={`w-5 h-5 rounded flex items-center justify-center text-xs font-bold ${
+                    isMicOn
+                      ? 'bg-green-500/90 text-white'
+                      : 'bg-red-500/90 text-white'
+                  }`}
+                  title={isMicOn ? 'Couper le micro' : 'Activer le micro'}
+                >
+                  {isMicOn ? '🎤' : '✕'}
+                </button>
+                <button
+                  onClick={toggleCamera}
+                  className={`w-5 h-5 rounded flex items-center justify-center text-xs font-bold ${
+                    isCameraOn
+                      ? 'bg-green-500/90 text-white'
+                      : 'bg-red-500/90 text-white'
+                  }`}
+                  title={isCameraOn ? 'Couper la caméra' : 'Activer la caméra'}
+                >
+                  {isCameraOn ? '📹' : '✕'}
+                </button>
+                <button
+                  onClick={deactivateCamera}
+                  className="w-5 h-5 rounded bg-red-600/90 flex items-center justify-center text-xs text-white hover:bg-red-700/90 font-bold"
+                  title="Désactiver la caméra"
+                >
+                  ✕
+                </button>
+                <button
+                  onClick={() => setIsMinimized(true)}
+                  className="w-5 h-5 rounded bg-gray-700/90 flex items-center justify-center text-xs text-white hover:bg-gray-600/90 font-bold"
+                  title="Minimiser"
+                >
+                  −
+                </button>
+              </div>
+            </>
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-700">
-              <span className="text-white/40 text-xs">🚫</span>
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800">
+              <span className="text-lg">🚫📹</span>
+              <p className="text-xs text-white/60 mt-1">Caméra désactivée</p>
+              {!cameraError && (
+                <button
+                  onClick={activateCamera}
+                  className="mt-2 px-2 py-1 bg-blue-600/90 hover:bg-blue-700/90 text-white text-xs rounded transition-colors"
+                  title="Activer ma caméra"
+                >
+                  Activer
+                </button>
+              )}
+              {cameraError && (
+                <p className="text-xs text-red-400 mt-2">Non disponible</p>
+              )}
             </div>
           )}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent px-1 py-0.5">
             <p className="text-white text-xs font-semibold">Vous</p>
-          </div>
-
-          {/* Boutons overlay */}
-          <div className="absolute inset-0 flex items-center justify-center gap-0.5 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              onClick={toggleMic}
-              className={`w-5 h-5 rounded flex items-center justify-center text-xs font-bold ${
-                isMicOn
-                  ? 'bg-green-500/90 text-white'
-                  : 'bg-red-500/90 text-white'
-              }`}
-            >
-              {isMicOn ? '🎤' : '✕'}
-            </button>
-            <button
-              onClick={() => setIsMinimized(true)}
-              className="w-5 h-5 rounded bg-gray-700/90 flex items-center justify-center text-xs text-white hover:bg-gray-600/90 font-bold"
-            >
-              −
-            </button>
           </div>
         </div>
       </div>
