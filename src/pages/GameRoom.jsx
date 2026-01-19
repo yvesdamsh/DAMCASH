@@ -1128,24 +1128,20 @@ export default function GameRoom() {
         {/* Boutons d'action */}
         {!isSpectator && (
           <div className="flex gap-3 justify-center my-4">
-            <button 
-              onClick={() => {
-                alert('✅ CLICK FONCTIONNE - PROPOSER NUL!');
-              }}
-              style={{ position: 'relative', zIndex: 9999, pointerEvents: 'auto' }}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer"
+            <Button 
+              onClick={handleOfferDraw}
+              disabled={drawOfferSent || session?.status !== 'in_progress'}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              🤝 Proposer nul
-            </button>
-            <button 
-              onClick={() => {
-                alert('✅ CLICK FONCTIONNE - ABANDONNER!');
-              }}
-              style={{ position: 'relative', zIndex: 9999, pointerEvents: 'auto' }}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 cursor-pointer"
+              🤝 {drawOfferSent ? 'En attente...' : 'Proposer nul'}
+            </Button>
+            <Button 
+              onClick={() => setShowResignConfirm(true)}
+              disabled={session?.status !== 'in_progress'}
+              className="bg-red-600 hover:bg-red-700 text-white"
             >
               🏳️ Abandonner
-            </button>
+            </Button>
             {user && session && user.id === session.player1_id && (
               <SpectatorManager roomId={roomId} hostId={user.id} session={session} />
             )}
