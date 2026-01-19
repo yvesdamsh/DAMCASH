@@ -138,10 +138,11 @@ export default function VideoCall({
   const activateCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 320 } },
+        video: { width: { ideal: 640 }, height: { ideal: 480 } },
         audio: true
       });
 
+      console.log('✅ Stream obtenu:', stream);
       setLocalStream(stream);
       setIsCameraActivated(true);
       setIsCameraOn(true);
@@ -149,6 +150,11 @@ export default function VideoCall({
 
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
+        // S'assurer que la vidéo se lit
+        localVideoRef.current.play().catch(err => {
+          console.log('Play error:', err);
+        });
+        console.log('✅ Stream attaché au video element local');
       }
 
       // Ajouter les tracks au peer connection existant
