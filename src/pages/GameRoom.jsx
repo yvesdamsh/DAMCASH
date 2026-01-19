@@ -197,45 +197,7 @@ export default function GameRoom() {
     }
   }, [session?.status, session?.winner_id, user?.id, opponent?.full_name, victoryByResignModal]);
 
-  // Polling: vérifier toutes les 2 secondes si la partie est terminée
-  useEffect(() => {
-    if (!roomId || !user || isSpectator || !gameStarted) return;
 
-    const checkSessionStatus = async () => {
-      try {
-        const sessions = await base44.entities.GameSession.filter({ room_id: roomId });
-        if (sessions.length === 0) return;
-
-        const currentSession = sessions[0];
-        console.log('Polling - roomId:', roomId);
-        console.log('Polling - status:', currentSession?.status);
-        console.log('Polling - winner_id:', currentSession?.winner_id);
-        console.log('Polling - user.id:', user?.id);
-        console.log('Polling - isCurrentUserWinner:', currentSession?.winner_id === user?.id);
-
-        // Si la partie est terminée et que le joueur actuel EST le gagnant
-        if (currentSession.status === 'finished' && currentSession.winner_id) {
-          const isCurrentUserWinner = currentSession.winner_id === user.id;
-          
-          if (isCurrentUserWinner && !victoryByResignModal) {
-            // Je suis le GAGNANT - afficher la victoire
-            const loserName = user.id === currentSession.player1_id 
-              ? (currentSession.player2_name || opponent?.full_name || 'Votre adversaire')
-              : (currentSession.player1_name || opponent?.full_name || 'Votre adversaire');
-
-            console.log('Modal victoire pour gagnant. Perdant:', loserName);
-            setResignationMessage(loserName);
-            setVictoryByResignModal(true);
-          }
-        }
-      } catch (e) {
-        console.log('Erreur polling session:', e?.message || e);
-      }
-    };
-
-    const interval = setInterval(checkSessionStatus, 2000);
-    return () => clearInterval(interval);
-  }, [roomId, user?.id, isSpectator, gameStarted, victoryByResignModal]);
 
   // Chat: charger + realtime messages
   useEffect(() => {
