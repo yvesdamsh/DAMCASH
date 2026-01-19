@@ -169,9 +169,9 @@ export default function VideoCall({
         sendSignal('offer', offer);
       }
     } catch (error) {
-      console.log('Erreur activation caméra:', error);
-      setCameraError(true);
-    }
+        console.error('❌ Erreur activation caméra:', error.name, error.message);
+        setCameraError(true);
+      }
   };
 
   const deactivateCamera = () => {
