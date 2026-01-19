@@ -261,10 +261,19 @@ export default function GameRoom() {
 
   // Realtime: écouter les événements de jeu (abandon)
   useEffect(() => {
-    if (!roomId || !user || isSpectator) return;
+    if (!roomId || !user || isSpectator) {
+      console.log('GameEvent listener non activé - roomId:', roomId, 'user:', user?.id, 'isSpectator:', isSpectator);
+      return;
+    }
+
+    console.log('GameEvent listener activé pour roomId:', roomId, 'userId:', user.id);
 
     const unsubscribe = base44.entities.GameEvent?.subscribe?.((event) => {
-      if (!event?.data || event.data.room_id !== roomId) return;
+      console.log('GameEvent reçu:', event?.type, 'type:', event?.data?.type, 'winner_id:', event?.data?.winner_id, 'current user:', user.id);
+      if (!event?.data || event.data.room_id !== roomId) {
+        console.log('GameEvent ignoré - room mismatch ou pas de data');
+        return;
+      }
 
       // ADVERSAIRE ABANDONNE: Je suis le gagnant
       if (event?.type === 'create' && event.data.type === 'resign' && event.data.winner_id === user.id && !victoryByResignModal) {
