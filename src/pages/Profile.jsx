@@ -3,9 +3,10 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, MessageSquare, BarChart3, History, Award, Settings } from 'lucide-react';
+import { ArrowLeft, MessageSquare, BarChart3, History, Award, Settings, Camera, Loader } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 import MessagesTab from '../components/profile/MessagesTab';
 import StatsTab from '../components/profile/StatsTab';
 import HistoryTab from '../components/profile/HistoryTab';
@@ -16,6 +17,8 @@ export default function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = React.useRef(null);
 
   useEffect(() => {
     loadUser();
@@ -29,6 +32,40 @@ export default function Profile() {
       navigate('/Home');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validation du type
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Format non autorisé (JPG, PNG, GIF seulement)');
+      return;
+    }
+
+    // Validation de la taille (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Fichier trop volumineux (max 5MB)');
+      return;
+    }
+
+    try {
+      setUploadingAvatar(true);
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      
+      await base44.auth.updateMe({ avatar_url: file_url });
+      
+      setUser(prev => ({ ...prev, avatar_url: file_url }));
+      toast.success('📷 Photo mise à jour!');
+    } catch (error) {
+      toast.error('Erreur lors du téléchargement');
+      console.error(error);
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -75,12 +112,35 @@ export default function Profile() {
           className="bg-gradient-to-br from-white/10 to-white/5 border border-[#D4A574]/30 rounded-xl p-8 mb-8"
         >
           <div className="flex flex-col md:flex-row items-center gap-8">
-            <Avatar className="w-32 h-32 border-4 border-[#D4A574] flex-shrink-0">
-              <AvatarImage src={user?.avatar_url} />
-              <AvatarFallback className="bg-[#8B5A2B] text-2xl font-bold">
-                {user?.full_name?.charAt(0) || 'U'}
-              </AvatarFallback>
-            </Avatar>
+            <div className="relative group">
+              <Avatar className="w-32 h-32 border-4 border-[#D4A574] flex-shrink-0">
+                <AvatarImage src={user?.avatar_url} />
+                <AvatarFallback className="bg-[#8B5A2B] text-2xl font-bold">
+                  {user?.full_name?.charAt(0) || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingAvatar}
+                className="absolute inset-0 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center disabled:bg-black/50"
+              >
+                {uploadingAvatar ? (
+                  <Loader className="w-6 h-6 text-white animate-spin" />
+                ) : (
+                  <Camera className="w-6 h-6 text-white" />
+                )}
+              </button>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".jpg,.jpeg,.png,.gif"
+                onChange={handleAvatarUpload}
+                disabled={uploadingAvatar}
+                className="hidden"
+              />
+            </div>
 
             <div className="flex-1 text-center md:text-left">
               <h2 className="text-4xl font-black text-white mb-2">{user?.full_name}</h2>
@@ -110,26 +170,41 @@ export default function Profile() {
 
         {/* Tabs */}
         <Tabs defaultValue="stats" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-white/5 border border-[#D4A574]/20 rounded-lg p-1 mb-8">
-            <TabsTrigger value="stats" className="flex items-center gap-2">
+          <TabsList className="flex flex-wrap gap-2 bg-transparent border-0 p-0 mb-8 h-auto">
+            <TabsTrigger 
+              value="stats" 
+              className="flex items-center gap-2 px-5 py-3 rounded-lg border-0 text-sm font-medium bg-transparent text-[#D4A574]/70 hover:bg-white/5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-600 data-[state=active]:text-white transition-all"
+            >
               <BarChart3 className="w-4 h-4" />
-              <span className="hidden sm:inline">Statistiques</span>
+              📊 Statistiques
             </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center gap-2">
-              <History className="w-4 h-4" />
-              <span className="hidden sm:inline">Historique</span>
-            </TabsTrigger>
-            <TabsTrigger value="messages" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="messages" 
+              className="flex items-center gap-2 px-5 py-3 rounded-lg border-0 text-sm font-medium bg-transparent text-[#D4A574]/70 hover:bg-white/5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-600 data-[state=active]:text-white transition-all"
+            >
               <MessageSquare className="w-4 h-4" />
-              <span className="hidden sm:inline">Messages</span>
+              📩 Messages
             </TabsTrigger>
-            <TabsTrigger value="badges" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="history" 
+              className="flex items-center gap-2 px-5 py-3 rounded-lg border-0 text-sm font-medium bg-transparent text-[#D4A574]/70 hover:bg-white/5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-600 data-[state=active]:text-white transition-all"
+            >
+              <History className="w-4 h-4" />
+              📜 Historique
+            </TabsTrigger>
+            <TabsTrigger 
+              value="badges" 
+              className="flex items-center gap-2 px-5 py-3 rounded-lg border-0 text-sm font-medium bg-transparent text-[#D4A574]/70 hover:bg-white/5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-600 data-[state=active]:text-white transition-all"
+            >
               <Award className="w-4 h-4" />
-              <span className="hidden sm:inline">Badges</span>
+              🏆 Badges
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="settings" 
+              className="flex items-center gap-2 px-5 py-3 rounded-lg border-0 text-sm font-medium bg-transparent text-[#D4A574]/70 hover:bg-white/5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-600 data-[state=active]:text-white transition-all"
+            >
               <Settings className="w-4 h-4" />
-              <span className="hidden sm:inline">Paramètres</span>
+              ⚙️ Paramètres
             </TabsTrigger>
           </TabsList>
 
