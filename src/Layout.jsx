@@ -4,7 +4,7 @@ import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
 import { Home, Search, Gamepad2, Mail, Trophy, Gem, User, LogOut, Menu, X, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import UserAvatar from '@/components/ui/UserAvatar';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationBadge from './components/notifications/NotificationBadge.jsx';
 import { toast } from 'sonner';
@@ -239,12 +239,7 @@ export default function Layout({ children, currentPageName }) {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                      <Avatar className="w-9 h-9 border-2 border-[#D4A574]/50">
-                        <AvatarImage src={userData?.avatar_url} />
-                        <AvatarFallback className="bg-[#5D3A1A] text-[#F5E6D3]">
-                          {user.full_name?.charAt(0) || 'U'}
-                        </AvatarFallback>
-                      </Avatar>
+                      <UserAvatar user={user} size="sm" className="border-[#D4A574]/50" />
                       <span className="text-sm font-medium hidden sm:block">{user.full_name}</span>
                     </button>
                   </DropdownMenuTrigger>
