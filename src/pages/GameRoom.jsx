@@ -1212,7 +1212,7 @@ export default function GameRoom() {
             </div>
           </div>
 
-          {/* Mobile: Joueur 1 + Caméras Horizontales + Joueur 2 */}
+          {/* Mobile: Joueur 1 et Joueur 2 */}
           <div className="md:hidden flex flex-col gap-2">
             {/* Ligne 1: Joueur 1 */}
             <div className="flex items-center gap-2">
@@ -1244,48 +1244,7 @@ export default function GameRoom() {
               </motion.div>
             </div>
 
-            {/* Ligne 2: Caméras Horizontales */}
-            {!isSpectator && (
-              <div className="flex gap-1 h-[120px]">
-                {/* Caméra Joueur 1 */}
-                <div className="relative flex-1 rounded-lg overflow-hidden bg-black shadow-lg border border-[#D4A574]/50">
-                  {session.player1_id === user?.id && localCameraActive ? (
-                    <video autoPlay playsInline muted className="w-full h-full object-cover scaleX-[-1]" id="local-video-p1-mobile" />
-                  ) : session.player1_id !== user?.id && remoteCameraActive ? (
-                    <video autoPlay playsInline className="w-full h-full object-cover" id="remote-video-p1-mobile" />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800">
-                      <span className="text-xs">🚫📹</span>
-                      {session.player1_id === user?.id && (
-                        <button onClick={() => setLocalCameraActive(true)} className="mt-1 px-1.5 py-0.5 bg-blue-600/90 text-white text-xs rounded">
-                          Activer
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Caméra Joueur 2 */}
-                <div className="relative flex-1 rounded-lg overflow-hidden bg-black shadow-lg border border-[#D4A574]/50">
-                  {session.player2_id === user?.id && localCameraActive ? (
-                    <video autoPlay playsInline muted className="w-full h-full object-cover scaleX-[-1]" id="local-video-p2-mobile" />
-                  ) : session.player2_id !== user?.id && remoteCameraActive ? (
-                    <video autoPlay playsInline className="w-full h-full object-cover" id="remote-video-p2-mobile" />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800">
-                      <span className="text-xs">🚫📹</span>
-                      {session.player2_id === user?.id && (
-                        <button onClick={() => setLocalCameraActive(true)} className="mt-1 px-1.5 py-0.5 bg-blue-600/90 text-white text-xs rounded">
-                          Activer
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Ligne 3: Joueur 2 */}
+            {/* Ligne 2: Joueur 2 */}
             <div className="flex items-center gap-2">
               <Avatar className="w-9 h-9 border-2 border-[#D4A574] flex-shrink-0">
                 <AvatarImage src={session.player2_id === user?.id ? user?.avatar_url : opponent?.avatar_url} />
