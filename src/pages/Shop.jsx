@@ -329,26 +329,48 @@ export default function Shop() {
                     </div>
                   </div>
 
-                  {isOwned(item.id) ? (
-                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                      <Check className="w-3 h-3 mr-1" />
-                      Possédé
-                    </Badge>
-                  ) : (
-                    <Button
-                      onClick={() => handlePurchase(item)}
-                      className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 whitespace-nowrap"
-                    >
-                      {item.real_price ? (
-                        <span>{item.real_price}</span>
-                      ) : (
-                        <>
-                          <Gem className="w-4 h-4 mr-1" />
-                          {item.price_gems}
-                        </>
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="flex gap-2">
+                      {isEquipped(item.id) && (
+                        <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                          <Check className="w-3 h-3 mr-1" />
+                          Équipé
+                        </Badge>
                       )}
-                    </Button>
-                  )}
+                      {isOwned(item.id) && !isEquipped(item.id) && (
+                        <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                          <Check className="w-3 h-3 mr-1" />
+                          Possédé
+                        </Badge>
+                      )}
+                    </div>
+
+                    {isOwned(item.id) && !isEquipped(item.id) && item.category !== 'gems' && (
+                      <Button
+                        onClick={() => handleEquipItem(item.id)}
+                        variant="outline"
+                        className="border-amber-500/30 text-amber-300 hover:bg-amber-500/10 whitespace-nowrap"
+                      >
+                        Équiper
+                      </Button>
+                    )}
+
+                    {!isOwned(item.id) && (
+                      <Button
+                        onClick={() => handlePurchaseClick(item)}
+                        className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 whitespace-nowrap"
+                      >
+                        {item.real_price ? (
+                          <span>{item.real_price}</span>
+                        ) : (
+                          <>
+                            <Gem className="w-4 h-4 mr-1" />
+                            {item.price_gems}
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
