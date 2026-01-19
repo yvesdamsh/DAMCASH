@@ -55,6 +55,8 @@ export default function GameRoom() {
   const [opponentNameForDraw, setOpponentNameForDraw] = useState('');
   const [victoryByResignModal, setVictoryByResignModal] = useState(false);
   const [resignationMessage, setResignationMessage] = useState('');
+  const [localStream, setLocalStream] = useState(null);
+  const localVideoRef = useRef(null);
 
 
   // Charger les données initiales
