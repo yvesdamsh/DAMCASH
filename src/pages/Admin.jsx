@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import UserAvatar from '@/components/ui/UserAvatar';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, AlertTriangle, Ban, MessageSquare, Search, Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -252,10 +252,7 @@ export default function Admin() {
                       className="flex items-center justify-between p-4 bg-white/5 border border-red-500/20 rounded-lg hover:bg-white/10 transition-all"
                     >
                       <div className="flex items-center gap-3 flex-1">
-                        <Avatar className="w-10 h-10">
-                          <AvatarImage src={u.avatar_url} />
-                          <AvatarFallback className="bg-red-600 text-xs">{u.full_name?.charAt(0)}</AvatarFallback>
-                        </Avatar>
+                        <UserAvatar user={u} size="default" className="border-red-500/50" />
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-sm">{u.full_name}</p>
                           <p className="text-xs text-red-300">{u.email}</p>
