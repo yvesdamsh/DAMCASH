@@ -104,8 +104,8 @@ const ChessSquare = memo(({
                         onDragEnd={handleDragEnd}
                         dragConstraints={boardRef}
                         canDrag={canInteract && (
-                            (currentTurn === 'white' && typeof piece === 'string' && piece === piece.toUpperCase()) ||
-                            (currentTurn === 'black' && typeof piece === 'string' && piece === piece.toLowerCase())
+                            (currentTurn === 'white' && typeof piece === 'string' && piece === piece.toUpperCase() && (!isMultiplayer || playerColor === 'white')) ||
+                            (currentTurn === 'black' && typeof piece === 'string' && piece === piece.toLowerCase() && (!isMultiplayer || playerColor === 'black'))
                         )}
                         animateFrom={animDelta}
                     />
@@ -135,20 +135,40 @@ export default function ChessBoard({
   onGameEnd,
   theme = 'standard', 
   pieceSet = 'standard',
-  orientation = 'white' 
+  orientation = 'white',
+  isMultiplayer = false,
+  canMove = true,
+  initialBoardState = null,
+  onSaveMove = null,
+  blockBoard = false,
+  currentTurnOverride = null
 }) {
-  const [board, setBoard] = useState(createInitialBoard());
+  const [board, setBoard] = useState(initialBoardState || createInitialBoard());
   const [selectedSquare, setSelectedSquare] = useState(null);
   const [validMoves, setValidMoves] = useState([]);
-  const [currentTurn, setCurrentTurn] = useState('white');
+  const [currentTurn, setCurrentTurn] = useState(currentTurnOverride || 'white');
   const [lastMove, setLastMove] = useState(null);
   const [lastDragMove, setLastDragMove] = useState(null);
   const [premove, setPremove] = useState(null);
 
-  const canInteract = true;
+  const canInteract = !blockBoard && (isMultiplayer ? canMove : true);
   const boardRef = useRef(null);
   const boardOrientation = orientation || (playerColor === 'black' ? 'black' : 'white');
   const isFlipped = boardOrientation === 'black';
+
+  // Sync avec initialBoardState
+  useEffect(() => {
+    if (initialBoardState) {
+      setBoard(initialBoardState);
+    }
+  }, [initialBoardState]);
+
+  // Sync avec currentTurnOverride
+  useEffect(() => {
+    if (currentTurnOverride) {
+      setCurrentTurn(currentTurnOverride);
+    }
+  }, [currentTurnOverride]);
 
   const targetMap = useMemo(() => {
     const map = new Set();
@@ -174,6 +194,8 @@ export default function ChessBoard({
   }, [board]);
 
   const handleSquareClick = (r, c) => {
+    if (!canInteract) return;
+    
     const piece = board[r][c];
     const pieceColor = piece ? (piece === piece.toUpperCase() ? 'white' : 'black') : null;
 
@@ -181,7 +203,7 @@ export default function ChessBoard({
       const move = validMoves.find(m => m.to.r === r && m.to.c === c);
       if (move) {
         makeMove(selectedSquare[0], selectedSquare[1], r, c);
-      } else if (piece && pieceColor === currentTurn) {
+      } else if (piece && pieceColor === currentTurn && pieceColor === (playerColor || 'white')) {
         setSelectedSquare([r, c]);
         setValidMoves(getValidMovesForPiece(r, c));
       } else {
@@ -189,7 +211,7 @@ export default function ChessBoard({
         setValidMoves([]);
       }
     } else {
-      if (piece && pieceColor === currentTurn) {
+      if (piece && pieceColor === currentTurn && pieceColor === (playerColor || 'white')) {
         setSelectedSquare([r, c]);
         setValidMoves(getValidMovesForPiece(r, c));
       }
@@ -197,6 +219,8 @@ export default function ChessBoard({
   };
 
   const handlePieceDrop = (fromR, fromC, toR, toC) => {
+    if (!canInteract) return;
+    
     const move = validMoves.find(m => m.to.r === toR && m.to.c === toC);
     if (move) {
       setLastDragMove({ from: { r: fromR, c: fromC }, to: { r: toR, c: toC } });
@@ -283,6 +307,7 @@ export default function ChessBoard({
 
   const makeMove = (fromR, fromC, toR, toC) => {
     const newBoard = board.map(row => [...row]);
+    const capturedPiece = newBoard[toR][toC];
     newBoard[toR][toC] = newBoard[fromR][fromC];
     newBoard[fromR][fromC] = null;
     
@@ -290,7 +315,33 @@ export default function ChessBoard({
     setLastMove({ from: { r: fromR, c: fromC }, to: { r: toR, c: toC } });
     setSelectedSquare(null);
     setValidMoves([]);
-    setCurrentTurn(currentTurn === 'white' ? 'black' : 'white');
+    
+    const nextTurn = currentTurn === 'white' ? 'black' : 'white';
+    setCurrentTurn(nextTurn);
+
+    // Mode multijoueur: sauvegarder le coup
+    if (isMultiplayer && onSaveMove) {
+      onSaveMove(newBoard, nextTurn);
+    }
+
+    // Vérifier échec et mat (simplifié)
+    const opponentColor = nextTurn;
+    const opponentKing = opponentColor === 'white' ? 'K' : 'k';
+    let kingFound = false;
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        if (newBoard[r][c] === opponentKing) {
+          kingFound = true;
+          break;
+        }
+      }
+      if (kingFound) break;
+    }
+
+    if (!kingFound && onGameEnd) {
+      const winner = currentTurn === 'white' ? 'whiteWins' : 'blackWins';
+      setTimeout(() => onGameEnd(winner), 500);
+    }
   };
 
   const rows = isFlipped ? [7,6,5,4,3,2,1,0] : [0,1,2,3,4,5,6,7];
