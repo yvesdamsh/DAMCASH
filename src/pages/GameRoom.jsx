@@ -1038,22 +1038,24 @@ export default function GameRoom() {
   }
 
   // Interface multijoueur complète
-  {/* Modal: Proposition de nul à envoyer */}
-  <DrawProposalModal
-    open={showDrawProposalModal}
-    onConfirm={confirmDrawProposal}
-    onCancel={() => setShowDrawProposalModal(false)}
-    isLoading={drawProposalLoading}
-  />
+  return (
+    <>
+      {/* Modal: Proposition de nul à envoyer */}
+      <DrawProposalModal
+        open={showDrawProposalModal}
+        onConfirm={confirmDrawProposal}
+        onCancel={() => setShowDrawProposalModal(false)}
+        isLoading={drawProposalLoading}
+      />
 
-  {/* Modal: Proposition de nul reçue */}
-  <DrawResponseModal
-    open={!!incomingDrawOffer}
-    onAccept={handleAcceptDraw}
-    onReject={handleDeclineDraw}
-    opponentName={incomingDrawOffer?.from_player_name}
-    isLoading={false}
-  />
+      {/* Modal: Proposition de nul reçue */}
+      <DrawResponseModal
+        open={!!incomingDrawOffer}
+        onAccept={handleAcceptDraw}
+        onReject={handleDeclineDraw}
+        opponentName={incomingDrawOffer?.from_player_name}
+        isLoading={false}
+      />
 
       {/* Modal: Confirmation abandon */}
       <Dialog open={showResignConfirm} onOpenChange={setShowResignConfirm}>
