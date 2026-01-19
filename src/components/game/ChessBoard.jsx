@@ -329,10 +329,9 @@ export default function ChessBoard({
                   backgroundColor: (r + c) % 2 === 0 ? '#F0D9B5' : '#B58863',
                   cursor: 'pointer',
                   fontSize: '48px',
-                  color: pieceColor === 'white' ? '#FFFFFF' : '#000000',
-                  textShadow: pieceColor === 'white' 
-                    ? '0 0 3px #000000, 0 0 5px #000000' 
-                    : '0 0 3px #FFFFFF, 0 0 5px #FFFFFF',
+                  color: pieceColor === 'white' ? '#FFFFFF' : '#1a1a1a',
+                  WebkitTextStroke: pieceColor === 'white' ? '1px #000000' : '1px #666666',
+                  filter: pieceColor === 'white' ? 'drop-shadow(0 2px 2px rgba(0,0,0,0.5))' : 'drop-shadow(0 1px 1px rgba(255,255,255,0.3))',
                   fontWeight: 'bold',
                   boxShadow: isSelected ? 'inset 0 0 0 4px #FFD700' : isValidMove ? 'inset 0 0 0 3px #4ADE80' : 'none',
                   position: 'relative'
