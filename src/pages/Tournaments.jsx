@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Users, Clock, Crown, Circle, Calendar, Gem, Zap, Flame, ChevronRight } from 'lucide-react';
+import { Trophy, Users, Clock, Crown, Circle, Calendar, Gem, Zap, Flame, ChevronRight, Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { motion } from 'framer-motion';
+import CreateTournamentModal from '../components/tournament/CreateTournamentModal';
 
 export default function Tournaments() {
   const [user, setUser] = useState(null);
