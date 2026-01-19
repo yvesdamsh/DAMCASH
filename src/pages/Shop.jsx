@@ -92,37 +92,7 @@ export default function Shop() {
 
   const displayItems = shopItems.length > 0 ? shopItems : mockItems;
 
-  const handlePurchase = async (item) => {
-    if (!user) {
-      base44.auth.redirectToLogin();
-      return;
-    }
 
-    if (item.category === 'gems') {
-      alert('Redirection vers le paiement...');
-      return;
-    }
-
-    if ((user.gems || 0) < item.price_gems) {
-      alert('Vous n\'avez pas assez de gemmes !');
-      return;
-    }
-
-    try {
-      await base44.auth.updateMe({
-        gems: (user.gems || 100) - item.price_gems,
-        purchased_items: [...(user.purchased_items || []), item.id]
-      });
-      setUser(prev => ({
-        ...prev,
-        gems: (prev.gems || 100) - item.price_gems,
-        purchased_items: [...(prev.purchased_items || []), item.id]
-      }));
-      alert('Achat réussi !');
-    } catch (error) {
-      console.error('Purchase error:', error);
-    }
-  };
 
   const isOwned = (itemId) => inventory.some(inv => inv.item_id === itemId);
   const isEquipped = (itemId) => inventory.some(inv => inv.item_id === itemId && inv.is_equipped);
