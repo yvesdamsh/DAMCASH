@@ -1099,7 +1099,7 @@ export default function GameRoom() {
       </div>
 
       {/* Plateau de jeu */}
-      <div className="flex-1 flex items-center justify-center overflow-auto p-6 relative">
+      <div className="flex-1 flex items-center justify-center p-6 relative">
         {!gameStarted && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="text-center">
