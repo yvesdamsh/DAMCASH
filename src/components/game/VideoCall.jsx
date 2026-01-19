@@ -231,13 +231,14 @@ export default function VideoCall({
         {/* Vidéo Adversaire */}
         <div className="relative w-20 h-16 rounded-lg overflow-hidden bg-black shadow-lg border border-[#D4A574]/50 group flex-shrink-0">
           {remoteStream ? (
-            <video
-              ref={remoteVideoRef}
-              autoPlay
-              playsInline
-              className="w-full h-full object-cover"
-            />
-          ) : (
+              <video
+                ref={remoteVideoRef}
+                autoPlay
+                playsInline
+                muted={false}
+                className="w-full h-full object-cover"
+              />
+            ) : (
             <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800">
               <span className="text-lg">🚫📹</span>
               <p className="text-xs text-white/60 mt-1 text-center px-1">Caméra désactivée</p>
