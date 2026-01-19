@@ -178,20 +178,24 @@ export default function GameRoom() {
   };
   }, [roomId]);
 
-  // Écouter les changements de status pour montrer le modal victoire par abandon
+  // Écouter les changements de session pour detecter l'abandon
   useEffect(() => {
-    if (!session || !user || session.status !== 'finished') return;
+    if (!session || !user || victoryByResignModal) return;
 
-    const isCurrentUserWinner = session.winner_id === user.id;
-    if (!isCurrentUserWinner) return;
+    // Si la partie est terminée
+    if (session.status === 'finished') {
+      // Si je suis le gagnant, afficher le modal
+      if (session.winner_id === user.id) {
+        const loserName = user.id === session.player1_id 
+          ? (session.player2_name || opponent?.full_name || 'Votre adversaire')
+          : (session.player1_name || opponent?.full_name || 'Votre adversaire');
 
-    const loserName = user.id === session.player1_id 
-      ? (session.player2_name || opponent?.full_name || 'Votre adversaire')
-      : (session.player1_name || 'Votre adversaire');
-
-    setResignationMessage(loserName);
-    setVictoryByResignModal(true);
-  }, [session?.status, session?.winner_id, user?.id]);
+        console.log('Victoire détectée - gagnant:', user.id, 'perdant:', loserName);
+        setResignationMessage(loserName);
+        setVictoryByResignModal(true);
+      }
+    }
+  }, [session?.status, session?.winner_id, user?.id, opponent?.full_name, victoryByResignModal]);
 
   // Polling: vérifier toutes les 2 secondes si la partie est terminée
   useEffect(() => {
