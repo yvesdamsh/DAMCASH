@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 
-export default function HeroSection() {
+export default function HeroSection({ gameType }) {
   const [stats, setStats] = useState({
     onlinePlayers: 1234,
     activeGames: 456
