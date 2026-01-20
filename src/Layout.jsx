@@ -107,13 +107,16 @@ export default function Layout({ children, currentPageName }) {
             // Mettre à jour
             await base44.entities.OnlineUser.update(existingOnlineUser[0].id, {
               status: 'online',
-              last_seen: new Date().toISOString()
+              last_seen: new Date().toISOString(),
+              avatar_url: currentUser.photoURL || currentUser.avatar_url || null,
+              username: currentUser.full_name
             });
           } else {
             // Créer nouvelle entrée
             await base44.entities.OnlineUser.create({
               user_id: currentUser.id,
               username: currentUser.full_name,
+              avatar_url: currentUser.photoURL || currentUser.avatar_url || null,
               status: 'online',
               last_seen: new Date().toISOString()
             });
