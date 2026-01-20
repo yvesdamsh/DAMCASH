@@ -103,20 +103,32 @@ export default function CreateRoomModal({ isOpen, onClose, user, onRoomCreated }
               </select>
             </div>
 
-            {/* Temps */}
+            {/* Temps - Grid moderne */}
             <div>
-              <label className="text-sm text-[#D4A574] mb-1 block">Contrôle du temps</label>
-              <select
-                value={formData.time_control}
-                onChange={(e) => setFormData({ ...formData, time_control: e.target.value })}
-                className="w-full bg-[#5D3A1A] border border-[#D4A574]/30 rounded-lg px-3 py-2 text-[#F5E6D3] focus:outline-none focus:border-[#D4A574]"
-              >
-                <option value="bullet">Bullet (1 min)</option>
-                <option value="blitz">Blitz (3 min)</option>
-                <option value="rapid">Rapide (10 min)</option>
-                <option value="classic">Classique (30 min)</option>
-                <option value="unlimited">Illimité</option>
-              </select>
+              <label className="text-sm text-[#D4A574] mb-3 block font-semibold">Mode de jeu</label>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { value: 'bullet', label: 'Rapide', time: '1 min', icon: '⚡' },
+                  { value: 'blitz', label: 'Blitz', time: '3-5 min', icon: '🔥' },
+                  { value: 'rapid', label: 'Rapide', time: '10 min', icon: '⏱️' },
+                  { value: 'classic', label: 'Classique', time: '30 min', icon: '🏆' },
+                ].map((mode) => (
+                  <button
+                    key={mode.value}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, time_control: mode.value })}
+                    className={`p-4 rounded-lg border-2 transition-all text-left ${
+                      formData.time_control === mode.value
+                        ? 'border-[#D4A574] bg-[#D4A574]/10 shadow-lg'
+                        : 'border-[#D4A574]/30 bg-[#5D3A1A] hover:border-[#D4A574]/60'
+                    }`}
+                  >
+                    <div className="text-2xl mb-2">{mode.icon}</div>
+                    <div className="font-bold text-[#F5E6D3]">{mode.label}</div>
+                    <div className="text-xs text-[#D4A574]">{mode.time}</div>
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Privé */}
