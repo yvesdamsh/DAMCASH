@@ -10,6 +10,8 @@ import Invitations from './pages/Invitations';
 import Leaderboard from './pages/Leaderboard';
 import Notifications from './pages/Notifications';
 import Play from './pages/Play';
+import PlayCheckers from './pages/PlayCheckers';
+import PlayChess from './pages/PlayChess';
 import Profile from './pages/Profile';
 import Puzzles from './pages/Puzzles';
 import ReviewGame from './pages/ReviewGame';
@@ -19,8 +21,6 @@ import Search from './pages/Search';
 import Shop from './pages/Shop';
 import Spectate from './pages/Spectate';
 import Tournaments from './pages/Tournaments';
-import PlayChess from './pages/PlayChess';
-import PlayCheckers from './pages/PlayCheckers';
 import __Layout from './Layout.jsx';
 
 
@@ -37,6 +37,8 @@ export const PAGES = {
     "Leaderboard": Leaderboard,
     "Notifications": Notifications,
     "Play": Play,
+    "PlayCheckers": PlayCheckers,
+    "PlayChess": PlayChess,
     "Profile": Profile,
     "Puzzles": Puzzles,
     "ReviewGame": ReviewGame,
@@ -46,8 +48,6 @@ export const PAGES = {
     "Shop": Shop,
     "Spectate": Spectate,
     "Tournaments": Tournaments,
-    "PlayChess": PlayChess,
-    "PlayCheckers": PlayCheckers,
 }
 
 export const pagesConfig = {

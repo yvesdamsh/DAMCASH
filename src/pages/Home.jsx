@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import GameCard from '../components/game/GameCard';
 import QuickAccessButton from '../components/game/QuickAccessButton';
+import LiveTournaments from '../components/home/LiveTournaments';
+import Colisee from '../components/home/Colisee';
 import { Crown, Users, ShoppingBag, UserPlus, Building, Puzzle, Trophy, TrendingUp, Eye, Swords } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -182,6 +184,12 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Live Tournaments */}
+      <LiveTournaments />
+
+      {/* Colisée */}
+      <Colisee />
 
       {/* Game Cards Grid */}
       <div className="grid grid-cols-2 gap-4 mb-8">
