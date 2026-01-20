@@ -28,63 +28,35 @@ export default function HeroSection({ gameType }) {
   }, []);
 
   return (
-    <div className="relative overflow-hidden rounded-3xl mb-12 h-80">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-orange-500 to-amber-600 opacity-80">
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-orange-500 via-purple-600 to-amber-600 opacity-0"
-          animate={{
-            opacity: [0, 0.3, 0]
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-      </div>
-
-      {/* Animated particles */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(5)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-64 h-64 rounded-full bg-white/10 blur-3xl"
-            animate={{
-              x: [Math.random() * 100 - 50, Math.random() * 100 - 50],
-              y: [Math.random() * 100 - 50, Math.random() * 100 - 50],
-            }}
-            transition={{
-              duration: Math.random() * 4 + 4,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-          />
-        ))}
-      </div>
+    <div className="relative overflow-hidden rounded-xl mb-12 border border-[#D4A574]/30 bg-gradient-to-br from-[#2C1810] to-[#5D3A1A]">
+      {/* Subtle pattern overlay */}
+      <div className="absolute inset-0 opacity-10" style={{
+        backgroundImage: 'linear-gradient(45deg, #D4A574 25%, transparent 25%, transparent 75%, #D4A574 75%, #D4A574), linear-gradient(45deg, #D4A574 25%, transparent 25%, transparent 75%, #D4A574 75%, #D4A574)',
+        backgroundSize: '60px 60px',
+        backgroundPosition: '0 0, 30px 30px'
+      }} />
 
       {/* Content */}
-      <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
-        <motion.h1
+      <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 py-16">
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-5xl md:text-6xl font-black text-white mb-4 drop-shadow-lg"
+          className="mb-8"
         >
-          🎮 Affrontez les meilleurs joueurs
-        </motion.h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-[#F5E6D3] mb-3">
+            Affrontez les meilleurs joueurs
+          </h1>
+          <div className="h-1 w-24 bg-gradient-to-r from-transparent via-[#D4A574] to-transparent mx-auto" />
+        </motion.div>
 
         <motion.p
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="text-xl md:text-2xl text-white/90 mb-8 drop-shadow"
+          className="text-lg md:text-xl text-[#D4A574] mb-10 max-w-2xl"
         >
-          Choisissez votre mode de jeu et gagnez des gemmes
+          Choisissez votre mode de jeu et démontrez votre maîtrise
         </motion.p>
 
         {/* Stats */}
@@ -92,28 +64,20 @@ export default function HeroSection({ gameType }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="flex gap-8 md:gap-16"
+          className="flex gap-12 md:gap-20"
         >
           <div className="text-center">
-            <motion.div
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg"
-            >
+            <div className="text-3xl md:text-4xl font-bold text-[#D4A574] mb-2">
               {stats.onlinePlayers.toLocaleString()}
-            </motion.div>
-            <p className="text-white/80 text-sm">Joueurs en ligne</p>
+            </div>
+            <p className="text-[#F5E6D3]/70 text-sm uppercase tracking-wider">Joueurs en ligne</p>
           </div>
-          <div className="h-12 w-0.5 bg-white/30" />
+          <div className="h-16 w-px bg-[#D4A574]/30" />
           <div className="text-center">
-            <motion.div
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-              className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg"
-            >
+            <div className="text-3xl md:text-4xl font-bold text-[#D4A574] mb-2">
               {stats.activeGames.toLocaleString()}
-            </motion.div>
-            <p className="text-white/80 text-sm">Parties actives</p>
+            </div>
+            <p className="text-[#F5E6D3]/70 text-sm uppercase tracking-wider">Parties actives</p>
           </div>
         </motion.div>
       </div>

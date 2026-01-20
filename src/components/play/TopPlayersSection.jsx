@@ -46,10 +46,12 @@ export default function TopPlayersSection({ gameType }) {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Main leaderboard */}
       <div className="lg:col-span-2">
-        <h2 className="text-3xl md:text-4xl font-black text-[#F5E6D3] mb-2">
-          🏆 Classement en direct
-        </h2>
-        <p className="text-[#D4A574] mb-6">Les meilleurs joueurs du moment</p>
+        <div className="border-l-4 border-[#D4A574] pl-6 mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-[#F5E6D3] mb-2">
+            Classement
+          </h2>
+          <p className="text-[#D4A574]">Les meilleurs joueurs du moment</p>
+        </div>
 
         <div className="space-y-3">
           {topPlayers.map((player, idx) => (
@@ -61,7 +63,7 @@ export default function TopPlayersSection({ gameType }) {
               whileHover={{ x: 8 }}
               className="relative group"
             >
-              <div className="bg-white/5 border border-white/10 hover:border-[#D4A574]/50 rounded-2xl p-4 transition-all hover:bg-white/10 backdrop-blur-sm">
+              <div className="bg-gradient-to-br from-[#2C1810] to-[#5D3A1A] border border-[#D4A574]/30 hover:border-[#D4A574]/60 rounded-lg p-4 transition-all hover:shadow-lg hover:shadow-[#D4A574]/10">
                 <div className="flex items-center justify-between gap-4">
                   {/* Rank and player info */}
                   <div className="flex items-center gap-4 flex-1">
@@ -94,8 +96,8 @@ export default function TopPlayersSection({ gameType }) {
 
         {/* View full leaderboard button */}
         <Link to={createPageUrl('Leaderboard')} className="mt-6 block">
-          <Button className="w-full bg-gradient-to-r from-[#D4A574] to-[#8B5A2B] text-[#2C1810] font-bold text-lg py-6 hover:shadow-lg hover:shadow-amber-500/50 transition-all">
-            Voir le classement complet →
+          <Button className="w-full bg-gradient-to-r from-[#D4A574] to-[#8B5A2B] text-[#2C1810] font-bold text-base py-6 hover:shadow-lg hover:shadow-[#D4A574]/30 transition-all rounded-lg">
+            Voir le classement complet
           </Button>
         </Link>
       </div>
@@ -107,26 +109,26 @@ export default function TopPlayersSection({ gameType }) {
           animate={{ opacity: 1, scale: 1 }}
           className="sticky top-20 h-fit"
         >
-          <div className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-3xl border-2 border-white/20 p-6 backdrop-blur-sm shadow-xl">
+          <div className="bg-gradient-to-br from-[#2C1810] to-[#5D3A1A] rounded-lg border-2 border-[#D4A574]/50 p-6 shadow-xl shadow-[#D4A574]/20">
             <div className="text-center">
-              <p className="text-white/80 text-sm mb-2">Ton classement</p>
-              <div className="text-5xl font-black text-white mb-4">#{userRank.rank}</div>
+              <p className="text-[#D4A574] text-sm uppercase tracking-wider mb-2">Votre classement</p>
+              <div className="text-5xl font-bold text-[#D4A574] mb-4">#{userRank.rank}</div>
               
               <UserAvatar user={currentUser} size="xl" className="mx-auto mb-4" />
               
-              <p className="text-2xl font-bold text-white mb-2">{currentUser.full_name}</p>
-              <p className="text-white/80 mb-6">
-                <span className="text-3xl font-black text-yellow-300">{userRank.elo}</span> ELO
+              <p className="text-xl font-bold text-[#F5E6D3] mb-2">{currentUser.full_name}</p>
+              <p className="text-[#D4A574] mb-6">
+                <span className="text-3xl font-bold text-[#F5E6D3]">{userRank.elo}</span> ELO
               </p>
 
-              <div className="space-y-2 text-sm text-white/80">
-                <p>📈 +45 ELO cette semaine</p>
-                <p>🎮 12 parties jouées</p>
-                <p>✅ 8 victoires</p>
+              <div className="space-y-2 text-sm text-[#D4A574] border-t border-b border-[#D4A574]/30 py-4">
+                <p>+45 ELO cette semaine</p>
+                <p>12 parties jouées</p>
+                <p>8 victoires</p>
               </div>
 
-              <Button className="w-full mt-6 bg-white text-purple-600 font-bold hover:bg-white/90">
-                Voir mes stats →
+              <Button className="w-full mt-6 bg-gradient-to-r from-[#D4A574] to-[#8B5A2B] text-[#2C1810] font-bold hover:shadow-lg hover:shadow-[#D4A574]/30 rounded-lg">
+                Voir mes statistiques
               </Button>
             </div>
           </div>
