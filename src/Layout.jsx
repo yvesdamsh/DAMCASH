@@ -42,7 +42,9 @@ export default function Layout({ children, currentPageName }) {
           if (results.length > 0) {
             await base44.entities.OnlineUser.update(results[0].id, {
               status: 'online',
-              last_seen: new Date().toISOString()
+              last_seen: new Date().toISOString(),
+              avatar_url: user.photoURL || user.avatar_url || null,
+              username: user.full_name
             });
           }
         });
