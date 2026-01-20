@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search as SearchIcon, UserPlus, User } from 'lucide-react';
+import UserAvatar from '@/components/ui/UserAvatar';
+import { Search as SearchIcon, UserPlus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { createPageUrl } from '../utils';
@@ -254,11 +254,13 @@ export default function Search() {
                className="flex items-center justify-between p-4 rounded-xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg hover:bg-white/15 hover:border-white/30 transition-all"
              >
               <div className="flex items-center gap-3 flex-1">
-                <Avatar className="w-10 h-10 bg-amber-900 text-amber-200">
-                  <AvatarFallback>
-                    <User className="w-5 h-5" />
-                  </AvatarFallback>
-                </Avatar>
+                <UserAvatar 
+                  user={{ 
+                    full_name: player.username,
+                    photoURL: player.avatar_url
+                  }}
+                  size="default"
+                />
                 <div className="flex items-center gap-2">
                   <h3 className="font-semibold text-white">{player.username}</h3>
                   <Badge className="bg-green-500 text-white">En ligne</Badge>
