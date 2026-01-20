@@ -7,7 +7,7 @@ import UserAvatar from '@/components/ui/UserAvatar';
 import { Button } from '@/components/ui/button';
 import { Medal, Crown } from 'lucide-react';
 
-export default function TopPlayersSection() {
+export default function TopPlayersSection({ gameType }) {
   const [topPlayers, setTopPlayers] = useState([]);
   const [userRank, setUserRank] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);

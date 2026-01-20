@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 
-export default function DailyChallengesSection() {
+export default function DailyChallengesSection({ gameType }) {
   const [timeLeft, setTimeLeft] = useState('18h 32min');
 
   useEffect(() => {

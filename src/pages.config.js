@@ -19,6 +19,8 @@ import Search from './pages/Search';
 import Shop from './pages/Shop';
 import Spectate from './pages/Spectate';
 import Tournaments from './pages/Tournaments';
+import PlayChess from './pages/PlayChess';
+import PlayCheckers from './pages/PlayCheckers';
 import __Layout from './Layout.jsx';
 
 
@@ -44,6 +46,8 @@ export const PAGES = {
     "Shop": Shop,
     "Spectate": Spectate,
     "Tournaments": Tournaments,
+    "PlayChess": PlayChess,
+    "PlayCheckers": PlayCheckers,
 }
 
 export const pagesConfig = {

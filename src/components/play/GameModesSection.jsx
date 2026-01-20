@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Check, Loader } from 'lucide-react';
 
-export default function GameModesSection() {
+export default function GameModesSection({ gameType }) {
   const navigate = useNavigate();
   const [selectedMode, setSelectedMode] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
