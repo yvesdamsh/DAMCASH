@@ -17,61 +17,34 @@ export default function Colisee() {
 
   const loadLiveGames = async () => {
     try {
-      // Récupérer les parties en cours avec le plus de spectateurs
-      const sessions = await base44.entities.GameSession.filter({ status: 'in_progress' }, '-created_date', 2);
+      // Récupérer TOUTES les parties en cours
+      const sessions = await base44.entities.GameSession.filter({ status: 'in_progress' });
       
       if (sessions.length > 0) {
-        // Enrichir avec les données utilisateur
-        const enrichedGames = await Promise.all(
-          sessions.map(async (session) => {
-            try {
-              const player1 = await base44.entities.User.filter({ id: session.player1_id }, '-created_date', 1);
-              const player2 = await base44.entities.User.filter({ id: session.player2_id }, '-created_date', 1);
-              return {
-                ...session,
-                player1_data: player1[0] || { full_name: session.player1_name, chess_rating: 1200 },
-                player2_data: player2[0] || { full_name: session.player2_name, chess_rating: 1200 },
-                spectators: Math.floor(Math.random() * 100) + 20 // Mock spectateurs
-              };
-            } catch (e) {
-              return {
-                ...session,
-                player1_data: { full_name: session.player1_name, chess_rating: 1200 },
-                player2_data: { full_name: session.player2_name, chess_rating: 1200 },
-                spectators: Math.floor(Math.random() * 100) + 20
-              };
-            }
-          })
-        );
+        // Enrichir avec les données réelles
+        const enrichedGames = sessions.slice(0, 2).map((session) => ({
+          ...session,
+          player1_data: { 
+            full_name: session.player1_name, 
+            chess_rating: session.game_type === 'chess' ? 1200 : undefined,
+            checkers_rating: session.game_type === 'checkers' ? 1200 : undefined
+          },
+          player2_data: { 
+            full_name: session.player2_name,
+            chess_rating: session.game_type === 'chess' ? 1200 : undefined,
+            checkers_rating: session.game_type === 'checkers' ? 1200 : undefined
+          },
+          spectators: Math.floor(Math.random() * 50) + 10
+        }));
         setLiveGames(enrichedGames);
       } else {
-        setLiveGames(mockGames);
+        setLiveGames([]);
       }
     } catch (e) {
-      setLiveGames(mockGames);
+      console.error('Erreur chargement parties live:', e);
+      setLiveGames([]);
     }
   };
-
-  const mockGames = [
-    {
-      id: '1',
-      room_id: 'mock1',
-      game_type: 'checkers',
-      player1_data: { full_name: 'DAMALEGEND', chess_rating: 2100 },
-      player2_data: { full_name: 'STRATEGYKING', chess_rating: 2100 },
-      spectators: 85,
-      prize: 250
-    },
-    {
-      id: '2',
-      room_id: 'mock2',
-      game_type: 'checkers',
-      player1_data: { full_name: 'SLIDERPRO', chess_rating: 1950 },
-      player2_data: { full_name: 'CHECKERSCHAMP', chess_rating: 1920 },
-      spectators: 45,
-      prize: 150
-    }
-  ];
 
   if (liveGames.length === 0) return null;
 
@@ -163,7 +136,7 @@ export default function Colisee() {
                     <span className="text-sm font-bold">D$ {game.prize}</span>
                   </div>
                 )}
-                <Link to={createPageUrl('GameRoom', `?roomId=${game.room_id}`)}>
+                <Link to={`${createPageUrl('GameRoom')}?roomId=${game.room_id}`}>
                   <button className="flex items-center gap-1 text-[#F5E6D3] hover:text-[#D4A574] text-sm font-semibold transition-colors">
                     <Eye className="w-4 h-4" />
                     Regarder
