@@ -129,14 +129,14 @@ export default function Tournaments() {
   const getStatusBadge = (status) => {
     if (status === 'in_progress') {
       return (
-        <div className="animate-pulse bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-          🔴 EN COURS
-        </div>
+        <Badge className="bg-green-600 text-white border-0 font-bold text-xs">
+          EN COURS
+        </Badge>
       );
     }
     return (
-      <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
-        {status === 'upcoming' ? '⏰ À VENIR' : '✅ TERMINÉ'}
+      <Badge className={`${status === 'upcoming' ? 'bg-blue-600' : 'bg-gray-600'} text-white border-0 font-bold text-xs`}>
+        {status === 'upcoming' ? 'À VENIR' : 'TERMINÉ'}
       </Badge>
     );
   };
@@ -184,48 +184,46 @@ export default function Tournaments() {
         onSuccess={handleTournamentCreated}
         user={user}
       />
-      {/* HEADER PREMIUM */}
-      <div className="bg-gradient-to-r from-yellow-600 via-orange-600 to-red-600 relative overflow-hidden pt-8 pb-12">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
-        </div>
+      {/* HEADER PROFESSIONNEL */}
+      <div className="relative overflow-hidden pt-8 pb-12 bg-gradient-to-br from-[#2C1810] to-[#5D3A1A] border-b-2 border-[#D4A574]/30">
+        <div className="absolute inset-0 opacity-5" style={{
+          backgroundImage: 'radial-gradient(circle at 1px 1px, #D4A574 1px, transparent 0)',
+          backgroundSize: '40px 40px'
+        }} />
         
         <div className="max-w-6xl mx-auto px-4 relative z-10">
           <div className="flex items-start justify-between mb-8">
             <div>
-              <div className="flex items-center gap-4 mb-3">
-                <div className="text-6xl">🏆</div>
-                <div>
-                  <h1 className="text-5xl font-black text-white drop-shadow-lg">TOURNOIS</h1>
-                  <p className="text-white/80 text-lg font-semibold mt-1">Compétitions officielles DamCash</p>
-                </div>
+              <div className="border-l-4 border-[#D4A574] pl-6">
+                <h1 className="text-4xl md:text-5xl font-bold text-[#F5E6D3] mb-2">Tournois</h1>
+                <p className="text-[#D4A574] text-lg">Compétitions officielles et qualifiantes</p>
               </div>
             </div>
             <motion.button 
               onClick={() => setShowCreateModal(true)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-400 hover:to-red-500 text-white font-black px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-orange-500/50"
+              className="bg-gradient-to-r from-[#D4A574] to-[#8B5A2B] hover:shadow-lg hover:shadow-[#D4A574]/30 text-[#2C1810] font-bold px-6 py-3 rounded-lg flex items-center gap-2 transition-all"
             >
               <Plus className="w-5 h-5" />
-              Créer mon tournoi
+              Créer un tournoi
             </motion.button>
           </div>
 
-          {/* STATS EN TEMPS RÉEL */}
-          <div className="grid grid-cols-3 gap-3">
-            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }} className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-              <p className="text-white/70 text-sm font-semibold">Tournois actifs</p>
-              <p className="text-3xl font-black text-white mt-1">{totalStats.active}</p>
+          {/* STATS */}
+          <div className="grid grid-cols-3 gap-4">
+            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }} className="bg-gradient-to-br from-[#2C1810] to-[#5D3A1A] border border-[#D4A574]/30 rounded-lg p-4">
+              <p className="text-[#D4A574] text-sm uppercase tracking-wider mb-2">Tournois actifs</p>
+              <p className="text-3xl font-bold text-[#F5E6D3]">{totalStats.active}</p>
             </motion.div>
-            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-              <p className="text-white/70 text-sm font-semibold">Joueurs en lice</p>
-              <p className="text-3xl font-black text-white mt-1">{totalStats.players}</p>
+            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="bg-gradient-to-br from-[#2C1810] to-[#5D3A1A] border border-[#D4A574]/30 rounded-lg p-4">
+              <p className="text-[#D4A574] text-sm uppercase tracking-wider mb-2">Participants</p>
+              <p className="text-3xl font-bold text-[#F5E6D3]">{totalStats.players}</p>
             </motion.div>
-            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-              <p className="text-white/70 text-sm font-semibold">Gemmes à gagner</p>
-              <p className="text-3xl font-black text-white mt-1 flex items-center gap-1">
-                <Gem className="w-7 h-7" />{totalStats.gems.toLocaleString()}
+            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="bg-gradient-to-br from-[#2C1810] to-[#5D3A1A] border border-[#D4A574]/30 rounded-lg p-4">
+              <p className="text-[#D4A574] text-sm uppercase tracking-wider mb-2">Prix total</p>
+              <p className="text-3xl font-bold text-[#F5E6D3] flex items-center gap-2">
+                <Gem className="w-6 h-6 text-[#D4A574]" />{totalStats.gems.toLocaleString()}
               </p>
             </motion.div>
           </div>
@@ -236,9 +234,10 @@ export default function Tournaments() {
         {/* TOURNOIS POPULAIRES */}
         {populartournaments.length > 0 && (
           <section className="mb-12">
-            <h2 className="text-3xl font-black text-[#F5E6D3] mb-4 flex items-center gap-2">
-              <Flame className="w-7 h-7 text-orange-500" /> Tournois populaires
-            </h2>
+            <div className="border-l-4 border-[#D4A574] pl-6 mb-6">
+              <h2 className="text-3xl font-bold text-[#F5E6D3] mb-2">Tournois populaires</h2>
+              <p className="text-[#D4A574]">Les compétitions les plus suivies</p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {populartournaments.map((tournament, idx) => (
                 <motion.div 
@@ -246,21 +245,24 @@ export default function Tournaments() {
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: idx * 0.1 }}
-                  className="group relative rounded-2xl overflow-hidden cursor-pointer"
+                  className="group relative rounded-lg overflow-hidden cursor-pointer border border-[#D4A574]/30 hover:border-[#D4A574]/60 transition-all"
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${getTournamentImage(tournament.game_type)}`}></div>
-                  <img src={tournament.image_url} alt={tournament.name} className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
+                  <div className="relative h-48">
+                    <img src={tournament.image_url} alt={tournament.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-60" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#2C1810] via-[#2C1810]/50 to-transparent"></div>
+                  </div>
                   
                   <div className="absolute top-3 left-3">
-                    <Badge className="bg-orange-500 text-white border-0">🔥 HOT</Badge>
+                    <Badge className="bg-[#D4A574] text-[#2C1810] border-0 font-bold">POPULAIRE</Badge>
                   </div>
                   
                   <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <h3 className="text-xl font-bold text-white mb-2">{tournament.name}</h3>
-                    <div className="flex items-center justify-between text-sm text-white/80">
-                      <span>{tournament.game_type === 'chess' ? '♔ Échecs' : '⚫ Dames'}</span>
-                      <span className="font-bold text-amber-300">{tournament.prize_gems} 💎</span>
+                    <h3 className="text-lg font-bold text-[#F5E6D3] mb-2">{tournament.name}</h3>
+                    <div className="flex items-center justify-between text-sm text-[#D4A574]">
+                      <span>{tournament.game_type === 'chess' ? 'Échecs' : 'Dames'}</span>
+                      <span className="font-bold text-[#F5E6D3] flex items-center gap-1">
+                        <Gem className="w-4 h-4" />{tournament.prize_gems}
+                      </span>
                     </div>
                   </div>
                 </motion.div>
@@ -272,41 +274,41 @@ export default function Tournaments() {
         {/* FILTRES & ONGLETS */}
         <section className="mb-8">
           <Tabs defaultValue="all" onValueChange={setStatusFilter} className="mb-6">
-            <TabsList className="bg-white/10 border border-[#D4A574]/30 p-1 flex flex-wrap h-auto">
-              <TabsTrigger value="all" className="data-[state=active]:bg-[#D4A574] data-[state=active]:text-[#2C1810]">Tous</TabsTrigger>
-              <TabsTrigger value="in_progress" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">En cours</TabsTrigger>
-              <TabsTrigger value="upcoming" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white">À venir</TabsTrigger>
-              <TabsTrigger value="finished" className="data-[state=active]:bg-gray-500 data-[state=active]:text-white">Terminés</TabsTrigger>
+            <TabsList className="bg-gradient-to-br from-[#2C1810] to-[#5D3A1A] border border-[#D4A574]/30 p-1">
+              <TabsTrigger value="all" className="data-[state=active]:bg-[#D4A574] data-[state=active]:text-[#2C1810] text-[#F5E6D3]">Tous</TabsTrigger>
+              <TabsTrigger value="in_progress" className="data-[state=active]:bg-[#D4A574] data-[state=active]:text-[#2C1810] text-[#F5E6D3]">En cours</TabsTrigger>
+              <TabsTrigger value="upcoming" className="data-[state=active]:bg-[#D4A574] data-[state=active]:text-[#2C1810] text-[#F5E6D3]">À venir</TabsTrigger>
+              <TabsTrigger value="finished" className="data-[state=active]:bg-[#D4A574] data-[state=active]:text-[#2C1810] text-[#F5E6D3]">Terminés</TabsTrigger>
             </TabsList>
           </Tabs>
 
-          {/* FILTRES INLINE */}
+          {/* FILTRES */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
             <div>
-              <label className="text-xs font-semibold text-[#D4A574] block mb-2">JEU</label>
-              <select value={gameFilter} onChange={(e) => setGameFilter(e.target.value)} className="w-full bg-white/5 border border-[#D4A574]/30 rounded-lg px-3 py-2 text-sm text-[#F5E6D3]">
-                <option value="all">Tous les jeux</option>
-                <option value="chess">♔ Échecs</option>
-                <option value="checkers">⚫ Dames</option>
+              <label className="text-xs font-semibold text-[#D4A574] block mb-2 uppercase tracking-wider">Discipline</label>
+              <select value={gameFilter} onChange={(e) => setGameFilter(e.target.value)} className="w-full bg-gradient-to-br from-[#2C1810] to-[#5D3A1A] border border-[#D4A574]/30 rounded-lg px-3 py-2 text-sm text-[#F5E6D3] focus:outline-none focus:border-[#D4A574]">
+                <option value="all">Toutes</option>
+                <option value="chess">Échecs</option>
+                <option value="checkers">Dames</option>
               </select>
             </div>
             <div>
-              <label className="text-xs font-semibold text-[#D4A574] block mb-2">DIFFICULTÉ</label>
-              <select value={difficultyFilter} onChange={(e) => setDifficultyFilter(e.target.value)} className="w-full bg-white/5 border border-[#D4A574]/30 rounded-lg px-3 py-2 text-sm text-[#F5E6D3]">
-                <option value="all">Tous les niveaux</option>
-                <option value="beginner">🟢 Débutant</option>
-                <option value="intermediate">🟡 Intermédiaire</option>
-                <option value="advanced">🔴 Avancé</option>
-                <option value="expert">🟣 Expert</option>
+              <label className="text-xs font-semibold text-[#D4A574] block mb-2 uppercase tracking-wider">Niveau</label>
+              <select value={difficultyFilter} onChange={(e) => setDifficultyFilter(e.target.value)} className="w-full bg-gradient-to-br from-[#2C1810] to-[#5D3A1A] border border-[#D4A574]/30 rounded-lg px-3 py-2 text-sm text-[#F5E6D3] focus:outline-none focus:border-[#D4A574]">
+                <option value="all">Tous</option>
+                <option value="beginner">Débutant</option>
+                <option value="intermediate">Intermédiaire</option>
+                <option value="advanced">Avancé</option>
+                <option value="expert">Expert</option>
               </select>
             </div>
             <div>
-              <label className="text-xs font-semibold text-[#D4A574] block mb-2">TRI</label>
-              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full bg-white/5 border border-[#D4A574]/30 rounded-lg px-3 py-2 text-sm text-[#F5E6D3]">
-                <option value="date">📅 Date</option>
-                <option value="popularity">👥 Popularité</option>
-                <option value="price">💎 Prix</option>
-                <option value="availability">📊 Places</option>
+              <label className="text-xs font-semibold text-[#D4A574] block mb-2 uppercase tracking-wider">Trier par</label>
+              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full bg-gradient-to-br from-[#2C1810] to-[#5D3A1A] border border-[#D4A574]/30 rounded-lg px-3 py-2 text-sm text-[#F5E6D3] focus:outline-none focus:border-[#D4A574]">
+                <option value="date">Date</option>
+                <option value="popularity">Popularité</option>
+                <option value="price">Prix</option>
+                <option value="availability">Places disponibles</option>
               </select>
             </div>
           </div>
@@ -314,9 +316,9 @@ export default function Tournaments() {
 
         {/* TOURNOIS */}
         {filteredTournaments.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="text-6xl mb-4">🏆</div>
-            <p className="text-[#D4A574] text-lg font-semibold">Aucun tournoi ne correspond à vos critères</p>
+          <div className="text-center py-16 border border-[#D4A574]/30 rounded-lg bg-gradient-to-br from-[#2C1810] to-[#5D3A1A]">
+            <Trophy className="w-16 h-16 text-[#D4A574] mx-auto mb-4" />
+            <p className="text-[#D4A574] text-lg">Aucun tournoi ne correspond à vos critères</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -327,42 +329,42 @@ export default function Tournaments() {
                   key={tournament.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="group rounded-2xl overflow-hidden border border-[#D4A574]/20 hover:border-[#D4A574]/60 transition-all hover:shadow-2xl hover:shadow-orange-500/20"
+                  className="group rounded-lg overflow-hidden border border-[#D4A574]/30 hover:border-[#D4A574]/60 transition-all hover:shadow-lg hover:shadow-[#D4A574]/20 bg-gradient-to-br from-[#2C1810] to-[#5D3A1A]"
                 >
-                  <div className={`relative h-40 bg-gradient-to-br ${getTournamentImage(tournament.game_type)} overflow-hidden`}>
-                    <img src={tournament.image_url} alt={tournament.name} className="w-full h-full object-cover opacity-50 group-hover:opacity-70 transition-opacity group-hover:scale-110 duration-300" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#2C1810] to-transparent"></div>
+                  <div className="relative h-40 overflow-hidden">
+                    <img src={tournament.image_url} alt={tournament.name} className="w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity group-hover:scale-105 duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#2C1810] via-[#2C1810]/50 to-transparent"></div>
                     
                     <div className="absolute top-4 right-4">
                       {getStatusBadge(tournament.status)}
                     </div>
                     
                     <div className="absolute bottom-3 left-3 right-3">
-                      <h3 className="text-xl font-bold text-white mb-1">{tournament.name}</h3>
-                      <div className="flex items-center gap-2 text-sm text-white/80">
-                        <span>{tournament.game_type === 'chess' ? '♔ Échecs' : '⚫ Dames'}</span>
+                      <h3 className="text-lg font-bold text-[#F5E6D3] mb-1">{tournament.name}</h3>
+                      <div className="flex items-center gap-2 text-sm text-[#D4A574]">
+                        <span>{tournament.game_type === 'chess' ? 'Échecs' : 'Dames'}</span>
                         <span>•</span>
-                        <span className="capitalize text-[#D4A574]">{tournament.time_control}</span>
+                        <span className="capitalize">{tournament.time_control}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-5 space-y-4 bg-white/5 backdrop-blur">
+                  <div className="p-5 space-y-4">
                     {/* Récompenses */}
-                    <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-lg p-3 border border-[#D4A574]/30">
-                      <p className="text-xs text-[#D4A574] font-bold mb-2">RÉCOMPENSES</p>
+                    <div className="bg-[#D4A574]/10 rounded-lg p-3 border border-[#D4A574]/30">
+                      <p className="text-xs text-[#D4A574] font-bold mb-2 uppercase tracking-wider">Dotation</p>
                       <div className="grid grid-cols-3 gap-2 text-center">
                         <div>
-                          <p className="text-yellow-400 font-bold text-lg">🥇</p>
-                          <p className="text-white text-sm font-bold">{Math.round(tournament.prize_gems * 0.6)}</p>
+                          <Trophy className="w-5 h-5 text-[#D4A574] mx-auto mb-1" />
+                          <p className="text-[#F5E6D3] text-sm font-bold">{Math.round(tournament.prize_gems * 0.6)}</p>
                         </div>
                         <div>
-                          <p className="text-gray-300 font-bold text-lg">🥈</p>
-                          <p className="text-white text-sm font-bold">{Math.round(tournament.prize_gems * 0.3)}</p>
+                          <Trophy className="w-5 h-5 text-[#8B5A2B] mx-auto mb-1" />
+                          <p className="text-[#F5E6D3] text-sm font-bold">{Math.round(tournament.prize_gems * 0.3)}</p>
                         </div>
                         <div>
-                          <p className="text-orange-500 font-bold text-lg">🥉</p>
-                          <p className="text-white text-sm font-bold">{Math.round(tournament.prize_gems * 0.1)}</p>
+                          <Trophy className="w-5 h-5 text-[#5D3A1A] mx-auto mb-1" />
+                          <p className="text-[#F5E6D3] text-sm font-bold">{Math.round(tournament.prize_gems * 0.1)}</p>
                         </div>
                       </div>
                     </div>
@@ -374,11 +376,11 @@ export default function Tournaments() {
                           <Calendar className="w-4 h-4" />
                           {format(new Date(tournament.start_date), 'dd MMM HH:mm', { locale: fr })}
                         </div>
-                        <Badge className={`bg-gradient-to-r ${getDifficultyColor(tournament.difficulty)} text-white border-0 text-xs`}>
-                          {tournament.difficulty === 'beginner' && '🟢 Débutant'}
-                          {tournament.difficulty === 'intermediate' && '🟡 Intermédiaire'}
-                          {tournament.difficulty === 'advanced' && '🔴 Avancé'}
-                          {tournament.difficulty === 'expert' && '🟣 Expert'}
+                        <Badge className="bg-[#8B5A2B] text-[#F5E6D3] border-0 text-xs font-bold">
+                          {tournament.difficulty === 'beginner' && 'Débutant'}
+                          {tournament.difficulty === 'intermediate' && 'Intermédiaire'}
+                          {tournament.difficulty === 'advanced' && 'Avancé'}
+                          {tournament.difficulty === 'expert' && 'Expert'}
                         </Badge>
                       </div>
 
@@ -391,9 +393,9 @@ export default function Tournaments() {
                           </div>
                           <span className="text-xs text-[#D4A574]">{progress}%</span>
                         </div>
-                        <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                        <div className="w-full h-2 bg-[#1a0f0f] rounded-full overflow-hidden">
                           <motion.div 
-                            className="h-full bg-gradient-to-r from-orange-500 to-red-500"
+                            className="h-full bg-gradient-to-r from-[#D4A574] to-[#8B5A2B]"
                             initial={{ width: 0 }}
                             animate={{ width: `${progress}%` }}
                             transition={{ duration: 0.5 }}
@@ -405,9 +407,9 @@ export default function Tournaments() {
                     {/* Boutons */}
                     <Button 
                       onClick={() => handleJoin(tournament.id)}
-                      className="w-full bg-gradient-to-r from-[#D4A574] to-orange-500 hover:from-[#E8B688] hover:to-orange-400 text-[#2C1810] font-bold py-2 flex items-center justify-center gap-2 group/btn"
+                      className="w-full bg-gradient-to-r from-[#D4A574] to-[#8B5A2B] hover:shadow-lg hover:shadow-[#D4A574]/30 text-[#2C1810] font-bold py-2 rounded-lg flex items-center justify-center gap-2 group/btn"
                     >
-                      {tournament.status === 'upcoming' ? 'S\'inscrire maintenant' : tournament.status === 'in_progress' ? 'Rejoindre' : 'Voir les résultats'}
+                      {tournament.status === 'upcoming' ? 'S\'inscrire' : tournament.status === 'in_progress' ? 'Rejoindre' : 'Résultats'}
                       <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                     </Button>
                   </div>
@@ -420,25 +422,26 @@ export default function Tournaments() {
         {/* MES TOURNOIS */}
         {myTournaments.length > 0 && user && (
           <section className="mt-12 pt-8 border-t border-[#D4A574]/30">
-            <h2 className="text-2xl font-bold text-[#F5E6D3] mb-6 flex items-center gap-2">
-              <Zap className="w-6 h-6 text-yellow-400" /> Mes tournois en cours
-            </h2>
+            <div className="border-l-4 border-[#D4A574] pl-6 mb-6">
+              <h2 className="text-2xl font-bold text-[#F5E6D3] mb-2">Mes tournois en cours</h2>
+              <p className="text-[#D4A574]">Compétitions auxquelles vous participez</p>
+            </div>
             <div className="space-y-4">
               {myTournaments.map((tournament) => (
                 <motion.div 
                   key={tournament.id}
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  className="bg-white/5 border border-green-500/30 rounded-xl p-4 flex items-center justify-between hover:bg-white/10 transition-all"
+                  className="bg-gradient-to-br from-[#2C1810] to-[#5D3A1A] border border-[#D4A574]/30 rounded-lg p-4 flex items-center justify-between hover:border-[#D4A574]/60 transition-all"
                 >
                   <div className="flex items-center gap-4 flex-1">
-                    <div className="text-3xl">{tournament.game_type === 'chess' ? '♔' : '⚫'}</div>
+                    <Trophy className="w-8 h-8 text-[#D4A574]" />
                     <div>
                       <h3 className="font-bold text-[#F5E6D3]">{tournament.name}</h3>
                       <p className="text-sm text-[#D4A574]">Position: 5e / 28</p>
                     </div>
                   </div>
-                  <Button className="bg-green-600 hover:bg-green-700 text-white">
+                  <Button className="bg-gradient-to-r from-[#D4A574] to-[#8B5A2B] hover:shadow-lg hover:shadow-[#D4A574]/30 text-[#2C1810] font-bold rounded-lg">
                     Rejoindre
                   </Button>
                 </motion.div>
