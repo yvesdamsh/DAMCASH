@@ -2,7 +2,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import HeroSection from '@/components/play/HeroSection';
 import GameCard from '@/components/play/GameCard';
-import GameModesSection from '@/components/play/GameModesSection';
 import DailyChallengesSection from '@/components/play/DailyChallengesSection';
 import TopPlayersSection from '@/components/play/TopPlayersSection';
 
@@ -50,17 +49,6 @@ export default function PlayCheckers() {
             <GameCard game={game} isPopular={true} />
           </motion.div>
         </section>
-
-        {/* Game Modes Section */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          viewport={{ once: true }}
-          className="mb-16"
-        >
-          <GameModesSection gameType="checkers" />
-        </motion.section>
 
         {/* Daily Challenges Section */}
         <motion.section
