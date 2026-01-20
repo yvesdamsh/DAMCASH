@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import UserAvatar from '@/components/ui/UserAvatar';
 import { Badge } from '@/components/ui/badge';
 import { Mail, Check, X, Crown, Circle, Clock, Users } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -15,7 +15,7 @@ export default function Invitations() {
   const [gameInvitations, setGameInvitations] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [senderNames, setSenderNames] = useState({});
+  const [senderData, setSenderData] = useState({});
 
   useEffect(() => {
     loadUser();
@@ -83,14 +83,35 @@ export default function Invitations() {
       console.log('Demandes d\'ami trouvées:', friendReqs);
       setFriendRequests(friendReqs);
 
-      // Charger les noms des expéditeurs (sans accès User)
-      const names = {};
-      for (const inv of gameInvs) {
-        if (!names[inv.sender_id] && inv.sender_name) {
-          names[inv.sender_id] = inv.sender_name;
+      // Charger les données des expéditeurs depuis OnlineUser
+      const senders = {};
+      const allInvitations = [...gameInvs, ...friendReqs];
+      
+      for (const inv of allInvitations) {
+        if (!senders[inv.sender_id]) {
+          try {
+            const onlineUsers = await base44.entities.OnlineUser.filter({ user_id: inv.sender_id });
+            if (onlineUsers.length > 0) {
+              senders[inv.sender_id] = {
+                full_name: onlineUsers[0].username,
+                avatar_url: onlineUsers[0].avatar_url
+              };
+            } else {
+              // Fallback si pas dans OnlineUser
+              senders[inv.sender_id] = {
+                full_name: inv.sender_name || 'Joueur',
+                avatar_url: null
+              };
+            }
+          } catch (e) {
+            senders[inv.sender_id] = {
+              full_name: inv.sender_name || 'Joueur',
+              avatar_url: null
+            };
+          }
         }
       }
-      setSenderNames(names);
+      setSenderData(senders);
     } catch (error) {
       console.error('Erreur chargement invitations:', error);
     } finally {
@@ -237,14 +258,14 @@ export default function Invitations() {
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <Avatar className="w-12 h-12 border-2 border-amber-500/30">
-                      <AvatarFallback className="bg-amber-900 text-amber-200">
-                        {senderNames[invitation.sender_id]?.charAt(0) || 'J'}
-                      </AvatarFallback>
-                    </Avatar>
+                    <UserAvatar 
+                      user={senderData[invitation.sender_id]}
+                      size="lg"
+                      className="border-2 border-amber-500/30"
+                    />
                     <div>
                       <h3 className="font-semibold text-white">
-                        {senderNames[invitation.sender_id] || 'Joueur'}
+                        {senderData[invitation.sender_id]?.full_name || 'Joueur'}
                       </h3>
                       <p className="text-sm text-gray-400">vous invite à jouer</p>
                     </div>
@@ -302,14 +323,14 @@ export default function Invitations() {
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <Avatar className="w-12 h-12 border-2 border-blue-500/30">
-                      <AvatarFallback className="bg-blue-900 text-blue-200">
-                        {senderNames[request.sender_id]?.charAt(0) || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
+                    <UserAvatar 
+                      user={senderData[request.sender_id]}
+                      size="lg"
+                      className="border-2 border-blue-500/30"
+                    />
                     <div>
                       <h3 className="font-semibold text-white">
-                        {senderNames[request.sender_id] || 'Utilisateur'}
+                        {senderData[request.sender_id]?.full_name || 'Utilisateur'}
                       </h3>
                       <p className="text-sm text-gray-400">vous demande en ami</p>
                     </div>
