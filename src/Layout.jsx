@@ -316,8 +316,8 @@ export default function Layout({ children, currentPageName }) {
                       isActive(item.page) ? 'text-[#D4A574]' : 'text-[#F5E6D3]/50'
                     }`} 
                   />
-                  {item.showInvitationBadge && user && (
-                    <InvitationBadge userEmail={user.email} userId={user.id} />
+                  {item.showBadge && user && (
+                    <NotificationBadge userEmail={user.email} />
                   )}
                 </motion.div>
                 <span className={`text-xs ${
