@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
 import { Home, Search, Gamepad2, Mail, Trophy, Gem, User, LogOut, Menu, X, Bell, Swords, Crown, History } from 'lucide-react';
@@ -23,6 +23,13 @@ export default function Layout({ children, currentPageName }) {
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const getCountryFlag = (countryCode) => {
+    if (!countryCode || countryCode.length !== 2) return '';
+    const offset = 127397;
+    return String.fromCodePoint(...countryCode.toUpperCase().split('').map(c => c.charCodeAt(0) + offset));
+  };
 
   useEffect(() => {
     loadUser();
@@ -78,6 +85,14 @@ export default function Layout({ children, currentPageName }) {
       const isAuth = await base44.auth.isAuthenticated();
       if (isAuth) {
         const currentUser = await base44.auth.me();
+        
+        // Redirect to onboarding if not completed
+        if (!currentUser.onboarding_completed) {
+          navigate(createPageUrl('Onboarding'));
+          setIsLoading(false);
+          return;
+        }
+        
         setUser(currentUser);
         
         // Initialize user data if needed
@@ -238,7 +253,9 @@ export default function Layout({ children, currentPageName }) {
                   <DropdownMenuTrigger asChild>
                     <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                       <UserAvatar user={user} size="sm" className="border-[#D4A574]/50" />
-                      <span className="text-sm font-medium hidden sm:block">{user.full_name}</span>
+                      <span className="text-sm font-medium hidden sm:block">
+                        {user.country && getCountryFlag(user.country)} {user.username || user.full_name}
+                      </span>
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-[#5D3A1A] border-[#D4A574]/50 text-[#F5E6D3]">

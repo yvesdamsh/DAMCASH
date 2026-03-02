@@ -72,6 +72,7 @@ import Shop from './pages/Shop';
 import Spectate from './pages/Spectate';
 import Tournaments from './pages/Tournaments';
 import Home from './pages/Home';
+import Onboarding from './pages/Onboarding';
 import __Layout from './Layout.jsx';
 
 
@@ -101,6 +102,7 @@ export const PAGES = {
     "Spectate": Spectate,
     "Tournaments": Tournaments,
     "Home": Home,
+    "Onboarding": Onboarding,
 }
 
 export const pagesConfig = {
