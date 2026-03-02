@@ -75,6 +75,7 @@ import Home from './pages/Home';
 import Onboarding from './pages/Onboarding';
 import GameReviews from './pages/GameReviews';
 import Statistics from './pages/Statistics';
+import Chat from './pages/Chat';
 import __Layout from './Layout.jsx';
 
 
@@ -107,6 +108,7 @@ export const PAGES = {
     "Onboarding": Onboarding,
     "GameReviews": GameReviews,
     "Statistics": Statistics,
+    "Chat": Chat,
 }
 
 export const pagesConfig = {
