@@ -255,18 +255,20 @@ export default function Search() {
                className="flex items-center justify-between p-4 rounded-xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg hover:bg-white/15 hover:border-white/30 transition-all"
              >
               <div className="flex items-center gap-3 flex-1">
-                <UserAvatar 
-                  user={{ 
-                    full_name: player.username,
-                    photoURL: player.avatar_url
-                  }}
-                  size="default"
-                />
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-white">{player.username}</h3>
-                  <Badge className="bg-green-500 text-white">En ligne</Badge>
-                </div>
-              </div>
+                 <UserAvatar 
+                   user={{ 
+                     full_name: player.username,
+                     photoURL: player.avatar_url
+                   }}
+                   size="default"
+                 />
+                 <div className="flex items-center gap-2">
+                   <PlayerPopup playerId={player.user_id} playerName={player.username} playerAvatar={player.avatar_url}>
+                     <h3 className="font-semibold text-white">{player.username}</h3>
+                   </PlayerPopup>
+                   <Badge className="bg-green-500 text-white">En ligne</Badge>
+                 </div>
+               </div>
 
               <div className="flex gap-2">
                 <Button
