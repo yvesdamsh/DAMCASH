@@ -204,7 +204,33 @@ export default function Tournaments() {
     gems: displayTournaments.reduce((a, t) => a + (t.prize_gems || 0), 0),
   };
 
-  const handleJoin = (id) => { if (!user) base44.auth.redirectToLogin(); };
+  const handleJoin = async (id) => {
+    if (!user) { base44.auth.redirectToLogin(); return; }
+    const tournament = displayTournaments.find(t => t.id === id);
+    if (!tournament) return;
+    if (tournament.status === 'finished') return;
+    if (tournament.participants?.includes(user.email)) {
+      toast?.('Vous êtes déjà inscrit à ce tournoi'); return;
+    }
+    if ((tournament.participants?.length || 0) >= (tournament.max_participants || 999)) {
+      toast?.('Ce tournoi est complet'); return;
+    }
+    try {
+      await base44.entities.Tournament.update(id, {
+        participants: [...(tournament.participants || []), user.email]
+      });
+      await base44.entities.Notification?.create?.({
+        user_email: user.email,
+        type: 'tournament_invitation',
+        title: `🏆 Inscription confirmée`,
+        message: `Vous êtes inscrit au tournoi "${tournament.name}"`,
+        is_read: false
+      });
+      queryClient.invalidateQueries({ queryKey: ['tournaments'] });
+    } catch (e) {
+      console.log('Erreur inscription tournoi:', e);
+    }
+  };
 
   const filters = [
     { key: 'all', label: 'Tous' },
