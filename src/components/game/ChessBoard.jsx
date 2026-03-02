@@ -132,6 +132,7 @@ export default function ChessBoard({
   blockBoard = false,
   currentTurnOverride = null
 }) {
+  const { playMoveSound } = useMovePieceSound();
   const [board, setBoard] = useState(initialBoardState || createInitialBoard());
   const [selectedSquare, setSelectedSquare] = useState(null);
   const [validMoves, setValidMoves] = useState([]);
@@ -238,6 +239,7 @@ export default function ChessBoard({
   };
 
   const makeMove = (fromR, fromC, toR, toC, moveData, promotionPiece = null) => {
+    playMoveSound();
     const newBoard = board.map(row => [...row]);
     const piece = newBoard[fromR][fromC];
     const pieceType = piece.toUpperCase();

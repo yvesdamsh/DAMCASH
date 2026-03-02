@@ -119,6 +119,7 @@ export default function CheckersBoard({
   gameStats = null,
   aiLevel = 'medium'
 }) {
+  const { playMoveSound } = useMovePieceSound();
   const [board, setBoard] = useState(() => initialBoardState || createInitialBoard());
   const [selectedSquare, setSelectedSquare] = useState(null);
   const [validMoves, setValidMoves] = useState([]);
@@ -127,6 +128,8 @@ export default function CheckersBoard({
   const [gameStatus, setGameStatus] = useState('playing');
   const [mustCapture, setMustCapture] = useState([]);
   const [chainCapture, setChainCapture] = useState(null);
+  const [draggedPiece, setDraggedPiece] = useState(null);
+  const boardRef = useRef(null);
 
   useEffect(() => {
     if (initialBoardState) {
@@ -292,6 +295,7 @@ export default function CheckersBoard({
   }, [getValidMovesForColor]);
 
   const makeMove = (fromRow, fromCol, toRow, toCol, capturedSquares = []) => {
+    playMoveSound();
     const nb = board.map(r => r.map(c => c ? { ...c } : null));
     const piece = { ...nb[fromRow][fromCol] };
     capturedSquares.forEach(({ row, col }) => { nb[row][col] = null; });
@@ -419,15 +423,19 @@ export default function CheckersBoard({
       />
 
       {/* Board wrapper — square, responsive */}
-      <div style={{
-        width: 'min(96vw, 96vh, 520px)',
-        aspectRatio: '1 / 1',
-        border: '6px solid #5a3a1c',
-        borderRadius: '4px',
-        boxShadow: '0 0 0 3px #3a2510, 0 8px 32px rgba(0,0,0,0.8)',
-        overflow: 'hidden',
-        flexShrink: 0,
-      }}>
+      <div 
+        ref={boardRef}
+        style={{
+          width: 'min(96vw, 96vh, 520px)',
+          aspectRatio: '1 / 1',
+          border: '6px solid #5a3a1c',
+          borderRadius: '4px',
+          boxShadow: '0 0 0 3px #3a2510, 0 8px 32px rgba(0,0,0,0.8)',
+          overflow: 'hidden',
+          flexShrink: 0,
+          position: 'relative',
+          touchAction: 'none'
+        }}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(10, 1fr)',
@@ -462,19 +470,41 @@ export default function CheckersBoard({
 
               return (
                 <div
-                  key={`${rowIdx}-${colIdx}`}
-                  onClick={() => isDark && handleSquareClick(actualRow, actualCol)}
-                  style={{
-                    position: 'relative',
-                    backgroundColor: bg,
-                    cursor: isDark ? 'pointer' : 'default',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'background-color 0.1s',
-                    userSelect: 'none',
-                  }}
-                >
+                   key={`${rowIdx}-${colIdx}`}
+                   onClick={() => isDark && handleSquareClick(actualRow, actualCol)}
+                   onDragOver={(e) => {
+                     if (!isDark || blockBoard || gameStatus !== 'playing' || !canMove) return;
+                     e.preventDefault();
+                     e.dataTransfer.dropEffect = 'move';
+                   }}
+                   onDrop={(e) => {
+                     if (!isDark || blockBoard || gameStatus !== 'playing' || !canMove) return;
+                     e.preventDefault();
+                     const [fromRow, fromCol] = e.dataTransfer.getData('text/plain').split(',').map(Number);
+                     const piece = board[fromRow][fromCol];
+                     if (piece && piece.color === playerColor) {
+                       const move = validMoves.find(m => m.row === actualRow && m.col === actualCol);
+                       if (move) {
+                         const result = makeMove(fromRow, fromCol, actualRow, actualCol, move.captured || []);
+                         if (!result.continueChain && isMultiplayer && onSaveMove) {
+                           const mp = board[fromRow][fromCol];
+                           onSaveMove(result.board, mp.color === 'white' ? 'black' : 'white');
+                         }
+                       }
+                     }
+                     setDraggedPiece(null);
+                   }}
+                   style={{
+                     position: 'relative',
+                     backgroundColor: bg,
+                     cursor: isDark ? (blockBoard || gameStatus !== 'playing' || !canMove ? 'default' : 'pointer') : 'default',
+                     display: 'flex',
+                     alignItems: 'center',
+                     justifyContent: 'center',
+                     transition: 'background-color 0.1s',
+                     userSelect: 'none',
+                   }}
+                 >
                   {/* Square number (international draughts) */}
                   {isDark && squareNum && (
                     <span style={{
@@ -494,21 +524,41 @@ export default function CheckersBoard({
                     </span>
                   )}
 
-                  {/* Piece */}
-                  <AnimatePresence mode="wait">
-                    {cell && (
-                      <motion.div
-                        key={`${actualRow}-${actualCol}-${cell.color}-${cell.isKing}`}
-                        initial={{ scale: 0.5, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.5, opacity: 0 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-                        style={{ width: '82%', height: '82%', zIndex: 1 }}
-                      >
-                        <CheckerPiece color={cell.color} isKing={cell.isKing} size="100%" />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {/* Piece with Drag */}
+                   <AnimatePresence mode="wait">
+                     {cell && (
+                       <motion.div
+                         key={`${actualRow}-${actualCol}-${cell.color}-${cell.isKing}`}
+                         initial={{ scale: 0.5, opacity: 0 }}
+                         animate={{ 
+                           scale: draggedPiece?.row === actualRow && draggedPiece?.col === actualCol ? 1.1 : 1, 
+                           opacity: 1,
+                           zIndex: draggedPiece?.row === actualRow && draggedPiece?.col === actualCol ? 50 : 1
+                         }}
+                         exit={{ scale: 0.5, opacity: 0 }}
+                         transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+                         draggable={!blockBoard && gameStatus === 'playing' && canMove && effectiveTurn === playerColor && cell.color === playerColor}
+                         onDragStart={(e) => {
+                           if (blockBoard || gameStatus !== 'playing' || !canMove || effectiveTurn !== playerColor || cell.color !== playerColor) {
+                             e.preventDefault();
+                             return;
+                           }
+                           setDraggedPiece({ row: actualRow, col: actualCol, startX: e.clientX, startY: e.clientY });
+                           e.dataTransfer.effectAllowed = 'move';
+                           e.dataTransfer.setData('text/plain', `${actualRow},${actualCol}`);
+                         }}
+                         onDragEnd={() => setDraggedPiece(null)}
+                         style={{ 
+                           width: '82%', 
+                           height: '82%', 
+                           zIndex: 1,
+                           cursor: !blockBoard && gameStatus === 'playing' && canMove && effectiveTurn === playerColor && cell.color === playerColor ? 'grab' : 'default'
+                         }}
+                       >
+                         <CheckerPiece color={cell.color} isKing={cell.isKing} size="100%" />
+                       </motion.div>
+                     )}
+                   </AnimatePresence>
 
                   {/* Valid move dot */}
                   {isValidMove && !cell && (
