@@ -397,7 +397,7 @@ export default function Tournaments() {
             ))}
           </div>
           <div className="flex items-center gap-1 p-1 rounded-xl bg-black/30 border border-[#D4A574]/10">
-            {[{ key: 'all', label: 'Tous' }, { key: 'chess', label: '♟ Échecs' }, { key: 'checkers', label: '⚫ Dames' }].map(f => (
+            {[{ key: 'chess', label: '♟ Échecs' }, { key: 'checkers', label: '⚫ Dames' }].map(f => (
               <button key={f.key} onClick={() => setGameFilter(f.key)}
                 className={`px-4 py-1.5 rounded-lg text-xs font-bold tracking-wider transition-all ${gameFilter === f.key ? 'bg-[#D4A574] text-[#2C1810]' : 'text-[#D4A574]/60 hover:text-[#D4A574]'}`}>
                 {f.label}
