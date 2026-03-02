@@ -181,8 +181,8 @@ export default function Colisee() {
               </Link>
             </div>
           </motion.div>
-        ))}
-      </div>
+          ))}
+        </div>
       )}
     </motion.div>
   );
