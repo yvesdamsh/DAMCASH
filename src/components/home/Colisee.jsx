@@ -183,6 +183,7 @@ export default function Colisee() {
           </motion.div>
         ))}
       </div>
+      )}
     </motion.div>
   );
 }
