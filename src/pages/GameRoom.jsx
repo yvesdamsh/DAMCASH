@@ -990,6 +990,10 @@ export default function GameRoom() {
     );
   }
 
+  // En multijoueur : le joueur courant doit TOUJOURS être en bas
+  // Player1 toujours blanc, Player2 toujours noir
+  // Si le joueur est Player1 → playerColor = 'white' (en bas par défaut)
+  // Si le joueur est Player2 → playerColor = 'black' (en bas après flip)
   const computedPlayerColor = user && session && user.id === session.player1_id ? 'white' : 'black';
   
   // Forcer le mode multijoueur si on a une vraie session avec deux joueurs
@@ -1220,7 +1224,7 @@ export default function GameRoom() {
         </div>
       )}
 
-            {/* Plateau de jeu */}
+            {/* Plateau de jeu - Toujours avec le camp du joueur en bas */}
             <div className="flex-1 flex items-center justify-center p-6 relative">
               {!gameStarted && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -1232,6 +1236,7 @@ export default function GameRoom() {
               {gameType === 'chess' ? (
           <ChessBoard 
             playerColor={effectivePlayerColor}
+            orientation={effectivePlayerColor}
             onGameEnd={handleGameEnd}
             isMultiplayer={true}
             canMove={canMove && gameStarted && !isSpectator}
