@@ -3,7 +3,24 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../../utils';
-import { Activity, Users, ChevronRight, Trophy } from 'lucide-react';
+import { Activity, Users, ChevronRight, Clock, Calendar } from 'lucide-react';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+
+const TIME_LABELS = {
+  bullet: '⚡ Bullet (1+0)',
+  blitz: '🔥 Blitz (3+0)',
+  rapid: '⏱ Rapide (10+0)',
+  classic: '♟ Classique (30+0)',
+};
+
+const TYPE_LABELS = {
+  arena_daily: '⚡ Arena Daily',
+  arena_weekly: '🔥 Arena Weekly',
+  arena_monthly: '👑 Arena Monthly',
+  arena_annual: '🏆 Arena Annual',
+  cup: '🛡 Coupe',
+};
 
 export default function LiveTournaments({ gameType }) {
   const [tournaments, setTournaments] = useState([]);
