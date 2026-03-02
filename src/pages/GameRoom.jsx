@@ -859,11 +859,47 @@ export default function GameRoom() {
         duration_seconds: duration
       });
 
-      if (ranked) {
-        await Promise.all([
-          updatePlayerStats(session.player1_id, session.player1_name, isDraw ? 'draw' : (whiteWinner ? 'win' : 'loss'), gameType),
-          updatePlayerStats(session.player2_id, session.player2_name || session.invited_player_name, isDraw ? 'draw' : (blackWinner ? 'win' : 'loss'), gameType)
-        ]);
+      // Calculer et mettre à jour l'ELO en temps réel
+      if (!isDraw) {
+        const currentUserIsPlayer1 = user?.id === session.player1_id;
+        const playerResult = currentUserIsPlayer1 
+          ? (whiteWinner ? 'win' : 'loss')
+          : (blackWinner ? 'win' : 'loss');
+        
+        const currentPlayerELO = currentUserIsPlayer1 
+          ? (user?.chess_rating || user?.checkers_rating || 1200)
+          : (opponent?.chess_rating || opponent?.checkers_rating || 1200);
+        
+        const opponentELO = currentUserIsPlayer1
+          ? (opponent?.chess_rating || opponent?.checkers_rating || 1200)
+          : (user?.chess_rating || user?.checkers_rating || 1200);
+
+        try {
+          const opponentEmail = currentUserIsPlayer1 ? session.player2_email : session.player1_email;
+          await base44.functions.invoke('updateELO', {
+            gameType,
+            opponentEmail,
+            result: playerResult,
+            playerCurrentELO,
+            opponentCurrentELO
+          });
+        } catch (eloError) {
+          console.log('Erreur ELO:', eloError?.message || eloError);
+        }
+      } else {
+        // Nul
+        try {
+          const opponentEmail = user?.id === session.player1_id ? session.player2_email : session.player1_email;
+          await base44.functions.invoke('updateELO', {
+            gameType,
+            opponentEmail,
+            result: 'draw',
+            playerCurrentELO: user?.chess_rating || user?.checkers_rating || 1200,
+            opponentCurrentELO: opponent?.chess_rating || opponent?.checkers_rating || 1200
+          });
+        } catch (eloError) {
+          console.log('Erreur ELO (nul):', eloError?.message || eloError);
+        }
       }
 
       // Notifications in-app (non-push)
