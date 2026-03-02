@@ -1,219 +1,242 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, UserPlus, Check, X, Swords, Crown, Circle } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { createPageUrl } from '../utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { UserPlus, Users, Clock, CheckCircle, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
+import FriendCard from '../components/friends/FriendCard';
+import FriendRequestCard from '../components/friends/FriendRequestCard';
+import AddFriendModal from '../components/friends/AddFriendModal';
 
 export default function Friends() {
   const [user, setUser] = useState(null);
+  const [showAddFriend, setShowAddFriend] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    const loadUser = async () => {
+      const currentUser = await base44.auth.me();
+      setUser(currentUser);
+    };
     loadUser();
   }, []);
 
-  const loadUser = async () => {
-    try {
-      const isAuth = await base44.auth.isAuthenticated();
-      if (isAuth) {
-        setUser(await base44.auth.me());
-      }
-    } catch (error) {
-      console.log('Not authenticated');
-    }
-  };
-
+  // Charger les amis acceptés
   const { data: friendships = [] } = useQuery({
-    queryKey: ['friendships', user?.email],
-    queryFn: () => user ? base44.entities.Friendship.list() : [],
-    enabled: !!user
+    queryKey: ['friendships', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const results = await base44.entities.Friendship.filter({
+        status: 'accepted'
+      });
+      return results.filter(f => f.user1 === user.email || f.user2 === user.email);
+    },
+    enabled: !!user?.id
   });
 
-  // Mock friends for demo
-  const mockFriends = [
-    { id: '1', email: 'alex@example.com', full_name: 'Alexandre Dupont', level: 15, is_online: true, chess_rating: 1450 },
-    { id: '2', email: 'marie@example.com', full_name: 'Marie Martin', level: 22, is_online: true, chess_rating: 1680 },
-    { id: '3', email: 'pierre@example.com', full_name: 'Pierre Bernard', level: 8, is_online: false, chess_rating: 1200 }
-  ];
-
-  const mockRequests = [
-    { id: '1', user1: 'new@example.com', from_name: 'Nouveau Joueur', level: 5, status: 'pending' }
-  ];
-
-  const acceptMutation = useMutation({
-    mutationFn: (friendshipId) => base44.entities.Friendship.update(friendshipId, { status: 'accepted' }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['friendships'] })
-  });
-
-  const declineMutation = useMutation({
-    mutationFn: (friendshipId) => base44.entities.Friendship.delete(friendshipId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['friendships'] })
-  });
-
-  const handleInvite = async (friendEmail, gameType) => {
-    if (!user) return;
-    
-    try {
-      await base44.entities.Invitation.create({
-        from_user: user.email,
-        to_user: friendEmail,
-        game_type: gameType,
-        time_control: 'blitz',
+  // Charger les demandes en attente
+  const { data: pendingRequests = [] } = useQuery({
+    queryKey: ['pendingRequests', user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const results = await base44.entities.FriendRequest.filter({
+        receiver_id: user.id,
         status: 'pending'
       });
-      alert('Invitation envoyée !');
+      return results;
+    }
+  });
+
+  // Charger les statuts en ligne
+  const { data: onlineStatuses = {} } = useQuery({
+    queryKey: ['onlineStatuses', friendships],
+    queryFn: async () => {
+      const statuses = {};
+      const friendIds = friendships.map(f => f.user1 === user?.email ? f.user2 : f.user1);
+      
+      for (const friendEmail of friendIds) {
+        const onlineUsers = await base44.entities.OnlineUser.list();
+        const onlineUser = onlineUsers.find(u => u.user_id);
+        if (onlineUser) {
+          statuses[friendEmail] = onlineUser.status === 'online';
+        }
+      }
+      return statuses;
+    },
+    refetchInterval: 10000 // Rafraîchir tous les 10s
+  });
+
+  // Accepter une demande
+  const handleAcceptRequest = async (requestId, senderId, senderEmail) => {
+    try {
+      await base44.entities.FriendRequest.update(requestId, { status: 'accepted' });
+      
+      // Créer la friendship
+      await base44.entities.Friendship.create({
+        user1: user.email,
+        user2: senderEmail,
+        status: 'accepted'
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['pendingRequests', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['friendships', user?.id] });
+      
+      toast.success('Ami ajouté!');
     } catch (error) {
-      console.error('Error sending invitation:', error);
+      toast.error('Erreur');
     }
   };
 
-  if (!user) {
-    return (
-      <div className="max-w-2xl mx-auto px-4 py-6 text-center">
-        <Users className="w-16 h-16 mx-auto mb-4 text-gray-600" />
-        <h2 className="text-xl font-bold text-white mb-2">Connectez-vous</h2>
-        <p className="text-gray-400 mb-4">Pour voir vos amis</p>
-        <Button 
-          onClick={() => base44.auth.redirectToLogin()}
-          className="bg-gradient-to-r from-amber-500 to-amber-600"
-        >
-          Se connecter
-        </Button>
-      </div>
-    );
-  }
+  // Refuser une demande
+  const handleDeclineRequest = async (requestId) => {
+    try {
+      await base44.entities.FriendRequest.update(requestId, { status: 'declined' });
+      queryClient.invalidateQueries({ queryKey: ['pendingRequests', user?.id] });
+      toast.success('Demande refusée');
+    } catch (error) {
+      toast.error('Erreur');
+    }
+  };
+
+  // Supprimer un ami
+  const handleRemoveFriend = async (friendshipId) => {
+    try {
+      await base44.entities.Friendship.delete(friendshipId);
+      queryClient.invalidateQueries({ queryKey: ['friendships', user?.id] });
+      toast.success('Ami supprimé');
+    } catch (error) {
+      toast.error('Erreur');
+    }
+  };
+
+  // Obtenir les infos détaillées des amis
+  const friendsList = friendships.map(f => {
+    const friendEmail = f.user1 === user?.email ? f.user2 : f.user1;
+    return {
+      ...f,
+      friendEmail,
+      isOnline: onlineStatuses[friendEmail] || false
+    };
+  });
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
-            <Users className="w-6 h-6 text-white" />
+    <div className="min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3]">
+      <style>{`
+        .glass-card { background: rgba(93, 58, 26, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(212, 165, 116, 0.2); }
+      `}</style>
+
+      {/* Header */}
+      <div className="max-w-4xl mx-auto px-4 py-8 border-b border-[#D4A574]/20">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Users className="w-8 h-8 text-[#D4A574]" />
+            <h1 className="text-3xl font-black">Amis</h1>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white">Amis</h1>
-            <p className="text-sm text-gray-400">{mockFriends.filter(f => f.is_online).length} en ligne</p>
-          </div>
-        </div>
-        
-        <Link to={createPageUrl('Search')}>
-          <Button className="bg-gradient-to-r from-amber-500 to-amber-600">
-            <UserPlus className="w-4 h-4 mr-1" />
-            Ajouter
+          <Button
+            onClick={() => setShowAddFriend(true)}
+            className="bg-gradient-to-r from-[#D4A574] to-[#8B5A2B] text-[#2C1810] hover:opacity-90 font-bold flex items-center gap-2"
+          >
+            <UserPlus className="w-4 h-4" />
+            Ajouter un ami
           </Button>
-        </Link>
+        </div>
       </div>
 
-      <Tabs defaultValue="friends">
-        <TabsList className="grid grid-cols-2 bg-white/5 border border-white/10 mb-4">
-          <TabsTrigger value="friends" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-300">
-            Amis ({mockFriends.length})
-          </TabsTrigger>
-          <TabsTrigger value="requests" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-300">
-            Demandes ({mockRequests.length})
-          </TabsTrigger>
-        </TabsList>
+      <AddFriendModal
+        open={showAddFriend}
+        onOpenChange={setShowAddFriend}
+        userId={user?.id}
+        userEmail={user?.email}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['friendships', user?.id] });
+          setShowAddFriend(false);
+        }}
+      />
 
-        <TabsContent value="friends">
-          <div className="space-y-3">
-            {mockFriends.map((friend) => (
-              <div
-                key={friend.id}
-                className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <Avatar className="w-12 h-12 border-2 border-amber-500/30">
-                      <AvatarFallback className="bg-amber-900 text-amber-200">
-                        {friend.full_name?.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    {friend.is_online && (
-                      <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-[#1a0f0f]"></div>
-                    )}
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-white">{friend.full_name}</h3>
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
-                      <span>Niveau {friend.level}</span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1">
-                        <Crown className="w-3 h-3 text-amber-400" />
-                        {friend.chess_rating}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <Tabs defaultValue="friends" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 bg-[#1a0f0f] mb-8">
+            <TabsTrigger value="friends" className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Amis ({friendsList.length})
+            </TabsTrigger>
+            <TabsTrigger value="requests" className="flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              Demandes ({pendingRequests.length})
+            </TabsTrigger>
+          </TabsList>
 
-                {friend.is_online && (
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={() => handleInvite(friend.email, 'chess')}
-                      className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300"
-                    >
-                      <Crown className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => handleInvite(friend.email, 'checkers')}
-                      className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-300"
-                    >
-                      <Circle className="w-4 h-4" />
-                    </Button>
-                  </div>
-                )}
+          {/* TAB: Amis */}
+          <TabsContent value="friends" className="space-y-4">
+            {friendsList.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <Users className="w-14 h-14 text-[#D4A574]/20 mb-4" />
+                <p className="text-[#D4A574]/50 text-lg mb-4">Aucun ami pour le moment</p>
+                <Button
+                  onClick={() => setShowAddFriend(true)}
+                  className="bg-[#D4A574] text-[#2C1810] hover:opacity-90"
+                >
+                  Commencer à ajouter des amis
+                </Button>
               </div>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="requests">
-          <div className="space-y-3">
-            {mockRequests.map((request) => (
-              <div
-                key={request.id}
-                className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10"
-              >
-                <div className="flex items-center gap-3">
-                  <Avatar className="w-12 h-12 border-2 border-amber-500/30">
-                    <AvatarFallback className="bg-amber-900 text-amber-200">
-                      {request.from_name?.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="font-semibold text-white">{request.from_name}</h3>
-                    <p className="text-sm text-gray-400">Niveau {request.level}</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() => acceptMutation.mutate(request.id)}
-                    className="bg-green-600 hover:bg-green-500"
-                  >
-                    <Check className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => declineMutation.mutate(request.id)}
-                    className="border-red-500/50 text-red-400 hover:bg-red-500/10"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <AnimatePresence>
+                  {friendsList.map((friend, idx) => (
+                    <motion.div
+                      key={friend.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ delay: idx * 0.05 }}
+                    >
+                      <FriendCard
+                        friend={friend}
+                        isOnline={friend.isOnline}
+                        onRemove={() => handleRemoveFriend(friend.id)}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
               </div>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+            )}
+          </TabsContent>
+
+          {/* TAB: Demandes */}
+          <TabsContent value="requests" className="space-y-4">
+            {pendingRequests.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <CheckCircle className="w-14 h-14 text-green-500/20 mb-4" />
+                <p className="text-[#D4A574]/50 text-lg">Aucune demande en attente</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <AnimatePresence>
+                  {pendingRequests.map((request, idx) => (
+                    <motion.div
+                      key={request.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ delay: idx * 0.05 }}
+                    >
+                      <FriendRequestCard
+                        request={request}
+                        onAccept={() => handleAcceptRequest(request.id, request.sender_id, request.sender_email || request.sender_id)}
+                        onDecline={() => handleDeclineRequest(request.id)}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }
