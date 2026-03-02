@@ -23,7 +23,10 @@ export default function Colisee({ gameType }) {
 
   const loadLiveGames = async () => {
     try {
-      const sessions = await base44.entities.GameSession.filter({ status: 'in_progress' }, '-updated_date', 20);
+      const filterObj = gameType
+        ? { status: 'in_progress', game_type: gameType }
+        : { status: 'in_progress' };
+      const sessions = await base44.entities.GameSession.filter(filterObj, '-updated_date', 20);
       // Garder seulement les parties actives depuis moins de 30 minutes
       const thirtyMinsAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
       const recentSessions = sessions.filter(s => s.updated_date >= thirtyMinsAgo);
