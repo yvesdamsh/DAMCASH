@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
-import { Home, Search, Gamepad2, Mail, Trophy, Gem, User, LogOut, Menu, X, Bell, Swords } from 'lucide-react';
+import { Home, Search, Gamepad2, Mail, Trophy, Gem, User, LogOut, Menu, X, Bell, Swords, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import UserAvatar from '@/components/ui/UserAvatar';
 import { motion, AnimatePresence } from 'framer-motion';
