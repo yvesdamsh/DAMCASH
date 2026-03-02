@@ -237,7 +237,7 @@ function TournamentCard({ tournament, onJoin, idx }) {
 export default function Tournaments() {
   const [user, setUser] = useState(null);
   const [typeFilter, setTypeFilter] = useState('all');
-  const [gameFilter, setGameFilter] = useState('all');
+  const [gameFilter, setGameFilter] = useState('chess');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const queryClient = useQueryClient();
 
