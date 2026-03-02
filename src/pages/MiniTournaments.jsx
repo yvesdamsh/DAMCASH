@@ -184,7 +184,8 @@ export default function MiniTournaments() {
   const [user, setUser] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
   const [search, setSearch] = useState('');
-  const [gameFilter, setGameFilter] = useState('all');
+  const urlParams = new URLSearchParams(window.location.search);
+  const [gameFilter, setGameFilter] = useState(urlParams.get('game') || 'all');
   const [statusFilter, setStatusFilter] = useState('waiting');
   const queryClient = useQueryClient();
 

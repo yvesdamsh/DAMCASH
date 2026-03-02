@@ -169,9 +169,10 @@ function TournamentCard({ tournament, onJoin, idx }) {
 export default function Tournaments() {
   const [user, setUser] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
-  const [gameFilter, setGameFilter] = useState('all');
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const queryClient = useQueryClient();
+  const urlParams = new URLSearchParams(window.location.search);
+  const [gameFilter, setGameFilter] = useState(urlParams.get('game') || 'all');
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     base44.auth.isAuthenticated().then(ok => ok && base44.auth.me().then(setUser).catch(() => {}));
