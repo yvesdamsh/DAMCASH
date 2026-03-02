@@ -169,7 +169,7 @@ export default function Layout({ children, currentPageName }) {
   const navItems = [
     { name: 'Accueil', icon: Home, page: 'Home' },
     { name: 'Tournois', icon: Trophy, page: 'Tournaments' },
-    { name: 'Salons', icon: Swords, page: 'MiniTournaments' },
+    { name: 'Historique', icon: History, page: 'History' },
     { name: 'Notifs', icon: Bell, page: 'Notifications', showBadge: true },
     { name: 'Profil', icon: User, page: 'Profile' },
   ];

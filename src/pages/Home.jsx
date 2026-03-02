@@ -265,7 +265,7 @@ export default function Home() {
             { icon: <ShoppingBag className="w-5 h-5 text-amber-400" />, label: 'Boutique', page: 'Shop' },
             { icon: <UserPlus className="w-5 h-5 text-green-400" />, label: 'Amis', page: 'Friends' },
             { icon: <Building className="w-5 h-5 text-blue-400" />, label: 'Clubs', page: 'Clubs' },
-            { icon: <span className="text-lg">🧩</span>, label: 'Puzzles', page: 'Puzzles' },
+            { icon: <History className="w-5 h-5 text-amber-400" />, label: 'Historique', page: 'History' },
           ].map((item, i) => (
             <motion.div key={item.page} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 + i * 0.07 }}>
               <Link to={createPageUrl(item.page)}
