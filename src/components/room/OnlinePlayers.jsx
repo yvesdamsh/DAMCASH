@@ -152,7 +152,9 @@ export default function OnlinePlayers() {
 
                     {/* Player details */}
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-[#F5E6D3] truncate">{player.username}</p>
+                      <PlayerPopup playerId={player.user_id} playerName={player.username} playerAvatar={player.avatar_url}>
+                        <span className="font-bold text-[#F5E6D3] truncate">{player.username}</span>
+                      </PlayerPopup>
                       <p className="text-sm text-[#D4A574]/70">
                         En ligne depuis {player.last_seen ? new Date(player.last_seen).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : 'récemment'}
                       </p>
