@@ -14,6 +14,12 @@ export default function Home() {
     loadUser();
   }, []);
 
+  useEffect(() => {
+    if (user?.preferred_universe) {
+      setUniverse(user.preferred_universe);
+    }
+  }, [user]);
+
   const loadUser = async () => {
     try {
       const isAuth = await base44.auth.isAuthenticated();

@@ -55,7 +55,6 @@ import CupCalendar from './pages/CupCalendar';
 import Friends from './pages/Friends';
 import GameRoom from './pages/GameRoom';
 import History from './pages/History';
-import Home from './pages/Home';
 import Invitations from './pages/Invitations';
 import Leaderboard from './pages/Leaderboard';
 import MiniTournaments from './pages/MiniTournaments';
@@ -72,6 +71,7 @@ import Search from './pages/Search';
 import Shop from './pages/Shop';
 import Spectate from './pages/Spectate';
 import Tournaments from './pages/Tournaments';
+import Home from './pages/Home';
 import __Layout from './Layout.jsx';
 
 
@@ -84,7 +84,6 @@ export const PAGES = {
     "Friends": Friends,
     "GameRoom": GameRoom,
     "History": History,
-    "Home": Home,
     "Invitations": Invitations,
     "Leaderboard": Leaderboard,
     "MiniTournaments": MiniTournaments,
@@ -101,6 +100,7 @@ export const PAGES = {
     "Shop": Shop,
     "Spectate": Spectate,
     "Tournaments": Tournaments,
+    "Home": Home,
 }
 
 export const pagesConfig = {
