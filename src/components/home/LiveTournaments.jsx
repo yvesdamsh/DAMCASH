@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '../../utils';
 import { Activity, Users, ChevronRight, Trophy } from 'lucide-react';
 
-export default function LiveTournaments() {
+export default function LiveTournaments({ gameType }) {
   const [tournaments, setTournaments] = useState([]);
   const [timeLeft, setTimeLeft] = useState({});
 
