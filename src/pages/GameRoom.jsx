@@ -15,6 +15,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SpectatorManager from '../components/game/SpectatorManager';
 import DrawProposalModal from '../components/game/DrawProposalModal';
 import DrawResponseModal from '../components/game/DrawResponseModal';
+import FloatingVideoCall from '../components/game/FloatingVideoCall';
 
 const TIME_CONTROLS = {
   bullet: 60,
