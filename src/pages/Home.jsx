@@ -150,7 +150,36 @@ export default function Home() {
                   transition={{ duration: 2, repeat: Infinity }}
                   className="text-5xl"
                 >
-                  {isChess ? '♟️' : '⚫'}
+                  {isChess ? (
+                     <span style={{
+                       display: 'inline-block',
+                       fontSize: '2.8rem',
+                       filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.7)) drop-shadow(0 2px 4px rgba(217,119,6,0.4))',
+                       textShadow: 'none'
+                     }}>♟</span>
+                   ) : (
+                     <span style={{
+                       display: 'inline-block',
+                       width: '52px',
+                       height: '52px',
+                       borderRadius: '50%',
+                       background: 'radial-gradient(circle at 35% 35%, #6b7280, #1f2937 55%, #111827)',
+                       boxShadow: '0 8px 16px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,255,255,0.15), inset 0 -3px 6px rgba(0,0,0,0.5), 0 2px 8px rgba(59,130,246,0.3)',
+                       border: '2px solid rgba(107,114,128,0.4)',
+                       position: 'relative'
+                     }}>
+                       <span style={{
+                         position: 'absolute',
+                         top: '30%',
+                         left: '30%',
+                         width: '30%',
+                         height: '20%',
+                         borderRadius: '50%',
+                         background: 'rgba(255,255,255,0.2)',
+                         transform: 'rotate(-30deg)'
+                       }} />
+                     </span>
+                   )}
                 </motion.span>
                 <div>
                   <h2 className="text-2xl font-black text-white">
