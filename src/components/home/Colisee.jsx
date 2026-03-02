@@ -23,15 +23,23 @@ export default function Colisee() {
 
   const loadLiveGames = async () => {
     try {
-      const sessions = await base44.entities.GameSession.filter({ status: 'in_progress' });
-      if (sessions.length > 0) {
-        const enrichedGames = sessions.slice(0, 2).map((session) => ({
-          ...session,
-          player1_data: { full_name: session.player1_name },
-          player2_data: { full_name: session.player2_name },
-          spectators: Math.floor(Math.random() * 50) + 10
-        }));
-        setLiveGames(enrichedGames);
+      const sessions = await base44.entities.GameSession.filter({ status: 'in_progress' }, '-updated_date', 20);
+      // Garder seulement les parties actives depuis moins de 30 minutes
+      const thirtyMinsAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+      const recentSessions = sessions.filter(s => s.updated_date >= thirtyMinsAgo);
+
+      if (recentSessions.length > 0) {
+        // Trier par nombre de spectateurs décroissant, prendre les 2 premières
+        const sorted = recentSessions
+          .sort((a, b) => (b.spectators_count || 0) - (a.spectators_count || 0))
+          .slice(0, 2)
+          .map((session) => ({
+            ...session,
+            player1_data: { full_name: session.player1_name },
+            player2_data: { full_name: session.player2_name },
+            spectators: session.spectators_count || 0
+          }));
+        setLiveGames(sorted);
       } else {
         setLiveGames([]);
       }
