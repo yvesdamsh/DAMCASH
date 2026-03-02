@@ -1514,6 +1514,18 @@ export default function GameRoom() {
         </div>
       </div>
 
+      {/* Floating Video Call */}
+      {gameStarted && !isSpectator && session && user && (
+        <FloatingVideoCall
+          roomId={roomId}
+          currentUserId={user.id}
+          opponentId={user.id === session.player1_id ? session.player2_id : session.player1_id}
+          opponentName={opponent?.full_name}
+          gameStarted={gameStarted}
+          isSpectator={isSpectator}
+        />
+      )}
+
       {/* Barre Joueur Courant - EN BAS */}
       {user && (
         <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-t-2 border-[#D4A574]/40 px-4 py-3 shadow-lg">
