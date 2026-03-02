@@ -105,7 +105,7 @@ export default function Home() {
             ♟️ Échecs
           </button>
           <button
-            onClick={() => setUniverse('checkers')}
+            onClick={() => { setUniverse('checkers'); localStorage.setItem('damcash_universe', 'checkers'); }}
             className={`flex items-center gap-2 px-5 py-2 rounded-full font-black text-sm transition-all border ${
               !isChess
                 ? 'bg-gradient-to-r from-blue-800 to-cyan-700 border-blue-500/50 text-white shadow-lg shadow-blue-900/40'
