@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function Home() {
   const [user, setUser] = useState(null);
   const [onlineCount, setOnlineCount] = useState(0);
-  const [universe, setUniverse] = useState('chess'); // 'chess' | 'checkers'
+  const [universe, setUniverse] = useState(() => localStorage.getItem('damcash_universe') || 'chess');
 
   useEffect(() => {
     loadUser();
