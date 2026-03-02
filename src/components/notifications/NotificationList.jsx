@@ -23,10 +23,21 @@ export default function NotificationList({ userEmail }) {
 
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ['notifications', userEmail],
-    queryFn: () => base44.entities.Notification.filter({ user_email: userEmail }, '-created_date'),
+    queryFn: () => base44.entities.Notification.filter({ user_email: userEmail }, '-created_date', 50),
     enabled: !!userEmail,
-    refetchInterval: 30000
+    refetchInterval: 15000
   });
+
+  // Realtime: écouter les nouvelles notifications
+  useEffect(() => {
+    if (!userEmail) return;
+    const unsubscribe = base44.entities.Notification?.subscribe?.((event) => {
+      if (event?.data?.user_email === userEmail) {
+        queryClient.invalidateQueries({ queryKey: ['notifications', userEmail] });
+      }
+    });
+    return () => { if (typeof unsubscribe === 'function') unsubscribe(); };
+  }, [userEmail, queryClient]);
 
   const markAsReadMutation = useMutation({
     mutationFn: (id) => base44.entities.Notification.update(id, { is_read: true }),
