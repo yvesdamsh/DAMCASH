@@ -844,7 +844,7 @@ export default function GameRoom() {
         ? Math.floor((new Date() - new Date(session.created_date)) / 1000)
         : null;
 
-      await base44.entities.GameResult?.create?.({
+      const gameResultData = {
         room_id: roomId,
         game_type: gameType,
         winner_id: winnerId,
@@ -856,8 +856,25 @@ export default function GameRoom() {
         result: isDraw ? 'draw' : (whiteWinner ? 'white' : 'black'),
         final_board_state: session.board_state,
         moves_count: session.move_count || 0,
-        duration_seconds: duration
-      });
+        duration_seconds: duration,
+        has_wager: session.has_wager || false,
+        wager_amount: session.wager_amount || null
+      };
+
+      const gameResult = await base44.entities.GameResult?.create?.(gameResultData);
+
+      // Traiter le paiement du pari si applicable
+      if (session.has_wager && session.wager_amount && !isDraw && winnerId) {
+        try {
+          await base44.functions.invoke('processWagerPayment', {
+            gameResultId: gameResult?.id,
+            winnerId,
+            wagerAmount: session.wager_amount
+          });
+        } catch (paymentError) {
+          console.log('Erreur traitement pari:', paymentError?.message || paymentError);
+        }
+      }
 
       // Calculer et mettre à jour l'ELO en temps réel
       if (!isDraw) {
