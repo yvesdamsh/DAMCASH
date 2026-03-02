@@ -70,6 +70,7 @@ import Search from './pages/Search';
 import Shop from './pages/Shop';
 import Spectate from './pages/Spectate';
 import Tournaments from './pages/Tournaments';
+import MiniTournaments from './pages/MiniTournaments';
 import __Layout from './Layout.jsx';
 
 
@@ -97,6 +98,7 @@ export const PAGES = {
     "Shop": Shop,
     "Spectate": Spectate,
     "Tournaments": Tournaments,
+    "MiniTournaments": MiniTournaments,
 }
 
 export const pagesConfig = {
