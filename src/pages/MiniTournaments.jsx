@@ -159,11 +159,20 @@ function MiniTournamentCard({ room, user, onJoin, onSpectate, idx }) {
             )}
           </div>
         ) : (
-          <motion.button whileTap={{ scale: 0.97 }} onClick={() => onJoin(room, null)}
-            className="w-full py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-[#D4A574] to-[#8B5A2B] text-[#1a0c06] hover:shadow-lg hover:shadow-[#D4A574]/20 transition-all relative overflow-hidden">
-            REJOINDRE
-            <motion.div animate={{ x: ['-100%', '200%'] }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+          <motion.button
+            whileTap={canAfford ? { scale: 0.97 } : {}}
+            onClick={() => canAfford && onJoin(room, null)}
+            disabled={!canAfford}
+            className={`w-full py-2.5 rounded-xl text-xs font-black transition-all relative overflow-hidden ${
+              canAfford
+                ? 'bg-gradient-to-r from-[#D4A574] to-[#8B5A2B] text-[#1a0c06] hover:shadow-lg hover:shadow-[#D4A574]/20'
+                : 'bg-red-900/20 border border-red-500/30 text-red-400/60 cursor-not-allowed'
+            }`}>
+            {canAfford ? 'REJOINDRE' : `❌ GEMMES INSUFFISANTES`}
+            {canAfford && (
+              <motion.div animate={{ x: ['-100%', '200%'] }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+            )}
           </motion.button>
         )}
       </div>
