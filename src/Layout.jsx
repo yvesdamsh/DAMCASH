@@ -7,8 +7,6 @@ import { Button } from '@/components/ui/button';
 import UserAvatar from '@/components/ui/UserAvatar';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationBadge from './components/notifications/NotificationBadge.jsx';
-import { toast } from 'sonner';
-import { toast } from 'sonner';
 import InvitationBadge from './components/notifications/InvitationBadge.jsx';
 import Splash from './components/Splash.jsx';
 import {
