@@ -82,6 +82,13 @@ export default function Colisee() {
       </div>
 
       {/* Game Cards */}
+      {liveGames.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-10 rounded-xl border border-[#D4A574]/10 bg-black/20 text-center">
+          <Activity className="w-8 h-8 text-[#D4A574]/20 mb-2" />
+          <p className="text-[#D4A574]/40 text-sm font-semibold">Aucune partie en direct</p>
+          <p className="text-[#D4A574]/20 text-xs mt-1">Le Colisée s'anime lors des grandes batailles</p>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {liveGames.map((game, idx) => (
           <motion.div
