@@ -1273,43 +1273,12 @@ export default function GameRoom() {
         />
       )}
 
-      {/* Barre Joueur Courant - EN BAS */}
-      {user && (
-        <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-t-2 border-[#D4A574]/40 px-4 py-3 shadow-lg">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 flex-1">
-              <UserAvatar 
-                user={user}
-                size="sm"
-              />
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-sm text-[#F5E6D3] truncate">{user.full_name}</p>
-                <p className={`text-xs font-semibold ${
-                  canMove ? 'text-lime-400' : 'text-[#D4A574]'
-                }`}>
-                  {canMove ? 'Votre tour' : 'En attente'}
-                </p>
-              </div>
-            </div>
-            <motion.div
-              animate={{
-                scale: (isPlayerWhite ? whiteTime : blackTime) < 60 && canMove ? [1, 1.05, 1] : 1
-              }}
-              transition={{ repeat: (isPlayerWhite ? whiteTime : blackTime) < 60 && canMove ? Infinity : 0, duration: 1 }}
-              className={`text-lg font-bold font-mono px-3 py-1 rounded transition-all ${
-                (isPlayerWhite ? whiteTime : blackTime) < 60 && (isPlayerWhite ? whiteTime : blackTime) > 0
-                  ? 'bg-red-500/30 border border-red-500 text-red-400 shadow-lg shadow-red-500/50 animate-pulse'
-                  : canMove 
-                    ? 'bg-green-500/20 border border-green-500 text-green-400' 
-                    : 'text-[#F5E6D3]'
-              }`}
-            >
-              {(isPlayerWhite ? whiteTime : blackTime) < 60 && (isPlayerWhite ? whiteTime : blackTime) > 0 && (
-                <AlertTriangle className="inline w-4 h-4 mr-1 animate-bounce" />
-              )}
-              {formatTime(isPlayerWhite ? whiteTime : blackTime)}
-            </motion.div>
-          </div>
+      {/* Indicateur de tour - bas, compact */}
+      {user && canMove !== undefined && (
+        <div className={`px-4 py-2 border-t text-center text-xs font-bold ${
+          canMove ? 'border-green-500/40 bg-green-900/20 text-green-400' : 'border-[#D4A574]/20 bg-transparent text-[#D4A574]/50'
+        }`}>
+          {canMove ? '🟢 Votre tour' : '⏳ Tour de l\'adversaire'}
         </div>
       )}
       </div>
