@@ -32,7 +32,7 @@ function PlayerSeats({ current, max }) {
   );
 }
 
-function MiniTournamentCard({ room, user, onJoin, onSpectate, idx }) {
+function MiniTournamentCard({ room, user, onJoin, onSpectate, onLaunch, idx }) {
   const [pwInput, setPwInput] = useState('');
   const [showPw, setShowPw] = useState(false);
   const current = room.players?.length || 0;
