@@ -289,7 +289,7 @@ export default function MiniTournaments() {
   };
 
   return (
-    <div className="min-h-screen text-[#F5E6D3]">
+    <div className="min-h-screen text-[#F5E6D3] overflow-x-hidden w-full">
       <CreateMiniTournamentModal open={showCreate} onClose={() => setShowCreate(false)} user={user}
         onCreated={() => queryClient.invalidateQueries({ queryKey: ['minitournaments'] })} />
 
