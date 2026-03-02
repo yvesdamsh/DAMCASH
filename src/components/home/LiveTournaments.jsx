@@ -35,31 +35,23 @@ export default function LiveTournaments({ gameType }) {
 
   const loadTournaments = async () => {
     try {
-      const data = await base44.entities.Tournament.filter({ status: 'in_progress' }, '-start_date', 2);
-      setTournaments(data.length > 0 ? data : mockTournaments);
+      const filterObj = gameType
+        ? { status: 'in_progress', game_type: gameType }
+        : { status: 'in_progress' };
+      const data = await base44.entities.Tournament.filter(filterObj, '-start_date', 2);
+      const mock = gameType === 'checkers'
+        ? [{ id: '2', name: 'CHECKERS WORLD SERIES', game_type: 'checkers', participants: Array(842).fill('user'), max_participants: 1500, start_date: new Date(Date.now() + 5 * 60 * 1000).toISOString() }]
+        : gameType === 'chess'
+        ? [{ id: '1', name: 'SUPER BLITZ MONDAY', game_type: 'chess', participants: Array(1204).fill('user'), max_participants: 2000, start_date: new Date(Date.now() + 12 * 60 * 1000).toISOString() }]
+        : [
+            { id: '1', name: 'SUPER BLITZ MONDAY', game_type: 'chess', participants: Array(1204).fill('user'), max_participants: 2000, start_date: new Date(Date.now() + 12 * 60 * 1000).toISOString() },
+            { id: '2', name: 'CHECKERS WORLD SERIES', game_type: 'checkers', participants: Array(842).fill('user'), max_participants: 1500, start_date: new Date(Date.now() + 5 * 60 * 1000).toISOString() }
+          ];
+      setTournaments(data.length > 0 ? data : mock);
     } catch (e) {
-      setTournaments(mockTournaments);
+      setTournaments([]);
     }
   };
-
-  const mockTournaments = [
-    {
-      id: '1',
-      name: 'SUPER BLITZ MONDAY',
-      game_type: 'chess',
-      participants: Array(1204).fill('user'),
-      max_participants: 2000,
-      start_date: new Date(Date.now() + 12 * 60 * 1000).toISOString()
-    },
-    {
-      id: '2',
-      name: 'CHECKERS WORLD SERIES',
-      game_type: 'checkers',
-      participants: Array(842).fill('user'),
-      max_participants: 1500,
-      start_date: new Date(Date.now() + 5 * 60 * 1000).toISOString()
-    }
-  ];
 
   if (tournaments.length === 0) return null;
 

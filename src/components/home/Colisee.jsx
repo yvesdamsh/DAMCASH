@@ -6,7 +6,7 @@ import { createPageUrl } from '../../utils';
 import { Activity, Eye, Gem, ChevronRight, Swords } from 'lucide-react';
 import UserAvatar from '../ui/UserAvatar';
 
-export default function Colisee() {
+export default function Colisee({ gameType }) {
   const [liveGames, setLiveGames] = useState([]);
   const [pulse, setPulse] = useState(false);
 
@@ -14,7 +14,7 @@ export default function Colisee() {
     loadLiveGames();
     const interval = setInterval(loadLiveGames, 15000);
     return () => clearInterval(interval);
-  }, []);
+  }, [gameType]);
 
   useEffect(() => {
     const p = setInterval(() => setPulse(v => !v), 1500);
