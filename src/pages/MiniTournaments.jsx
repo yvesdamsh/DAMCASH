@@ -40,6 +40,7 @@ function MiniTournamentCard({ room, user, onJoin, onSpectate, idx }) {
 
   const statusColor = room.status === 'in_progress' ? 'text-red-400' : room.status === 'waiting' ? 'text-emerald-400' : 'text-gray-400';
   const statusLabel = room.status === 'in_progress' ? 'EN COURS' : room.status === 'waiting' ? 'EN ATTENTE' : 'TERMINÉ';
+  const canAfford = !room.entry_gems || (user?.gems || 0) >= room.entry_gems;
 
   return (
     <motion.div
