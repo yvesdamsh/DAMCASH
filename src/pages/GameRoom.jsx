@@ -685,50 +685,37 @@ export default function GameRoom() {
 
   const handleSaveMove = async (newBoardState, nextTurn) => {
     if (!session || !user) return;
-    
-    try {
-      const playerColor = user.id === session.player1_id ? 'white' : 'black';
-      
-      // SAUVEGARDER: board_state + current_turn + timestamp + timer
-      const updateData = {
-        board_state: JSON.stringify(newBoardState),
-        current_turn: nextTurn,
-        last_move_timestamp: new Date().toISOString()
-      };
 
-      // Sauvegarder le temps du joueur qui VIENT de jouer
-      if (playerColor === 'white') {
-        updateData.white_time = whiteTime;
-      } else {
-        updateData.black_time = blackTime;
-      }
+    const playerColor = user.id === session.player1_id ? 'white' : 'black';
+    const boardJson = JSON.stringify(newBoardState);
+    const timestamp = new Date().toISOString();
 
-      // Envoyer à la base de données
-      await base44.entities.GameSession.update(session.id, {
-        ...updateData,
-        move_count: (session.move_count || 0) + 1
-      });
+    const updateData = {
+      board_state: boardJson,
+      current_turn: nextTurn,
+      last_move_timestamp: timestamp,
+      ...(playerColor === 'white' ? { white_time: whiteTime } : { black_time: blackTime })
+    };
 
-      // Enregistrer le coup en realtime (best-effort)
-      try {
-        await base44.entities.GameMove?.create?.({
-          room_id: roomId,
-          player_id: user.id,
-          board_state: JSON.stringify(newBoardState),
-          next_turn: nextTurn,
-          white_time: whiteTime,
-          black_time: blackTime
-        });
-      } catch (moveError) {
-        console.log('Realtime move non disponible:', moveError?.message || moveError);
-      }
-      
-      // Mettre à jour le state local
-      setBoardState(newBoardState);
-      setSession(prev => ({ ...prev, ...updateData }));
-    } catch (error) {
-      console.error('Erreur sauvegarde coup:', error);
-    }
+    // Mettre à jour le state LOCAL immédiatement (0ms latency perçue)
+    setBoardState(newBoardState);
+    setSession(prev => ({ ...prev, ...updateData }));
+
+    // Envoyer GameMove EN PREMIER (realtime pour l'adversaire, plus léger)
+    base44.entities.GameMove?.create?.({
+      room_id: roomId,
+      player_id: user.id,
+      board_state: boardJson,
+      next_turn: nextTurn,
+      white_time: whiteTime,
+      black_time: blackTime
+    }).catch(() => {});
+
+    // Persister sur GameSession en parallèle (pas besoin d'await)
+    base44.entities.GameSession.update(session.id, {
+      ...updateData,
+      move_count: (session.move_count || 0) + 1
+    }).catch(e => console.error('Erreur sauvegarde session:', e));
   };
 
   const handleTimeOut = async (playerColor) => {
