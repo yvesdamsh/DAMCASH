@@ -7,6 +7,7 @@ import UserAvatar from '@/components/ui/UserAvatar';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send } from 'lucide-react';
 import { toast } from 'sonner';
+import PlayerPopup from '../ui/PlayerPopup';
 
 export default function OnlinePlayers() {
   const navigate = useNavigate();
