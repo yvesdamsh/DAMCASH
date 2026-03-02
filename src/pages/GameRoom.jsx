@@ -331,8 +331,6 @@ export default function GameRoom() {
           winner_id: winnerId,
           winner_name: winnerName
         });
-        console.log('GameEvent created successfully');
-
         await base44.entities.Notification?.create?.({
         user_email: winnerId,
         type: 'game_result',
