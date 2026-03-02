@@ -70,6 +70,8 @@ import RoomLobby from './pages/RoomLobby';
 import Search from './pages/Search';
 import Shop from './pages/Shop';
 import Spectate from './pages/Spectate';
+import Tournaments from './pages/Tournaments';
+import CupCalendar from './pages/CupCalendar';
 import __Layout from './Layout.jsx';
 
 
@@ -97,6 +99,8 @@ export const PAGES = {
     "Search": Search,
     "Shop": Shop,
     "Spectate": Spectate,
+    "Tournaments": Tournaments,
+    "CupCalendar": CupCalendar,
 }
 
 export const pagesConfig = {
