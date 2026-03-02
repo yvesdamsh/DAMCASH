@@ -238,7 +238,46 @@ export default function MiniTournaments() {
   };
 
   const handleSpectate = (room) => {
-    // future: navigate to spectate view
+    if (!room.room_id) return;
+    window.location.href = createPageUrl('GameRoom') + `?roomId=${room.room_id}&spectate=true`;
+  };
+
+  const handleLaunch = async (room) => {
+    if (!user || room.host_id !== user.id) return;
+    if ((room.players?.length || 0) < 2) { toast.error('Il faut au moins 2 joueurs pour lancer.'); return; }
+    try {
+      // Créer la GameSession pour la première partie
+      const roomId = `mini_${room.id}_${Date.now()}`;
+      await base44.entities.GameSession.create({
+        room_id: roomId,
+        player1_id: room.players[0],
+        player1_email: room.players[0],
+        player1_name: room.player_names?.[0] || 'Joueur 1',
+        player2_id: room.players[1],
+        player2_email: room.players[1],
+        player2_name: room.player_names?.[1] || 'Joueur 2',
+        game_type: room.game_type,
+        status: 'in_progress',
+        current_turn: 'white',
+        time_control: room.time_control || 'blitz'
+      });
+      await base44.entities.MiniTournament.update(room.id, { status: 'in_progress', room_id: roomId });
+      // Notifier les joueurs
+      await Promise.all(room.players.map(email =>
+        base44.entities.Notification?.create?.({
+          user_email: email,
+          type: 'game_started',
+          title: '⚔️ Le tournoi commence !',
+          message: `Le salon "${room.name}" a démarré.`,
+          link: `GameRoom?roomId=${roomId}`,
+          is_read: false
+        })
+      ));
+      queryClient.invalidateQueries({ queryKey: ['minitournaments'] });
+      window.location.href = createPageUrl('GameRoom') + `?roomId=${roomId}`;
+    } catch (e) {
+      toast.error('Erreur lors du lancement');
+    }
   };
 
   const stats = {
