@@ -132,7 +132,7 @@ function MiniTournamentCard({ room, user, onJoin, onSpectate, onLaunch, idx }) {
               ✓ INSCRIT
             </div>
             {isHost && (
-              <motion.button whileTap={{ scale: 0.97 }}
+              <motion.button whileTap={{ scale: 0.97 }} onClick={() => onLaunch(room)}
                 className="flex-1 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-[#D4A574] to-[#8B5A2B] text-[#1a0c06] relative overflow-hidden">
                 LANCER
                 <motion.div animate={{ x: ['-100%', '200%'] }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
