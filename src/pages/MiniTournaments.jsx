@@ -4,6 +4,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Lock, Gem, Plus, Clock, Zap, Trophy, Search, Eye } from 'lucide-react';
 import CreateMiniTournamentModal from '../components/tournament/CreateMiniTournamentModal';
+import { createPageUrl } from '../utils';
+import { toast } from 'sonner';
 
 const TIME_LABELS = { bullet: '⚡ Bullet', blitz: '🔥 Blitz', rapid: '⏱ Rapide', classic: '♟ Classique' };
 const FORMAT_LABELS = { round_robin: '🔄 Round Robin', elimination: '⚔️ Élimination' };
