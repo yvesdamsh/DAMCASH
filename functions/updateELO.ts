@@ -4,86 +4,149 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    
+
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const {
-      gameType,        // 'chess' | 'checkers'
-      opponentId,      // ID du joueur adverse
-      opponentEmail,   // Email du joueur adverse
-      result,          // 'win' | 'loss' | 'draw'
-      playerCurrentELO,
-      opponentCurrentELO
-    } = await req.json();
+    const { gameType, opponentEmail, result, playerCurrentELO, opponentCurrentELO } = await req.json();
 
-    if (!gameType || !opponentEmail || !result) {
-      return Response.json({ error: 'Missing required fields' }, { status: 400 });
+    if (!gameType || !opponentEmail || !result || !playerCurrentELO) {
+      return Response.json({ error: 'Missing parameters' }, { status: 400 });
     }
 
-    const K = 32; // Standard K-factor
+    // Récupérer les stats du joueur courant
+    const playerStats = await base44.asServiceRole.entities.PlayerStats.filter({
+      user_id: user.id
+    });
 
-    // Calcul Expected Score
+    let stats = playerStats[0] || {
+      user_id: user.id,
+      username: user.full_name,
+      chess_rating: 1200,
+      checkers_rating: 1200,
+      games_played: 0,
+      games_won: 0,
+      games_lost: 0,
+      games_drawn: 0
+    };
+
+    // Calculer le changement ELO (Système ELO simple)
+    const K = 32; // Facteur K standard
     const expectedScore = 1 / (1 + Math.pow(10, (opponentCurrentELO - playerCurrentELO) / 400));
-    const expectedOpponentScore = 1 / (1 + Math.pow(10, (playerCurrentELO - opponentCurrentELO) / 400));
+    
+    let ratingChange = 0;
+    let newRating = playerCurrentELO;
 
-    // Déterminer les points réels
-    let actualScore, opponentActualScore;
     if (result === 'win') {
-      actualScore = 1;
-      opponentActualScore = 0;
+      ratingChange = Math.round(K * (1 - expectedScore));
+      newRating = playerCurrentELO + ratingChange;
+      stats.games_won = (stats.games_won || 0) + 1;
     } else if (result === 'loss') {
-      actualScore = 0;
-      opponentActualScore = 1;
-    } else { // draw
-      actualScore = 0.5;
-      opponentActualScore = 0.5;
+      ratingChange = Math.round(K * (0 - expectedScore));
+      newRating = playerCurrentELO + ratingChange;
+      stats.games_lost = (stats.games_lost || 0) + 1;
+    } else if (result === 'draw') {
+      ratingChange = Math.round(K * (0.5 - expectedScore));
+      newRating = playerCurrentELO + ratingChange;
+      stats.games_drawn = (stats.games_drawn || 0) + 1;
     }
 
-    // Calculer les nouveaux ELO
-    const newELO = Math.round(playerCurrentELO + K * (actualScore - expectedScore));
-    const newOpponentELO = Math.round(opponentCurrentELO + K * (opponentActualScore - expectedOpponentScore));
+    // Mise à jour du rating selon le type de jeu
+    const ratingField = gameType === 'chess' ? 'chess_rating' : 'checkers_rating';
+    stats[ratingField] = Math.max(0, newRating); // Minimum 0
+    stats.games_played = (stats.games_played || 0) + 1;
 
-    // Déterminer le champ à mettre à jour
-    const eloField = gameType === 'chess' ? 'chess_rating' : 'checkers_rating';
+    // Sauvegarder les stats
+    if (playerStats[0]?.id) {
+      await base44.asServiceRole.entities.PlayerStats.update(playerStats[0].id, stats);
+    } else {
+      await base44.asServiceRole.entities.PlayerStats.create(stats);
+    }
 
-    // Mettre à jour l'ELO du joueur actuel
-    await base44.asServiceRole.auth.updateUserByEmail(user.email, {
-      [eloField]: Math.max(0, newELO) // ELO ne peut pas être négatif
+    // Enregistrer l'historique ELO
+    await base44.asServiceRole.entities.ELORating.create({
+      user_id: user.id,
+      game_type: gameType,
+      rating_before: playerCurrentELO,
+      rating_after: newRating,
+      rating_change: ratingChange,
+      opponent_rating: opponentCurrentELO || 1200,
+      timestamp: new Date().toISOString()
     });
 
-    // Mettre à jour l'ELO de l'adversaire
-    await base44.asServiceRole.auth.updateUserByEmail(opponentEmail, {
-      [eloField]: Math.max(0, newOpponentELO)
-    });
+    // Récupérer les stats de l'adversaire et mettre à jour aussi
+    try {
+      const opponentUsers = await base44.asServiceRole.entities.User.list('-created_date', 1000);
+      const opponent = opponentUsers.find(u => u.email === opponentEmail);
+      
+      if (opponent) {
+        const opponentStats = await base44.asServiceRole.entities.PlayerStats.filter({
+          user_id: opponent.id
+        });
 
-    // Créer une notification pour les deux joueurs
-    await base44.asServiceRole.entities.Notification.create({
-      user_email: user.email,
-      type: 'game_ended',
-      title: `${result === 'win' ? '🎉 Victoire!' : result === 'loss' ? '😔 Défaite' : '🤝 Match nul'}`,
-      message: `ELO ${eloField === 'chess_rating' ? '♟' : '⚫'}: ${playerCurrentELO} → ${newELO} (${newELO > playerCurrentELO ? '+' : ''}${newELO - playerCurrentELO})`,
-      is_read: false
-    });
+        let oppStats = opponentStats[0] || {
+          user_id: opponent.id,
+          username: opponent.full_name,
+          chess_rating: 1200,
+          checkers_rating: 1200,
+          games_played: 0,
+          games_won: 0,
+          games_lost: 0,
+          games_drawn: 0
+        };
 
-    await base44.asServiceRole.entities.Notification.create({
-      user_email: opponentEmail,
-      type: 'game_ended',
-      title: `${result === 'loss' ? '🎉 Victoire!' : result === 'win' ? '😔 Défaite' : '🤝 Match nul'}`,
-      message: `ELO ${eloField === 'chess_rating' ? '♟' : '⚫'}: ${opponentCurrentELO} → ${newOpponentELO} (${newOpponentELO > opponentCurrentELO ? '+' : ''}${newOpponentELO - opponentCurrentELO})`,
-      is_read: false
-    });
+        // Calcul inverse pour l'adversaire
+        const oppExpectedScore = 1 / (1 + Math.pow(10, (playerCurrentELO - opponentCurrentELO) / 400));
+        let oppRatingChange = 0;
+        let oppNewRating = opponentCurrentELO;
+
+        if (result === 'win') {
+          oppRatingChange = Math.round(K * (0 - oppExpectedScore));
+          oppNewRating = opponentCurrentELO + oppRatingChange;
+          oppStats.games_lost = (oppStats.games_lost || 0) + 1;
+        } else if (result === 'loss') {
+          oppRatingChange = Math.round(K * (1 - oppExpectedScore));
+          oppNewRating = opponentCurrentELO + oppRatingChange;
+          oppStats.games_won = (oppStats.games_won || 0) + 1;
+        } else if (result === 'draw') {
+          oppRatingChange = Math.round(K * (0.5 - oppExpectedScore));
+          oppNewRating = opponentCurrentELO + oppRatingChange;
+          oppStats.games_drawn = (oppStats.games_drawn || 0) + 1;
+        }
+
+        oppStats[ratingField] = Math.max(0, oppNewRating);
+        oppStats.games_played = (oppStats.games_played || 0) + 1;
+
+        if (opponentStats[0]?.id) {
+          await base44.asServiceRole.entities.PlayerStats.update(opponentStats[0].id, oppStats);
+        } else {
+          await base44.asServiceRole.entities.PlayerStats.create(oppStats);
+        }
+
+        // Historique adversaire
+        await base44.asServiceRole.entities.ELORating.create({
+          user_id: opponent.id,
+          game_type: gameType,
+          rating_before: opponentCurrentELO,
+          rating_after: oppNewRating,
+          rating_change: oppRatingChange,
+          opponent_rating: playerCurrentELO,
+          timestamp: new Date().toISOString()
+        });
+      }
+    } catch (err) {
+      console.log('Opponent ELO update error:', err?.message || err);
+    }
 
     return Response.json({
       success: true,
-      playerNewELO: newELO,
-      playerELOChange: newELO - playerCurrentELO,
-      opponentNewELO: newOpponentELO,
-      opponentELOChange: newOpponentELO - opponentCurrentELO
+      newRating: newRating,
+      ratingChange: ratingChange,
+      message: `Rating mis à jour: ${playerCurrentELO} → ${newRating} (${ratingChange > 0 ? '+' : ''}${ratingChange})`
     });
   } catch (error) {
-    console.error('ELO Update Error:', error);
+    console.error('ELO update error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
