@@ -1100,254 +1100,46 @@ export default function GameRoom() {
         </div>
       </div>
 
-      {/* Header 2 Colonnes Symétriques avec Caméras Opt-in */}
+      {/* Infos joueurs - bandeau compact */}
       {opponent && session && (
-        <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-b-2 border-[#D4A574]/40 px-4 py-3 shadow-lg">
-          {/* Desktop: 2 colonnes */}
-          <div className="hidden md:grid grid-cols-2 gap-4">
-            {/* COLONNE GAUCHE - Joueur 1 */}
-             <div className="flex flex-col gap-3">
-               <div className="flex items-center gap-2">
-                 <UserAvatar 
-                   user={session.player1_id === user?.id ? user : opponent}
-                   size="sm"
-                 />
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-sm text-[#F5E6D3] truncate">
-                    {session.player1_id === user?.id ? user?.full_name : opponent?.full_name}
-                  </p>
-                  <p className={`text-xs font-semibold ${
-                    session.current_turn === 'white' ? 'text-yellow-400' : 'text-[#D4A574]'
-                  }`}>
-                    {session.current_turn === 'white' ? 'En train de jouer...' : 'En attente'}
-                  </p>
-                </div>
-                <motion.div 
-                  animate={{
-                    scale: whiteTime < 60 && session.current_turn === 'white' ? [1, 1.05, 1] : 1
-                  }}
-                  transition={{ repeat: whiteTime < 60 && session.current_turn === 'white' ? Infinity : 0, duration: 1 }}
-                  className={`text-lg font-bold font-mono px-3 py-1 rounded transition-all flex-shrink-0 ${
-                    whiteTime < 60 && whiteTime > 0
-                      ? 'bg-red-500/30 border border-red-500 text-red-400 shadow-lg shadow-red-500/50 animate-pulse'
-                      : session.current_turn === 'white' 
-                        ? 'bg-orange-500/20 border border-orange-500 text-orange-400' 
-                        : 'text-[#F5E6D3]'
-                  }`}
-                >
-                  {whiteTime < 60 && whiteTime > 0 && (
-                    <AlertTriangle className="inline w-4 h-4 mr-1 animate-bounce" />
-                  )}
-                  {formatTime(whiteTime)}
-                </motion.div>
-              </div>
-              <div className="w-full aspect-video rounded-lg overflow-hidden bg-gray-900 shadow-lg border border-[#D4A574]/50 flex flex-col items-center justify-center">
-                {session.player1_id === user?.id && localStream ? (
-                  <video
-                    ref={localVideoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <>
-                    <span className="text-4xl mb-2">📹</span>
-                    <p className="text-[#D4A574] text-sm font-semibold">Caméra désactivée</p>
-                    {session.player1_id === user?.id && (
-                      <Button
-                        onClick={activateMyCamera}
-                        className="mt-3 bg-blue-600 hover:bg-blue-700 text-white"
-                        size="sm"
-                      >
-                        🎥 Activer ma caméra
-                      </Button>
-                    )}
-                  </>
-                )}
-              </div>
+        <div className="bg-gradient-to-r from-[#3E2723] to-[#2C1810] border-b border-[#D4A574]/30 px-4 py-2">
+          <div className="flex items-center justify-between gap-2">
+            {/* Joueur adverse (haut) */}
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <UserAvatar user={session.player1_id === user?.id ? opponent : user} size="sm" />
+              <p className="font-bold text-xs text-[#F5E6D3] truncate">
+                {session.player1_id === user?.id ? opponent?.full_name : user?.full_name}
+              </p>
             </div>
-
-            {/* COLONNE DROITE - Joueur 2 */}
-             <div className="flex flex-col gap-3">
-               <div className="flex items-center gap-2">
-                 <UserAvatar 
-                   user={session.player2_id === user?.id ? user : opponent}
-                   size="sm"
-                 />
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-sm text-[#F5E6D3] truncate">
-                    {session.player2_id === user?.id ? user?.full_name : opponent?.full_name}
-                  </p>
-                  <p className={`text-xs font-semibold ${
-                    session.current_turn === 'black' ? 'text-yellow-400' : 'text-[#D4A574]'
-                  }`}>
-                    {session.player2_id ? (
-                      session.current_turn === 'black' ? 'En train de jouer...' : 'En attente'
-                    ) : (
-                      'En attente de rejoindre...'
-                    )}
-                  </p>
-                </div>
-                <motion.div 
-                  animate={{
-                    scale: blackTime < 60 && session.current_turn === 'black' ? [1, 1.05, 1] : 1
-                  }}
-                  transition={{ repeat: blackTime < 60 && session.current_turn === 'black' ? Infinity : 0, duration: 1 }}
-                  className={`text-lg font-bold font-mono px-3 py-1 rounded transition-all flex-shrink-0 ${
-                    blackTime < 60 && blackTime > 0
-                      ? 'bg-red-500/30 border border-red-500 text-red-400 shadow-lg shadow-red-500/50 animate-pulse'
-                      : session.current_turn === 'black' 
-                        ? 'bg-orange-500/20 border border-orange-500 text-orange-400' 
-                        : 'text-[#F5E6D3]'
-                  }`}
-                >
-                  {blackTime < 60 && blackTime > 0 && (
-                    <AlertTriangle className="inline w-4 h-4 mr-1 animate-bounce" />
-                  )}
-                  {formatTime(blackTime)}
-                </motion.div>
-              </div>
-              <div className="w-full aspect-video rounded-lg overflow-hidden bg-gray-900 shadow-lg border border-[#D4A574]/50 flex flex-col items-center justify-center">
-                {session.player2_id === user?.id && localStream ? (
-                  <video
-                    ref={localVideoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <>
-                    <span className="text-4xl mb-2">📹</span>
-                    <p className="text-[#D4A574] text-sm font-semibold">Caméra désactivée</p>
-                    {session.player2_id === user?.id && (
-                      <Button
-                        onClick={activateMyCamera}
-                        className="mt-3 bg-blue-600 hover:bg-blue-700 text-white"
-                        size="sm"
-                      >
-                        🎥 Activer ma caméra
-                      </Button>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile: Joueur 1 et Joueur 2 */}
-          <div className="md:hidden flex flex-col gap-2">
-            {/* Ligne 1: Joueur 1 */}
-            <div className="flex items-center gap-2">
-              <UserAvatar 
-                user={session.player1_id === user?.id ? user : opponent}
-                size="sm"
-              />
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-xs text-[#F5E6D3] truncate">
-                  {session.player1_id === user?.id ? user?.full_name : opponent?.full_name}
-                </p>
-              </div>
-              <motion.div 
-                animate={{
-                  scale: whiteTime < 60 && session.current_turn === 'white' ? [1, 1.05, 1] : 1
-                }}
+            <div className="flex items-center gap-3">
+              {/* Timer blanc */}
+              <motion.div
+                animate={{ scale: whiteTime < 60 && session.current_turn === 'white' ? [1, 1.05, 1] : 1 }}
                 transition={{ repeat: whiteTime < 60 && session.current_turn === 'white' ? Infinity : 0, duration: 1 }}
-                className={`text-sm font-bold font-mono px-2 py-0.5 rounded flex-shrink-0 ${
+                className={`text-sm font-bold font-mono px-2 py-0.5 rounded ${
                   whiteTime < 60 && whiteTime > 0
-                    ? 'bg-red-500/30 border border-red-500 text-red-400'
-                    : session.current_turn === 'white' 
-                      ? 'bg-orange-500/20 border border-orange-500 text-orange-400' 
-                      : 'text-[#F5E6D3]'
+                    ? 'bg-red-500/30 border border-red-500 text-red-400 animate-pulse'
+                    : session.current_turn === 'white'
+                      ? 'bg-orange-500/20 border border-orange-500 text-orange-400'
+                      : 'text-[#F5E6D3]/60'
                 }`}
               >
-                {formatTime(whiteTime)}
+                ♙ {formatTime(whiteTime)}
               </motion.div>
-            </div>
-
-            {/* Ligne 2: Caméras côte à côte */}
-            <div className="flex gap-2 h-[120px]">
-              {/* Caméra Joueur 1 */}
-              <div className="flex-1 rounded-lg overflow-hidden bg-gray-900 shadow-lg border border-[#D4A574]/50 flex flex-col items-center justify-center">
-                {session.player1_id === user?.id && localStream ? (
-                  <video
-                    ref={localVideoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <>
-                    <span className="text-2xl mb-1">📹</span>
-                    <p className="text-[#D4A574] text-xs font-semibold">Caméra off</p>
-                    {session.player1_id === user?.id && (
-                      <Button
-                        onClick={activateMyCamera}
-                        className="mt-2 bg-blue-600 hover:bg-blue-700 text-white"
-                        size="sm"
-                      >
-                        🎥 Activer
-                      </Button>
-                    )}
-                  </>
-                )}
-              </div>
-
-              {/* Caméra Joueur 2 */}
-              <div className="flex-1 rounded-lg overflow-hidden bg-gray-900 shadow-lg border border-[#D4A574]/50 flex flex-col items-center justify-center">
-                {session.player2_id === user?.id && localStream ? (
-                  <video
-                    ref={localVideoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <>
-                    <span className="text-2xl mb-1">📹</span>
-                    <p className="text-[#D4A574] text-xs font-semibold">Caméra off</p>
-                    {session.player2_id === user?.id && (
-                      <Button
-                        onClick={activateMyCamera}
-                        className="mt-2 bg-blue-600 hover:bg-blue-700 text-white"
-                        size="sm"
-                      >
-                        🎥 Activer
-                      </Button>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Ligne 3: Joueur 2 */}
-            <div className="flex items-center gap-2">
-              <UserAvatar 
-                user={session.player2_id === user?.id ? user : opponent}
-                size="sm"
-              />
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-xs text-[#F5E6D3] truncate">
-                  {session.player2_id === user?.id ? user?.full_name : opponent?.full_name}
-                </p>
-              </div>
-              <motion.div 
-                animate={{
-                  scale: blackTime < 60 && session.current_turn === 'black' ? [1, 1.05, 1] : 1
-                }}
+              <span className="text-[#D4A574]/30">|</span>
+              {/* Timer noir */}
+              <motion.div
+                animate={{ scale: blackTime < 60 && session.current_turn === 'black' ? [1, 1.05, 1] : 1 }}
                 transition={{ repeat: blackTime < 60 && session.current_turn === 'black' ? Infinity : 0, duration: 1 }}
-                className={`text-sm font-bold font-mono px-2 py-0.5 rounded flex-shrink-0 ${
+                className={`text-sm font-bold font-mono px-2 py-0.5 rounded ${
                   blackTime < 60 && blackTime > 0
-                    ? 'bg-red-500/30 border border-red-500 text-red-400'
-                    : session.current_turn === 'black' 
-                      ? 'bg-orange-500/20 border border-orange-500 text-orange-400' 
-                      : 'text-[#F5E6D3]'
+                    ? 'bg-red-500/30 border border-red-500 text-red-400 animate-pulse'
+                    : session.current_turn === 'black'
+                      ? 'bg-orange-500/20 border border-orange-500 text-orange-400'
+                      : 'text-[#F5E6D3]/60'
                 }`}
               >
-                {formatTime(blackTime)}
+                ♟ {formatTime(blackTime)}
               </motion.div>
             </div>
           </div>
