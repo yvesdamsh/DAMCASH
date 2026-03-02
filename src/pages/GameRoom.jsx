@@ -218,12 +218,7 @@ export default function GameRoom() {
 
   // Realtime: écouter les propositions de nul
   useEffect(() => {
-    if (!roomId || !user || isSpectator) {
-      console.log('DrawOffer listener non activé - roomId:', roomId, 'user:', user?.id, 'isSpectator:', isSpectator);
-      return;
-    }
-
-    console.log('DrawOffer listener activé pour roomId:', roomId, 'userId:', user.id);
+    if (!roomId || !user || isSpectator) return;
 
     const unsubscribe = base44.entities.DrawOffer?.subscribe?.((event) => {
       if (!event?.data || event.data.room_id !== roomId) return;
