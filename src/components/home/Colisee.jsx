@@ -90,7 +90,7 @@ export default function Colisee() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {liveGames.map((game, idx) => (
+          {liveGames.map((game, idx) => (
           <motion.div
             key={game.id}
             initial={{ opacity: 0, x: idx === 0 ? -20 : 20 }}
