@@ -84,6 +84,25 @@ function MiniTournamentCard({ room, user, onJoin, onSpectate, idx }) {
           <PlayerSeats current={current} max={room.max_players} />
         </div>
 
+        {/* Entry fee banner */}
+        {room.entry_gems > 0 && (
+          <div className={`mb-3 rounded-xl px-3 py-2 flex items-center justify-between border ${
+            canAfford
+              ? 'bg-[#D4A574]/10 border-[#D4A574]/30'
+              : 'bg-red-900/20 border-red-500/30'
+          }`}>
+            <div className="flex items-center gap-2">
+              <Gem className={`w-4 h-4 ${canAfford ? 'text-[#D4A574]' : 'text-red-400'}`} />
+              <span className={`text-sm font-black ${canAfford ? 'text-[#D4A574]' : 'text-red-400'}`}>
+                {room.entry_gems} gemmes
+              </span>
+            </div>
+            <span className={`text-xs font-semibold ${canAfford ? 'text-[#D4A574]/60' : 'text-red-400/80'}`}>
+              {canAfford ? `Vous avez: ${user?.gems || 0}` : '❌ Insuffisant'}
+            </span>
+          </div>
+        )}
+
         {/* Tags */}
         <div className="flex items-center gap-2 flex-wrap mb-4">
           <span className="text-xs bg-black/30 border border-[#D4A574]/10 text-[#D4A574]/60 px-2 py-0.5 rounded-full">
@@ -92,11 +111,6 @@ function MiniTournamentCard({ room, user, onJoin, onSpectate, idx }) {
           <span className="text-xs bg-black/30 border border-[#D4A574]/10 text-[#D4A574]/60 px-2 py-0.5 rounded-full">
             {FORMAT_LABELS[room.format] || room.format}
           </span>
-          {room.entry_gems > 0 && (
-            <span className="text-xs bg-[#D4A574]/10 border border-[#D4A574]/30 text-[#D4A574] px-2 py-0.5 rounded-full flex items-center gap-1">
-              <Gem className="w-2.5 h-2.5" /> {room.entry_gems}
-            </span>
-          )}
         </div>
 
         {/* Actions */}
