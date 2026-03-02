@@ -195,29 +195,29 @@ export default function FloatingVideoCall({
 
             {/* Local video (you — bottom, smaller) */}
             <div className="relative" style={{ height: 80 }}>
-              {localStream && isCameraOn ? (
-                <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover" style={{ transform: 'scaleX(-1)' }} />
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center gap-1"
-                  style={{ background: 'linear-gradient(135deg, #0f0604, #1a0c06)' }}>
-                  {cameraError ? (
-                    <p className="text-[9px] text-red-400/70">Caméra indisponible</p>
-                  ) : !localStream ? (
-                    <motion.button
-                      whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                      onClick={activateCamera}
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-[#D4A574]/30 text-[#D4A574] hover:bg-[#D4A574]/10 transition-all"
-                    >
-                      <Video className="w-3 h-3" /> Activer
-                    </motion.button>
-                  ) : (
-                    <VideoOff className="w-5 h-5 text-[#D4A574]/30" />
-                  )}
-                </div>
-              )}
-              <div className="absolute bottom-0 left-0 right-0 px-2 py-1 bg-gradient-to-t from-black/60 to-transparent">
-                <p className="text-[10px] font-bold text-white/60">Vous</p>
+            {localStream && isCameraOn ? (
+              <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover" style={{ transform: 'scaleX(-1)' }} />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center gap-1"
+                style={{ background: 'linear-gradient(135deg, #0f0604, #1a0c06)' }}>
+                {cameraError ? (
+                  <p className="text-[9px] text-red-400/70">Caméra indisponible</p>
+                ) : !localStream ? (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                    onClick={activateCamera}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-[#D4A574]/30 text-[#D4A574] hover:bg-[#D4A574]/10 transition-all"
+                  >
+                    <Video className="w-3 h-3" /> Activer ma cam
+                  </motion.button>
+                ) : (
+                  <VideoOff className="w-5 h-5 text-[#D4A574]/30" />
+                )}
               </div>
+            )}
+            <div className="absolute bottom-0 left-0 right-0 px-2 py-1 bg-gradient-to-t from-black/60 to-transparent">
+              <p className="text-[10px] font-bold text-white/60">Vous 🎤</p>
+            </div>
             </div>
 
             {/* Controls */}
