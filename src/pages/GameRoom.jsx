@@ -671,32 +671,53 @@ export default function GameRoom() {
     const boardJson = JSON.stringify(newBoardState);
     const timestamp = new Date().toISOString();
 
-    const updateData = {
-      board_state: boardJson,
-      current_turn: nextTurn,
-      last_move_timestamp: timestamp,
-      ...(playerColor === 'white' ? { white_time: whiteTime } : { black_time: blackTime })
-    };
+    try {
+      // VALIDER LE COUP CÔTÉ SERVEUR EN PREMIER
+      const validationResponse = await base44.functions.invoke('validateGameMove', {
+        roomId: roomId,
+        from: '', // TODO: récupérer depuis le composant plateau
+        to: '', // TODO: récupérer depuis le composant plateau
+        boardState: boardJson,
+        gameType: session.game_type
+      });
 
-    // Mettre à jour le state LOCAL immédiatement (0ms latency perçue)
-    setBoardState(newBoardState);
-    setSession(prev => ({ ...prev, ...updateData }));
+      if (!validationResponse.data?.valid) {
+        toast.error('Coup invalide', {
+          description: validationResponse.data?.details || 'Ce coup n\'est pas autorisé'
+        });
+        return;
+      }
 
-    // Envoyer GameMove EN PREMIER (realtime pour l'adversaire, plus léger)
-    base44.entities.GameMove?.create?.({
-      room_id: roomId,
-      player_id: user.id,
-      board_state: boardJson,
-      next_turn: nextTurn,
-      white_time: whiteTime,
-      black_time: blackTime
-    }).catch(() => {});
+      const updateData = {
+        board_state: boardJson,
+        current_turn: nextTurn,
+        last_move_timestamp: timestamp,
+        ...(playerColor === 'white' ? { white_time: whiteTime } : { black_time: blackTime })
+      };
 
-    // Persister sur GameSession en parallèle (pas besoin d'await)
-    base44.entities.GameSession.update(session.id, {
-      ...updateData,
-      move_count: (session.move_count || 0) + 1
-    }).catch(e => console.error('Erreur sauvegarde session:', e));
+      // Mettre à jour le state LOCAL immédiatement
+      setBoardState(newBoardState);
+      setSession(prev => ({ ...prev, ...updateData }));
+
+      // Envoyer GameMove EN PREMIER (realtime)
+      base44.entities.GameMove?.create?.({
+        room_id: roomId,
+        player_id: user.id,
+        board_state: boardJson,
+        next_turn: nextTurn,
+        white_time: whiteTime,
+        black_time: blackTime
+      }).catch(() => {});
+
+      // Persister sur GameSession
+      base44.entities.GameSession.update(session.id, {
+        ...updateData,
+        move_count: (session.move_count || 0) + 1
+      }).catch(e => console.error('Erreur sauvegarde session:', e));
+    } catch (error) {
+      console.error('Erreur validation coup:', error);
+      toast.error('Erreur serveur');
+    }
   };
 
   const handleTimeOut = async (playerColor) => {
