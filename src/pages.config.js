@@ -74,6 +74,7 @@ import Tournaments from './pages/Tournaments';
 import Home from './pages/Home';
 import Onboarding from './pages/Onboarding';
 import GameReviews from './pages/GameReviews';
+import Statistics from './pages/Statistics';
 import __Layout from './Layout.jsx';
 
 
@@ -105,6 +106,7 @@ export const PAGES = {
     "Home": Home,
     "Onboarding": Onboarding,
     "GameReviews": GameReviews,
+    "Statistics": Statistics,
 }
 
 export const pagesConfig = {
