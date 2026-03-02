@@ -48,7 +48,7 @@ export default function Colisee() {
     }
   };
 
-  if (liveGames.length === 0) return null;
+  // Ne pas masquer le composant, afficher un état vide à la place
 
   return (
     <motion.div
