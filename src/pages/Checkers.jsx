@@ -1,123 +1,87 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Circle } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
-import { base44 } from '@/api/base44Client';
-import GameSetup from '../components/game/GameSetup';
-import CheckersBoard from '../components/game/CheckersBoard';
+import { motion } from 'framer-motion';
+import { Trophy, Swords, Puzzle } from 'lucide-react';
+import LiveTournaments from '../components/home/LiveTournaments';
+import Colisee from '../components/home/Colisee';
+import DailyChallengesSection from '../components/play/DailyChallengesSection';
+import TopPlayersSection from '../components/play/TopPlayersSection';
 
 export default function Checkers() {
-  const navigate = useNavigate();
-  const [gameStarted, setGameStarted] = useState(false);
-  const [settings, setSettings] = useState({
-    mode: 'ai',
-    timeControl: 'blitz',
-    color: 'white',
-    aiLevel: 'medium'
-  });
-
-  const handleStart = async () => {
-    console.log('🎮 handleStart called with settings:', settings);
-    
-    const finalColor = settings.color === 'random' 
-      ? (Math.random() > 0.5 ? 'white' : 'black')
-      : settings.color;
-    
-    console.log('🎯 Final color:', finalColor);
-    
-    if (settings.mode === 'online') {
-      // Mode multijoueur - créer une session et rediriger vers GameRoom
-      try {
-        console.log('🌐 Creating online game session...');
-        const user = await base44.auth.me();
-        const roomId = `checkers_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        
-        const TIME_CONTROLS = {
-          bullet: 60,
-          blitz: 180,
-          rapid: 600,
-          classic: 1800,
-          unlimited: null
-        };
-        
-        const timeValue = TIME_CONTROLS[settings.timeControl];
-        
-        await base44.entities.GameSession.create({
-          room_id: roomId,
-          player1_id: user.id,
-          player1_email: user.email,
-          player1_name: user.full_name,
-          game_type: 'checkers',
-          status: 'waiting',
-          time_control: settings.timeControl,
-          white_time: timeValue,
-          black_time: timeValue,
-          current_turn: 'white',
-          board_state: null
-        });
-        
-        console.log('✅ Session created, navigating to GameRoom');
-        navigate(`/GameRoom?roomId=${roomId}&waiting=true`);
-      } catch (error) {
-        console.error('❌ Error creating game session:', error);
-      }
-    } else {
-      // Mode IA - rediriger vers GameRoom avec mode=ai
-      console.log('🤖 Starting AI game');
-      navigate(`/GameRoom?mode=ai&playerColor=${finalColor}&aiLevel=${settings.aiLevel}`);
-    }
-  };
-
-  const handleBack = () => {
-    setGameStarted(false);
-  };
-
   return (
-    <div className="w-full px-4 py-6 flex flex-col items-center min-h-screen">
-      {/* Header */}
-       <div className="w-full max-w-6xl flex items-center gap-4 mb-6">
-         <Link to={createPageUrl(gameStarted ? 'Checkers' : 'Play')}>
-           <Button 
-             variant="ghost" 
-             size="icon" 
-             className="text-gray-400 hover:text-white"
-             onClick={gameStarted ? handleBack : undefined}
-           >
-             <ArrowLeft className="w-5 h-5" />
-           </Button>
-         </Link>
-         <div className="flex items-center gap-3">
-           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-             <Circle className="w-5 h-5 text-white" />
-           </div>
-           <div>
-             <h1 className="text-xl font-bold text-white">Dames Internationales</h1>
-             <p className="text-xs text-gray-400">
-               {gameStarted 
-                 ? `${settings.mode === 'ai' ? 'vs IA' : 'En ligne'} • ${settings.timeControl}`
-                 : 'Configuration de la partie'
-               }
-             </p>
-           </div>
-         </div>
-       </div>
+    <div className="relative min-h-screen text-[#F5E6D3]">
+      <div className="absolute inset-0 opacity-5" style={{
+        backgroundImage: 'radial-gradient(circle at 1px 1px, #D4A574 1px, transparent 0)',
+        backgroundSize: '40px 40px'
+      }} />
 
-       <div className="w-full max-w-6xl flex justify-center">
-         {!gameStarted ? (
-           <GameSetup 
-             gameType="checkers"
-             settings={settings}
-             setSettings={setSettings}
-             onStart={handleStart}
-           />
-         ) : (
-           <CheckersBoard 
-             playerColor={settings.color}
-             aiLevel={settings.aiLevel}
-           />
-         )}
-       </div>
+      <div className="relative z-10 max-w-2xl mx-auto px-4 py-6">
+        {/* Universe header */}
+        <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-4xl">⚫</span>
+            <div>
+              <h1 className="text-2xl font-black text-[#F5E6D3]">Univers Dames</h1>
+              <p className="text-xs text-[#D4A574]/60 uppercase tracking-widest">Tactique & classique</p>
+            </div>
+          </div>
+          <Link to={createPageUrl('Chess')} className="inline-flex items-center gap-1.5 text-xs text-[#D4A574]/50 hover:text-[#D4A574] transition-colors mt-1 border border-[#D4A574]/15 hover:border-[#D4A574]/40 px-3 py-1.5 rounded-full">
+            ♟️ Passer aux Échecs →
+          </Link>
+        </motion.div>
+
+        {/* Play CTA */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-6">
+          <Link to={createPageUrl('PlayCheckers')} className="block w-full relative overflow-hidden rounded-xl shadow-2xl shadow-blue-900/30">
+            <motion.button
+              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+              className="w-full p-4 bg-gradient-to-r from-blue-800 via-blue-700 to-cyan-700 text-white font-black text-lg tracking-wide flex items-center justify-center gap-3 rounded-xl"
+            >
+              <span className="text-xl">⚫</span> Jouer aux Dames
+            </motion.button>
+            <motion.div
+              animate={{ x: ['-100%', '200%'] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1.5 }}
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none rounded-xl"
+            />
+          </Link>
+        </motion.div>
+
+        {/* Quick links */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="grid grid-cols-3 gap-3 mb-8">
+          <Link to={`${createPageUrl('Tournaments')}?game=checkers`}
+            className="flex flex-col items-center gap-2 p-3 rounded-xl border border-[#D4A574]/15 hover:border-[#D4A574]/40 bg-black/20 transition-all">
+            <Trophy className="w-5 h-5 text-blue-400" />
+            <span className="text-xs text-[#F5E6D3]/80 font-semibold">Tournois</span>
+          </Link>
+          <Link to={`${createPageUrl('MiniTournaments')}?game=checkers`}
+            className="flex flex-col items-center gap-2 p-3 rounded-xl border border-[#D4A574]/15 hover:border-[#D4A574]/40 bg-black/20 transition-all">
+            <Swords className="w-5 h-5 text-blue-400" />
+            <span className="text-xs text-[#F5E6D3]/80 font-semibold">Salons</span>
+          </Link>
+          <Link to={createPageUrl('Puzzles')}
+            className="flex flex-col items-center gap-2 p-3 rounded-xl border border-[#D4A574]/15 hover:border-[#D4A574]/40 bg-black/20 transition-all">
+            <Puzzle className="w-5 h-5 text-blue-400" />
+            <span className="text-xs text-[#F5E6D3]/80 font-semibold">Puzzles</span>
+          </Link>
+        </motion.div>
+
+        {/* Live Tournaments (checkers only) */}
+        <LiveTournaments gameType="checkers" />
+
+        {/* Colisée (checkers only) */}
+        <Colisee gameType="checkers" />
+
+        {/* Daily Challenges */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-8">
+          <DailyChallengesSection gameType="checkers" />
+        </motion.div>
+
+        {/* Top Players */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mb-8">
+          <TopPlayersSection gameType="checkers" />
+        </motion.div>
       </div>
-      );
+    </div>
+  );
 }
