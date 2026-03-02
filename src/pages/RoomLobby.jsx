@@ -189,28 +189,30 @@ export default function RoomLobby() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] p-6">
+    <div className="min-h-screen bg-gradient-to-br from-[#2C1810] via-[#5D3A1A] to-[#2C1810] text-[#F5E6D3] p-4 overflow-x-hidden w-full">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between gap-2 mb-8">
+          <div className="flex items-center gap-2 min-w-0">
             <Button
-              onClick={() => navigate('/Play')}
+              onClick={() => navigate(-1)}
               variant="ghost"
-              className="text-[#F5E6D3] hover:bg-white/10"
+              size="sm"
+              className="text-[#F5E6D3] hover:bg-white/10 flex-shrink-0"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline ml-1">Retour</span>
             </Button>
-            <h1 className="text-3xl font-bold">Multijoueur</h1>
+            <h1 className="text-xl sm:text-3xl font-bold truncate">Multijoueur</h1>
           </div>
           {activeTab === 'rooms' && (
             <Button
               onClick={() => setIsModalOpen(true)}
-              className="bg-amber-600 hover:bg-amber-700"
+              className="bg-amber-600 hover:bg-amber-700 flex-shrink-0 text-sm px-3"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Créer un salon
+              <Plus className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Créer un salon</span>
+              <span className="sm:hidden">Créer</span>
             </Button>
           )}
         </div>
