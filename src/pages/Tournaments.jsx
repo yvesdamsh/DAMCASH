@@ -245,6 +245,7 @@ export default function Tournaments() {
     const urlParams = new URLSearchParams(window.location.search);
     const g = urlParams.get('game');
     if (g) setGameFilter(g);
+    else setGameFilter('chess');
     base44.auth.isAuthenticated().then(ok => ok && base44.auth.me().then(setUser).catch(() => {}));
   }, []);
 
