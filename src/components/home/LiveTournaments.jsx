@@ -3,24 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../../utils';
-import { Activity, Users, ChevronRight, Clock, Calendar } from 'lucide-react';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-
-const TIME_LABELS = {
-  bullet: '⚡ Bullet (1+0)',
-  blitz: '🔥 Blitz (3+0)',
-  rapid: '⏱ Rapide (10+0)',
-  classic: '♟ Classique (30+0)',
-};
-
-const TYPE_LABELS = {
-  arena_daily: '⚡ Arena Daily',
-  arena_weekly: '🔥 Arena Weekly',
-  arena_monthly: '👑 Arena Monthly',
-  arena_annual: '🏆 Arena Annual',
-  cup: '🛡 Coupe',
-};
+import { Activity, Users, ChevronRight, Trophy } from 'lucide-react';
 
 export default function LiveTournaments({ gameType }) {
   const [tournaments, setTournaments] = useState([]);
@@ -56,21 +39,13 @@ export default function LiveTournaments({ gameType }) {
         ? { status: 'in_progress', game_type: gameType }
         : { status: 'in_progress' };
       const data = await base44.entities.Tournament.filter(filterObj, '-start_date', 2);
-      const mock = gameType === 'checkers'
-        ? [{ id: '2', name: 'CHECKERS WORLD SERIES', game_type: 'checkers', participants: Array(842).fill('user'), max_participants: 1500, start_date: new Date(Date.now() + 5 * 60 * 1000).toISOString() }]
-        : gameType === 'chess'
-        ? [{ id: '1', name: 'SUPER BLITZ MONDAY', game_type: 'chess', participants: Array(1204).fill('user'), max_participants: 2000, start_date: new Date(Date.now() + 12 * 60 * 1000).toISOString() }]
-        : [
-            { id: '1', name: 'SUPER BLITZ MONDAY', game_type: 'chess', participants: Array(1204).fill('user'), max_participants: 2000, start_date: new Date(Date.now() + 12 * 60 * 1000).toISOString() },
-            { id: '2', name: 'CHECKERS WORLD SERIES', game_type: 'checkers', participants: Array(842).fill('user'), max_participants: 1500, start_date: new Date(Date.now() + 5 * 60 * 1000).toISOString() }
-          ];
-      setTournaments(data.length > 0 ? data : mock);
+      setTournaments(data);
     } catch (e) {
       setTournaments([]);
     }
   };
 
-  if (tournaments.length === 0) return null;
+  if (!tournaments || tournaments.length === 0) return null;
 
   return (
     <motion.div
@@ -129,50 +104,24 @@ export default function LiveTournaments({ gameType }) {
             </div>
 
             <div className="p-5">
-              {/* Game type + tournament type */}
-              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                <span className="text-xs text-red-400/80 uppercase tracking-widest font-bold">
+              {/* Game type icon */}
+              <div className="mb-3">
+                <span className="text-xs text-red-400/70 uppercase tracking-widest font-semibold">
                   {tournament.game_type === 'chess' ? '♟ Échecs' : '⚫ Dames'}
                 </span>
-                {tournament.tournament_type && (
-                  <span className="text-xs text-[#D4A574]/60 font-semibold">
-                    · {TYPE_LABELS[tournament.tournament_type] || tournament.tournament_type}
-                  </span>
-                )}
               </div>
 
               {/* Name */}
-              <h3 className="text-lg font-black text-[#F5E6D3] mb-2 pr-16 leading-tight">
+              <h3 className="text-lg font-black text-[#F5E6D3] mb-4 pr-16 leading-tight">
                 {tournament.name}
               </h3>
-
-              {/* Time control + Start time */}
-              <div className="flex items-center gap-3 mb-4 flex-wrap">
-                {tournament.time_control && (
-                  <span className="text-xs bg-[#D4A574]/10 border border-[#D4A574]/20 rounded-full px-2.5 py-0.5 text-[#D4A574] font-semibold">
-                    {TIME_LABELS[tournament.time_control] || tournament.time_control}
-                  </span>
-                )}
-                {tournament.start_date && (
-                  <span className="flex items-center gap-1 text-xs text-[#D4A574]/60">
-                    <Calendar className="w-3 h-3" />
-                    Début: {format(new Date(tournament.start_date), "dd MMM · HH'h'mm", { locale: fr })}
-                  </span>
-                )}
-              </div>
 
               {/* Stats */}
               <div className="grid grid-cols-2 gap-3 mb-5">
                 <div className="bg-black/30 rounded-lg p-3 border border-red-900/30">
-                  <p className="text-xs text-[#D4A574]/50 uppercase tracking-wider mb-1">
-                    {tournament.status === 'in_progress' ? 'Fin dans' : 'Début dans'}
-                  </p>
+                  <p className="text-xs text-[#D4A574]/50 uppercase tracking-wider mb-1">Fin dans</p>
                   <p className="text-2xl font-black text-red-500 font-mono tracking-widest">
-                    {timeLeft[tournament.id]
-                      ? (timeLeft[tournament.id].startsWith('00:')
-                          ? timeLeft[tournament.id].slice(3)
-                          : timeLeft[tournament.id])
-                      : '--:--'}
+                    {timeLeft[tournament.id] ? timeLeft[tournament.id].slice(3) : '--:--'}
                   </p>
                 </div>
                 <div className="bg-black/30 rounded-lg p-3 border border-red-900/30">
