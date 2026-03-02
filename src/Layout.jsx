@@ -23,6 +23,7 @@ export default function Layout({ children, currentPageName }) {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
