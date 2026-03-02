@@ -180,8 +180,17 @@ export default function Tournaments() {
 
   const { data: tournaments = [], isLoading } = useQuery({
     queryKey: ['tournaments'],
-    queryFn: () => base44.entities.Tournament.list('-start_date')
+    queryFn: () => base44.entities.Tournament.list('-start_date'),
+    refetchInterval: 30000
   });
+
+  // Realtime: écouter les changements de tournois
+  useEffect(() => {
+    const unsubscribe = base44.entities.Tournament?.subscribe?.(() => {
+      queryClient.invalidateQueries({ queryKey: ['tournaments'] });
+    });
+    return () => { if (typeof unsubscribe === 'function') unsubscribe(); };
+  }, [queryClient]);
 
   const sampleTournaments = [
     { id: '1', name: 'Grand Prix Échecs', game_type: 'chess', status: 'upcoming', start_date: new Date(Date.now() + 86400000 * 2).toISOString(), max_participants: 64, participants: Array(22).fill('u'), prize_gems: 500, time_control: 'blitz', image_url: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=800' },
