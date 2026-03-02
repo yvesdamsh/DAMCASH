@@ -177,14 +177,7 @@ export default function Layout({ children, currentPageName }) {
   const isActive = (page) => currentPageName === page;
 
   if (isLoading) {
-    return (
-        <>
-          <Splash />
-          <div className="min-h-screen bg-gradient-to-br from-[#1a0f0f] via-[#2d1515] to-[#1a0f0f] flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
-          </div>
-        </>
-      );
+    return <Splash />;
   }
 
   return (
