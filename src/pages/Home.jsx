@@ -6,7 +6,7 @@ import GameCard from '../components/game/GameCard';
 import QuickAccessButton from '../components/game/QuickAccessButton';
 import LiveTournaments from '../components/home/LiveTournaments';
 import Colisee from '../components/home/Colisee';
-import { Crown, Users, ShoppingBag, UserPlus, Building, Puzzle, Trophy, TrendingUp, Eye, Swords } from 'lucide-react';
+import { Crown, ShoppingBag, UserPlus, Building, Puzzle, Trophy, TrendingUp, Swords, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Home() {
