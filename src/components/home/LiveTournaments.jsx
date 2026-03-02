@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../../utils';
-import { Activity, Users, Clock, ChevronRight } from 'lucide-react';
+import { Activity, Users, ChevronRight, Trophy } from 'lucide-react';
 
 export default function LiveTournaments() {
   const [tournaments, setTournaments] = useState([]);
@@ -21,14 +21,11 @@ export default function LiveTournaments() {
       tournaments.forEach(t => {
         if (t.start_date) {
           const diff = new Date(t.start_date) - new Date();
-          if (diff > 0) {
-            const hours = Math.floor(diff / 3600000);
-            const mins = Math.floor((diff % 3600000) / 60000);
-            const secs = Math.floor((diff % 60000) / 1000);
-            newTimeLeft[t.id] = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-          } else {
-            newTimeLeft[t.id] = '00:00:00';
-          }
+          const totalSecs = Math.max(0, Math.floor(diff / 1000));
+          const h = Math.floor(totalSecs / 3600);
+          const m = Math.floor((totalSecs % 3600) / 60);
+          const s = totalSecs % 60;
+          newTimeLeft[t.id] = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
         }
       });
       setTimeLeft(newTimeLeft);
@@ -67,71 +64,111 @@ export default function LiveTournaments() {
   if (tournaments.length === 0) return null;
 
   return (
-    <div className="mb-8">
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="mb-8"
+    >
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
-        <Activity className="w-6 h-6 text-red-500" />
-        <h2 className="text-xl font-bold text-[#F5E6D3]">TOURNOIS EN COURS</h2>
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-3">
+          <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-red-600/20 border border-red-500/30">
+            <Activity className="w-5 h-5 text-red-500" />
+            <motion.div
+              animate={{ scale: [1, 1.8, 1], opacity: [0.5, 0, 0.5] }}
+              transition={{ duration: 1.8, repeat: Infinity }}
+              className="absolute inset-0 rounded-lg border border-red-500/50"
+            />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold tracking-widest text-[#F5E6D3] uppercase">Tournois en cours</h2>
+            <p className="text-xs text-[#D4A574]/70 tracking-wider">Compétitions actives</p>
+          </div>
+        </div>
+        <Link
+          to={createPageUrl('Tournaments')}
+          className="flex items-center gap-1 text-xs text-[#D4A574] hover:text-[#F5E6D3] transition-colors font-semibold tracking-wider uppercase"
+        >
+          Voir tout <ChevronRight className="w-3 h-3" />
+        </Link>
       </div>
 
-      {/* Tournament Cards */}
+      {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {tournaments.map((tournament) => (
+        {tournaments.map((tournament, idx) => (
           <motion.div
             key={tournament.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-[#2C1810] to-[#1a0f0f] border border-[#D4A574]/30 rounded-lg p-5 relative overflow-hidden"
+            transition={{ delay: idx * 0.12, duration: 0.4 }}
+            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            className="relative overflow-hidden rounded-xl border border-red-900/40 hover:border-red-500/40 transition-colors group"
+            style={{ background: 'linear-gradient(135deg, #1a0505 0%, #2C1010 60%, #1a0505 100%)' }}
           >
-            {/* Live Badge */}
-            <div className="absolute top-3 right-3">
-              <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-                LIVE
-              </span>
+            {/* Glow top */}
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-500/40 to-transparent" />
+
+            {/* LIVE badge */}
+            <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-red-600 px-2.5 py-1 rounded-full">
+              <motion.div
+                animate={{ opacity: [1, 0, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+                className="w-1.5 h-1.5 rounded-full bg-white"
+              />
+              <span className="text-white text-xs font-black tracking-widest">LIVE</span>
             </div>
 
-            {/* Tournament Name */}
-            <h3 className="text-lg font-bold text-[#F5E6D3] mb-1">
-              {tournament.name}
-            </h3>
-            <p className="text-sm text-[#D4A574] mb-4">
-              MENEUR: {tournament.game_type === 'chess' ? 'MAGNUS_CLONE' : 'SLIDERPRO'}
-            </p>
+            <div className="p-5">
+              {/* Game type icon */}
+              <div className="mb-3">
+                <span className="text-xs text-red-400/70 uppercase tracking-widest font-semibold">
+                  {tournament.game_type === 'chess' ? '♟ Échecs' : '⚫ Dames'}
+                </span>
+              </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="bg-[#1a0f0f] rounded-lg p-3 border border-[#D4A574]/20">
-                <p className="text-xs text-[#D4A574] uppercase mb-1">Fin dans</p>
-                <p className="text-xl font-bold text-red-500 font-mono">
-                  {timeLeft[tournament.id] || '00:00:00'}
-                </p>
+              {/* Name */}
+              <h3 className="text-lg font-black text-[#F5E6D3] mb-4 pr-16 leading-tight">
+                {tournament.name}
+              </h3>
+
+              {/* Stats */}
+              <div className="grid grid-cols-2 gap-3 mb-5">
+                <div className="bg-black/30 rounded-lg p-3 border border-red-900/30">
+                  <p className="text-xs text-[#D4A574]/50 uppercase tracking-wider mb-1">Fin dans</p>
+                  <p className="text-2xl font-black text-red-500 font-mono tracking-widest">
+                    {timeLeft[tournament.id] ? timeLeft[tournament.id].slice(3) : '--:--'}
+                  </p>
+                </div>
+                <div className="bg-black/30 rounded-lg p-3 border border-red-900/30">
+                  <p className="text-xs text-[#D4A574]/50 uppercase tracking-wider mb-1">Participants</p>
+                  <div className="flex items-end gap-1">
+                    <p className="text-2xl font-black text-[#F5E6D3]">
+                      {tournament.participants?.length || 0}
+                    </p>
+                    <p className="text-xs text-[#D4A574]/40 mb-1">/ {tournament.max_participants || '∞'}</p>
+                  </div>
+                </div>
               </div>
-              <div className="bg-[#1a0f0f] rounded-lg p-3 border border-[#D4A574]/20">
-                <p className="text-xs text-[#D4A574] uppercase mb-1">Participants</p>
-                <p className="text-xl font-bold text-[#F5E6D3]">
-                  {tournament.participants?.length || 0}
-                </p>
-              </div>
+
+              {/* Action */}
+              <Link to={createPageUrl('Tournaments')}>
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  className="w-full relative overflow-hidden bg-red-700 hover:bg-red-600 text-white font-black py-3 rounded-lg transition-colors tracking-widest text-sm uppercase"
+                >
+                  <span className="relative z-10">Rejoindre l'action</span>
+                  <motion.div
+                    animate={{ x: ['-100%', '200%'] }}
+                    transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1 }}
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none"
+                  />
+                </motion.button>
+              </Link>
             </div>
-
-            {/* Action Button */}
-            <Link to={createPageUrl('Tournaments')}>
-              <button className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2">
-                REJOINDRE L'ACTION
-              </button>
-            </Link>
           </motion.div>
         ))}
       </div>
-
-      {/* View All Link */}
-      <Link 
-        to={createPageUrl('Tournaments')}
-        className="flex items-center justify-center gap-2 text-[#D4A574] hover:text-[#F5E6D3] font-semibold mt-4 transition-colors"
-      >
-        Voir tous les tournois
-        <ChevronRight className="w-4 h-4" />
-      </Link>
-    </div>
+    </motion.div>
   );
 }
