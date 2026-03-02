@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function Home() {
   const [user, setUser] = useState(null);
   const [onlineCount, setOnlineCount] = useState(0);
-  const [universe, setUniverse] = useState(() => localStorage.getItem('damcash_universe') || 'chess');
+  const [universe, setUniverse] = useState('chess'); // 'chess' | 'checkers'
 
   useEffect(() => {
     loadUser();
@@ -95,7 +95,7 @@ export default function Home() {
         {/* Toggle pills */}
         <div className="flex items-center justify-center gap-2 mb-4">
           <button
-            onClick={() => { setUniverse('chess'); localStorage.setItem('damcash_universe', 'chess'); }}
+            onClick={() => setUniverse('chess')}
             className={`flex items-center gap-2 px-5 py-2 rounded-full font-black text-sm transition-all border ${
               isChess
                 ? 'bg-gradient-to-r from-amber-700 to-orange-700 border-amber-500/50 text-white shadow-lg shadow-amber-900/40'
@@ -105,7 +105,7 @@ export default function Home() {
             ♟️ Échecs
           </button>
           <button
-            onClick={() => { setUniverse('checkers'); localStorage.setItem('damcash_universe', 'checkers'); }}
+            onClick={() => setUniverse('checkers')}
             className={`flex items-center gap-2 px-5 py-2 rounded-full font-black text-sm transition-all border ${
               !isChess
                 ? 'bg-gradient-to-r from-blue-800 to-cyan-700 border-blue-500/50 text-white shadow-lg shadow-blue-900/40'
