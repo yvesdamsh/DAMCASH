@@ -301,18 +301,18 @@ export default function MiniTournaments() {
         }} />
         <div className="absolute top-0 right-1/3 w-80 h-80 rounded-full blur-3xl opacity-[0.08]" style={{ background: 'radial-gradient(circle, #D4A574, transparent)' }} />
 
-        <div className="relative z-10 max-w-6xl mx-auto px-4 pt-10 pb-12">
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between mb-8">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 pt-8 pb-12">
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <span className="text-3xl">🃏</span>
-                <h1 className="text-3xl md:text-4xl font-black text-[#F5E6D3] tracking-tight">SALONS PRIVÉS</h1>
+                <span className="text-2xl">🃏</span>
+                <h1 className="text-2xl md:text-4xl font-black text-[#F5E6D3] tracking-tight">SALONS PRIVÉS</h1>
               </div>
               <p className="text-[#D4A574]/50 text-xs tracking-widest uppercase ml-1">Mini-tournois de 3 à 20 joueurs</p>
             </div>
             <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
               onClick={() => { if (!user) { base44.auth.redirectToLogin(); return; } setShowCreate(true); }}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4A574] to-[#8B5A2B] text-[#1a0c06] font-black text-sm hover:shadow-lg hover:shadow-[#D4A574]/25 transition-all">
+              className="self-start sm:self-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#D4A574] to-[#8B5A2B] text-[#1a0c06] font-black text-sm hover:shadow-lg hover:shadow-[#D4A574]/25 transition-all whitespace-nowrap">
               <Plus className="w-4 h-4" /> Créer un salon
             </motion.button>
           </motion.div>
