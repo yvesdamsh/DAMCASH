@@ -89,7 +89,7 @@ export default function Colisee() {
           <p className="text-[#D4A574]/20 text-xs mt-1">Le Colisée s'anime lors des grandes batailles</p>
         </div>
       ) : (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {liveGames.map((game, idx) => (
           <motion.div
             key={game.id}
