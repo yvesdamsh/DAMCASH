@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { createPageUrl } from '../utils';
 import InviteModal from '../components/game/InviteModal';
+import PlayerPopup from '../components/ui/PlayerPopup';
 
 export default function Search() {
   const navigate = useNavigate();
