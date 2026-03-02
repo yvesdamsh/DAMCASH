@@ -26,10 +26,44 @@ export default function GameCard({ game, isPopular }) {
     loadStats();
   }, [game.gameType]);
 
-  const handlePlayNow = (e) => {
+  const handlePlayNow = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    navigate(createPageUrl('RoomLobby') + `?game=${game.gameType}`);
+    try {
+      const user = await base44.auth.me();
+      // Chercher une partie en attente pour ce type de jeu
+      const waiting = await base44.entities.GameSession.filter({ game_type: game.gameType, status: 'waiting' });
+      const available = waiting.find(s => s.player1_id !== user.id && !s.player2_id);
+      if (available) {
+        // Rejoindre la partie existante
+        await base44.entities.GameSession.update(available.id, {
+          player2_id: user.id,
+          player2_email: user.email,
+          player2_name: user.full_name,
+          status: 'in_progress'
+        });
+        navigate(`/GameRoom?roomId=${available.room_id}&color=black`);
+      } else {
+        // Créer une nouvelle salle et attendre un adversaire
+        const roomId = `${game.gameType}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+        await base44.entities.GameSession.create({
+          room_id: roomId,
+          player1_id: user.id,
+          player1_email: user.email,
+          player1_name: user.full_name,
+          game_type: game.gameType,
+          status: 'waiting',
+          current_turn: 'white',
+          time_control: 'blitz',
+          white_time: 180,
+          black_time: 180,
+          moves: JSON.stringify([])
+        });
+        navigate(`/GameRoom?roomId=${roomId}&color=white`);
+      }
+    } catch {
+      base44.auth.redirectToLogin();
+    }
   };
 
   return (
