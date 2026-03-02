@@ -3,24 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../../utils';
-import { Activity, Users, ChevronRight, Clock, Calendar } from 'lucide-react';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-
-const TIME_LABELS = {
-  bullet: '⚡ Bullet (1+0)',
-  blitz: '🔥 Blitz (3+0)',
-  rapid: '⏱ Rapide (10+0)',
-  classic: '♟ Classique (30+0)',
-};
-
-const TYPE_LABELS = {
-  arena_daily: '⚡ Arena Daily',
-  arena_weekly: '🔥 Arena Weekly',
-  arena_monthly: '👑 Arena Monthly',
-  arena_annual: '🏆 Arena Annual',
-  cup: '🛡 Coupe',
-};
+import { Activity, Users, ChevronRight, Trophy } from 'lucide-react';
 
 export default function LiveTournaments({ gameType }) {
   const [tournaments, setTournaments] = useState([]);
@@ -56,15 +39,7 @@ export default function LiveTournaments({ gameType }) {
         ? { status: 'in_progress', game_type: gameType }
         : { status: 'in_progress' };
       const data = await base44.entities.Tournament.filter(filterObj, '-start_date', 2);
-      const mock = gameType === 'checkers'
-        ? [{ id: '2', name: 'CHECKERS WORLD SERIES', game_type: 'checkers', participants: Array(842).fill('user'), max_participants: 1500, start_date: new Date(Date.now() + 5 * 60 * 1000).toISOString() }]
-        : gameType === 'chess'
-        ? [{ id: '1', name: 'SUPER BLITZ MONDAY', game_type: 'chess', participants: Array(1204).fill('user'), max_participants: 2000, start_date: new Date(Date.now() + 12 * 60 * 1000).toISOString() }]
-        : [
-            { id: '1', name: 'SUPER BLITZ MONDAY', game_type: 'chess', participants: Array(1204).fill('user'), max_participants: 2000, start_date: new Date(Date.now() + 12 * 60 * 1000).toISOString() },
-            { id: '2', name: 'CHECKERS WORLD SERIES', game_type: 'checkers', participants: Array(842).fill('user'), max_participants: 1500, start_date: new Date(Date.now() + 5 * 60 * 1000).toISOString() }
-          ];
-      setTournaments(data.length > 0 ? data : mock);
+      setTournaments(data);
     } catch (e) {
       setTournaments([]);
     }
