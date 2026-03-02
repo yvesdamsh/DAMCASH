@@ -389,7 +389,7 @@ export default function MiniTournaments() {
           <AnimatePresence mode="popLayout">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filtered.map((room, i) => (
-                <MiniTournamentCard key={room.id} room={room} user={user} onJoin={handleJoin} onSpectate={handleSpectate} idx={i} />
+                <MiniTournamentCard key={room.id} room={room} user={user} onJoin={handleJoin} onSpectate={handleSpectate} onLaunch={handleLaunch} idx={i} />
               ))}
             </div>
           </AnimatePresence>
