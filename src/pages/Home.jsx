@@ -95,7 +95,7 @@ export default function Home() {
         {/* Toggle pills */}
         <div className="flex items-center justify-center gap-2 mb-4">
           <button
-            onClick={() => setUniverse('chess')}
+            onClick={() => { setUniverse('chess'); localStorage.setItem('damcash_universe', 'chess'); }}
             className={`flex items-center gap-2 px-5 py-2 rounded-full font-black text-sm transition-all border ${
               isChess
                 ? 'bg-gradient-to-r from-amber-700 to-orange-700 border-amber-500/50 text-white shadow-lg shadow-amber-900/40'
