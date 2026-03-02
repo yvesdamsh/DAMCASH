@@ -192,6 +192,20 @@ export default function MiniTournaments() {
     if (!user) { base44.auth.redirectToLogin(); return; }
     if (room.is_private && password !== room.password) { alert('Mot de passe incorrect'); return; }
     if (room.players?.includes(user.email)) return;
+    if ((room.players?.length || 0) >= room.max_players) { alert('Ce salon est complet.'); return; }
+
+    // Vérifier les gemmes
+    if (room.entry_gems > 0) {
+      const userGems = user.gems || 0;
+      if (userGems < room.entry_gems) {
+        alert(`Gemmes insuffisantes. Il vous faut ${room.entry_gems} gemmes, vous en avez ${userGems}.`);
+        return;
+      }
+      // Déduire les gemmes
+      await base44.auth.updateMe({ gems: userGems - room.entry_gems });
+      setUser(prev => ({ ...prev, gems: userGems - room.entry_gems }));
+    }
+
     await base44.entities.MiniTournament.update(room.id, {
       players: [...(room.players || []), user.email],
       player_names: [...(room.player_names || []), user.full_name],
