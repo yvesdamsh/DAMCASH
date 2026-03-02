@@ -170,7 +170,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Accueil', icon: Home, page: 'Home' },
     { name: 'Tournois', icon: Trophy, page: 'Tournaments' },
     { name: 'Salons', icon: Swords, page: 'MiniTournaments' },
-    { name: 'Notifs', icon: Bell, page: 'Notifications' },
+    { name: 'Notifs', icon: Bell, page: 'Notifications', showBadge: true },
     { name: 'Profil', icon: User, page: 'Profile' },
   ];
 
