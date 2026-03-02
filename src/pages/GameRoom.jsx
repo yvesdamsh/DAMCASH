@@ -85,10 +85,13 @@ export default function GameRoom() {
     return () => clearTimeout(timeout);
   }, [roomId, gameMode]);
 
-  // Fallback: recharger périodiquement si le realtime se coupe
+  // Fallback léger: resync toutes les 30s seulement si aucun coup reçu récemment
+  const lastMoveRef = useRef(Date.now());
   useEffect(() => {
     if (!roomId) return;
-    const interval = setInterval(() => loadData(), 15000);
+    const interval = setInterval(() => {
+      if (Date.now() - lastMoveRef.current > 25000) loadData();
+    }, 30000);
     return () => clearInterval(interval);
   }, [roomId]);
 
