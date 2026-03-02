@@ -153,43 +153,27 @@ export default function GameRoom() {
     };
   }, [roomId, user?.id, opponent?.id, session?.id]);
 
-  // Realtime dédié aux coups: écouter les créations de GameMove
+  // Realtime PRIORITAIRE: coups via GameMove (latence minimale)
   useEffect(() => {
-  if (!roomId) return;
+    if (!roomId) return;
 
-  const unsubscribe = base44.entities.GameMove?.subscribe?.((event) => {
-    if (event?.type !== 'create') return;
-    const matchesRoom = event?.data?.room_id === roomId;
-    if (!matchesRoom) return;
+    const unsubscribe = base44.entities.GameMove?.subscribe?.((event) => {
+      if (event?.type !== 'create') return;
+      if (event?.data?.room_id !== roomId) return;
 
-    const move = event.data;
+      const move = event.data;
+      lastMoveRef.current = Date.now(); // reset fallback timer
 
-    if (move.board_state) {
-      try {
-        setBoardState(JSON.parse(move.board_state));
-      } catch (e) {
-        console.log('Erreur parsing board_state (move)');
+      if (move.board_state) {
+        try { setBoardState(JSON.parse(move.board_state)); } catch {}
       }
-    }
+      if (typeof move.white_time !== 'undefined') setWhiteTime(move.white_time);
+      if (typeof move.black_time !== 'undefined') setBlackTime(move.black_time);
+      if (move.next_turn) setSession(prev => ({ ...prev, current_turn: move.next_turn }));
+      if (move.created_date || move.created_at) setSession(prev => ({ ...prev, last_move_timestamp: move.created_date || move.created_at }));
+    });
 
-    if (typeof move.white_time !== 'undefined') {
-      setWhiteTime(move.white_time);
-    }
-    if (typeof move.black_time !== 'undefined') {
-      setBlackTime(move.black_time);
-    }
-
-    if (move.next_turn) {
-      setSession(prev => ({ ...prev, current_turn: move.next_turn }));
-    }
-    if (move.created_date || move.created_at) {
-      setSession(prev => ({ ...prev, last_move_timestamp: move.created_date || move.created_at }));
-    }
-  });
-
-  return () => {
-    if (typeof unsubscribe === 'function') unsubscribe();
-  };
+    return () => { if (typeof unsubscribe === 'function') unsubscribe(); };
   }, [roomId]);
 
 
