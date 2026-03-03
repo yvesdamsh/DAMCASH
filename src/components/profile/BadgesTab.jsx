@@ -40,17 +40,27 @@ export default function BadgesTab({ user }) {
   };
 
   const allBadges = [
-    { type: 'first_blood', icon: '🆕', name: 'Premier Sang', description: '1ère victoire' },
-    { type: 'on_fire', icon: '🔥', name: 'En Feu', description: '5 victoires consécutives' },
-    { type: 'champion', icon: '🏆', name: 'Champion', description: 'Gagner un tournoi' },
-    { type: 'level_10', icon: '⭐', name: 'Niveau 10', description: 'Atteindre niveau 10' },
-    { type: 'level_20', icon: '⭐⭐', name: 'Niveau 20', description: 'Atteindre niveau 20' },
-    { type: 'level_50', icon: '👑', name: 'Niveau 50', description: 'Atteindre niveau 50' },
-    { type: 'level_100', icon: '🌟', name: 'Niveau 100', description: 'Atteindre niveau 100' },
-    { type: 'millionaire', icon: '💰', name: 'Millionnaire', description: '1000+ gemmes' },
-    { type: 'streak_5', icon: '🔴', name: 'Séquence de 5', description: '5 victoires de suite' },
-    { type: 'streak_10', icon: '🌶️', name: 'Séquence de 10', description: '10 victoires de suite' },
-    { type: 'none_player', icon: '🤐', name: 'Maître du Nul', description: '10 parties nulles' }
+    // Badges de jeu
+    { type: 'first_blood', icon: '🆕', name: 'Premier Sang', description: '1ère victoire', category: 'Jeu' },
+    { type: 'on_fire', icon: '🔥', name: 'En Feu', description: '5 victoires consécutives', category: 'Jeu' },
+    { type: 'streak_5', icon: '🔴', name: 'Séquence de 5', description: '5 victoires de suite', category: 'Jeu' },
+    { type: 'streak_10', icon: '🌶️', name: 'Séquence de 10', description: '10 victoires de suite', category: 'Jeu' },
+    { type: 'none_player', icon: '🤐', name: 'Maître du Nul', description: '10 parties nulles', category: 'Jeu' },
+    // Badges de niveau
+    { type: 'level_10', icon: '⭐', name: 'Niveau 10', description: 'Atteindre niveau 10', category: 'Niveau' },
+    { type: 'level_20', icon: '⭐⭐', name: 'Niveau 20', description: 'Atteindre niveau 20', category: 'Niveau' },
+    { type: 'level_50', icon: '👑', name: 'Niveau 50', description: 'Atteindre niveau 50', category: 'Niveau' },
+    { type: 'level_100', icon: '🌟', name: 'Niveau 100', description: 'Atteindre niveau 100', category: 'Niveau' },
+    // Badges de tournoi
+    { type: 'tournament_participant', icon: '🎫', name: 'Compétiteur', description: 'Participer à un tournoi', category: 'Tournoi' },
+    { type: 'tournament_winner', icon: '🏆', name: 'Champion', description: 'Remporter un tournoi', category: 'Tournoi' },
+    { type: 'arena_daily_winner', icon: '⚡', name: 'Champion Arena Daily', description: 'Remporter une Arena Daily', category: 'Tournoi' },
+    { type: 'arena_weekly_winner', icon: '🔥', name: 'Champion Arena Weekly', description: 'Remporter une Arena Weekly', category: 'Tournoi' },
+    { type: 'arena_monthly_winner', icon: '👑', name: 'Champion du Mois', description: 'Remporter une Arena Monthly', category: 'Tournoi' },
+    { type: 'arena_annual_winner', icon: '🏅', name: 'Champion Annuel', description: 'Remporter une Arena Annual', category: 'Tournoi' },
+    { type: 'cup_winner', icon: '🛡', name: 'Vainqueur de Coupe', description: 'Remporter une Coupe', category: 'Tournoi' },
+    { type: 'tournament_top3', icon: '🥉', name: 'Podium', description: 'Top 3 dans un tournoi', category: 'Tournoi' },
+    { type: 'millionaire', icon: '🪙', name: 'Richissime', description: '1000+ jetons', category: 'Économie' },
   ];
 
   return (
