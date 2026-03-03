@@ -135,9 +135,8 @@ export default function TopPlayersSection({ gameType }) {
               </p>
 
               <div className="space-y-2 text-sm text-[#D4A574] border-t border-b border-[#D4A574]/30 py-4">
-                <p>+45 ELO cette semaine</p>
-                <p>12 parties jouées</p>
-                <p>8 victoires</p>
+                <p>{userRank.games_played || 0} parties jouées</p>
+                <p>{userRank.games_won || 0} victoires</p>
               </div>
 
               <Button className="w-full mt-6 bg-gradient-to-r from-[#D4A574] to-[#8B5A2B] text-[#2C1810] font-bold hover:shadow-lg hover:shadow-[#D4A574]/30 rounded-lg">
