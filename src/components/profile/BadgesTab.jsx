@@ -63,21 +63,30 @@ export default function BadgesTab({ user }) {
     { type: 'millionaire', icon: '🪙', name: 'Richissime', description: '1000+ jetons', category: 'Économie' },
   ];
 
+  const categories = [...new Set(allBadges.map(b => b.category))];
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {allBadges.map(badge => {
-        const earned = badges.find(b => b.badge_type === badge.type);
-        return (
-          <BadgeItem
-            key={badge.type}
-            icon={badge.icon}
-            name={badge.name}
-            description={badge.description}
-            earned={!!earned}
-            earnedAt={earned?.earned_at}
-          />
-        );
-      })}
+    <div className="space-y-8">
+      {categories.map(cat => (
+        <div key={cat}>
+          <h3 className="text-sm font-bold text-[#D4A574]/60 uppercase tracking-widest mb-3">{cat}</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {allBadges.filter(b => b.category === cat).map(badge => {
+              const earned = badges.find(b => b.badge_type === badge.type);
+              return (
+                <BadgeItem
+                  key={badge.type}
+                  icon={badge.icon}
+                  name={badge.name}
+                  description={badge.description}
+                  earned={!!earned}
+                  earnedAt={earned?.earned_at}
+                />
+              );
+            })}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
