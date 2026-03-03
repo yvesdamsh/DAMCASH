@@ -108,8 +108,8 @@ function MiniTournamentCard({ room, user, onJoin, onSpectate, onLaunch, idx }) {
 
         {/* Tags */}
         <div className="flex items-center gap-2 flex-wrap mb-4">
-          <span className="text-xs bg-black/30 border border-[#D4A574]/10 text-[#D4A574]/60 px-2 py-0.5 rounded-full">
-            {TIME_LABELS[room.time_control] || room.time_control}
+          <span className="text-xs bg-black/30 border border-[#D4A574]/10 text-[#D4A574]/60 px-2 py-0.5 rounded-full font-black">
+            ⏱ {room.time_control_label || TIME_LABELS[room.time_control] || room.time_control}
           </span>
           <span className="text-xs bg-black/30 border border-[#D4A574]/10 text-[#D4A574]/60 px-2 py-0.5 rounded-full">
             {FORMAT_LABELS[room.format] || room.format}
