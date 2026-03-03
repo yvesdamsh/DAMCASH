@@ -339,6 +339,7 @@ export default function Tournaments() {
   return (
     <div className="min-h-screen text-[#F5E6D3]">
       <CreateTournamentModal open={showCreateModal} onOpenChange={setShowCreateModal} onSuccess={() => queryClient.invalidateQueries({ queryKey: ['tournaments'] })} user={user} />
+      {leaderboardTournament && <TournamentLeaderboard tournament={leaderboardTournament} onClose={() => setLeaderboardTournament(null)} />}
 
       {/* HERO */}
       <div className="relative overflow-hidden" style={{ background: 'linear-gradient(160deg, #0d0503 0%, #2C1810 50%, #1a0b05 100%)' }}>
