@@ -190,16 +190,29 @@ function TournamentCard({ tournament, onJoin, idx }) {
 
         <PointsRules isArena={isArena} />
 
-        {/* Prize */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1 text-xs text-[#D4A574]/60">
-            <Gem className="w-3.5 h-3.5 text-[#D4A574]" />
-            <span>Prix: <span className="text-[#D4A574] font-black">{tournament.prize_gems?.toLocaleString()}</span> gemmes</span>
+        {/* Prize + Rewards */}
+        <div className="rounded-lg border border-[#D4A574]/20 bg-black/20 p-3 space-y-2">
+          <p className="text-xs font-bold text-[#D4A574]/60 uppercase tracking-wider">Récompenses</p>
+          <div className="grid grid-cols-3 gap-1 text-xs text-center">
+            <div className="bg-yellow-900/30 border border-yellow-500/20 rounded p-1.5">
+              <div className="text-yellow-400 font-black">🥇 1er</div>
+              <div className="text-white font-bold">{Math.round((tournament.prize_gems || 0) * 0.6)} 🪙</div>
+              <div className="text-yellow-300/60">+{isArena ? 200 : 300} XP</div>
+            </div>
+            <div className="bg-gray-800/30 border border-gray-500/20 rounded p-1.5">
+              <div className="text-gray-300 font-black">🥈 2e</div>
+              <div className="text-white font-bold">{Math.round((tournament.prize_gems || 0) * 0.3)} 🪙</div>
+              <div className="text-gray-300/60">+{isArena ? 100 : 150} XP</div>
+            </div>
+            <div className="bg-amber-900/30 border border-amber-700/20 rounded p-1.5">
+              <div className="text-amber-600 font-black">🥉 3e</div>
+              <div className="text-white font-bold">{Math.round((tournament.prize_gems || 0) * 0.1)} 🪙</div>
+              <div className="text-amber-600/60">+{isArena ? 50 : 75} XP</div>
+            </div>
           </div>
-          <div className="flex gap-1 text-xs text-[#D4A574]/40">
-            <span>🥇{Math.round((tournament.prize_gems || 0) * 0.6)}</span>
-            <span>🥈{Math.round((tournament.prize_gems || 0) * 0.3)}</span>
-            <span>🥉{Math.round((tournament.prize_gems || 0) * 0.1)}</span>
+          <div className="flex items-center justify-between pt-1 border-t border-[#D4A574]/10">
+            <span className="text-[10px] text-[#D4A574]/40">🎫 Participation: +25 XP</span>
+            <span className="text-[10px] text-[#D4A574]/40">🏅 Badge exclusif pour le vainqueur</span>
           </div>
         </div>
 
