@@ -93,7 +93,7 @@ function PointsRules({ isArena }) {
   );
 }
 
-function TournamentCard({ tournament, onJoin, idx }) {
+function TournamentCard({ tournament, onJoin, onShowLeaderboard, idx }) {
   const progress = Math.round(((tournament.participants?.length || 0) / (tournament.max_participants || 1)) * 100);
   const status = STATUS_CONFIG[tournament.status] || STATUS_CONFIG.upcoming;
   const spotsLeft = (tournament.max_participants || 0) - (tournament.participants?.length || 0);
