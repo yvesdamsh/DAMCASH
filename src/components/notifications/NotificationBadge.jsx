@@ -10,11 +10,11 @@ export default function NotificationBadge({ userEmail }) {
 
     const loadUnreadCount = async () => {
       try {
-        const notifications = await base44.entities.Notification.filter({
-          user_email: userEmail,
-          is_read: false
-        });
-        setUnreadCount(notifications.length);
+        const [notifications, notifLogs] = await Promise.all([
+          base44.entities.Notification.filter({ user_email: userEmail, is_read: false }),
+          base44.entities.NotificationLog.filter({ user_email: userEmail, read: false })
+        ]);
+        setUnreadCount((notifications?.length || 0) + (notifLogs?.length || 0));
       } catch (error) {
         console.error('Error loading notifications:', error);
       }
