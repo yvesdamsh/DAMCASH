@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import { Crown, ShoppingBag, UserPlus, Building, Gem, TrendingUp, ChevronRight, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import OnlinePlayersList from '@/components/home/OnlinePlayersList';
 
 export default function Home() {
   const [user, setUser] = useState(null);

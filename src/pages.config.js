@@ -48,17 +48,22 @@
  * The mainPage value must match a key in the PAGES object exactly.
  */
 import Admin from './pages/Admin';
+import AdvancedStatistics from './pages/AdvancedStatistics';
+import Chat from './pages/Chat';
 import Checkers from './pages/Checkers';
 import Chess from './pages/Chess';
 import Clubs from './pages/Clubs';
 import CupCalendar from './pages/CupCalendar';
 import Friends from './pages/Friends';
+import GameReviews from './pages/GameReviews';
 import GameRoom from './pages/GameRoom';
 import History from './pages/History';
+import Home from './pages/Home';
 import Invitations from './pages/Invitations';
 import Leaderboard from './pages/Leaderboard';
 import MiniTournaments from './pages/MiniTournaments';
 import Notifications from './pages/Notifications';
+import Onboarding from './pages/Onboarding';
 import Play from './pages/Play';
 import PlayCheckers from './pages/PlayCheckers';
 import PlayChess from './pages/PlayChess';
@@ -70,29 +75,29 @@ import RoomLobby from './pages/RoomLobby';
 import Search from './pages/Search';
 import Shop from './pages/Shop';
 import Spectate from './pages/Spectate';
-import Tournaments from './pages/Tournaments';
-import Home from './pages/Home';
-import Onboarding from './pages/Onboarding';
-import GameReviews from './pages/GameReviews';
 import Statistics from './pages/Statistics';
-import Chat from './pages/Chat';
-import AdvancedStatistics from './pages/AdvancedStatistics';
+import Tournaments from './pages/Tournaments';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "Admin": Admin,
+    "AdvancedStatistics": AdvancedStatistics,
+    "Chat": Chat,
     "Checkers": Checkers,
     "Chess": Chess,
     "Clubs": Clubs,
     "CupCalendar": CupCalendar,
     "Friends": Friends,
+    "GameReviews": GameReviews,
     "GameRoom": GameRoom,
     "History": History,
+    "Home": Home,
     "Invitations": Invitations,
     "Leaderboard": Leaderboard,
     "MiniTournaments": MiniTournaments,
     "Notifications": Notifications,
+    "Onboarding": Onboarding,
     "Play": Play,
     "PlayCheckers": PlayCheckers,
     "PlayChess": PlayChess,
@@ -104,13 +109,8 @@ export const PAGES = {
     "Search": Search,
     "Shop": Shop,
     "Spectate": Spectate,
-    "Tournaments": Tournaments,
-    "Home": Home,
-    "Onboarding": Onboarding,
-    "GameReviews": GameReviews,
     "Statistics": Statistics,
-    "Chat": Chat,
-    "AdvancedStatistics": AdvancedStatistics,
+    "Tournaments": Tournaments,
 }
 
 export const pagesConfig = {
