@@ -97,9 +97,9 @@ export default function Layout({ children, currentPageName }) {
         setUser(currentUser);
         
         // Initialize user data if needed
-        if (!currentUser.gems) {
+        if (!currentUser.level) {
           await base44.auth.updateMe({ 
-            gems: 100, 
+            gems: 0, 
             level: 1, 
             xp: 0,
             chess_rating: 1200,
@@ -108,7 +108,7 @@ export default function Layout({ children, currentPageName }) {
             games_won: 0,
             is_online: true
           });
-          setUserData({ gems: 100, level: 1, xp: 0 });
+          setUserData({ gems: 0, level: 1, xp: 0 });
         } else {
           setUserData(currentUser);
         }
