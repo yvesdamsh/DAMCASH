@@ -173,7 +173,7 @@ export default function Notifications() {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              handleDelete(notification.id);
+              handleDelete(notification);
             }}
             className="p-1 hover:bg-red-500/10 rounded transition-all"
             title="Supprimer"
