@@ -104,17 +104,31 @@ export default function LiveTournaments({ gameType }) {
             </div>
 
             <div className="p-5">
-              {/* Game type icon */}
-              <div className="mb-3">
+              {/* Game type + format badges */}
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
                 <span className="text-xs text-red-400/70 uppercase tracking-widest font-semibold">
                   {tournament.game_type === 'chess' ? '♟ Échecs' : '⚫ Dames'}
                 </span>
+                {tournament.tournament_type?.startsWith('arena') ? (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-orange-600/30 text-orange-400 border border-orange-500/30">
+                    🏟 Arena
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-600/30 text-purple-400 border border-purple-500/30">
+                    ⚔️ Coupe
+                  </span>
+                )}
               </div>
 
               {/* Name */}
-              <h3 className="text-lg font-black text-[#F5E6D3] mb-4 pr-16 leading-tight">
+              <h3 className="text-lg font-black text-[#F5E6D3] mb-1 pr-16 leading-tight">
                 {tournament.name}
               </h3>
+              <p className="text-[11px] text-[#D4A574]/50 mb-3 leading-relaxed">
+                {tournament.tournament_type?.startsWith('arena')
+                  ? 'Adversaires aléatoires · Marquez un max de points en temps limité'
+                  : 'Tous contre tous · Le meilleur score du groupe l\'emporte'}
+              </p>
 
               {/* Stats */}
               <div className="grid grid-cols-2 gap-3 mb-5">
