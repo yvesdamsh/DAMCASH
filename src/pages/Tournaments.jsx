@@ -310,15 +310,27 @@ export default function Tournaments() {
       await base44.entities.Tournament.update(id, {
         participants: [...(tournament.participants || []), user.email]
       });
+
+      // +25 XP pour participation
+      const newXp = (user.xp || 0) + 25;
+      const newLevel = Math.floor(newXp / 500) + 1;
+      await base44.auth.updateMe({ xp: newXp, level: newLevel });
+
+      // Badge "Compétiteur" si premier tournoi
+      const existingBadges = await base44.entities.Badge.filter({ user_id: user.id, badge_type: 'tournament_participant' });
+      if (existingBadges.length === 0) {
+        await base44.entities.Badge.create({ user_id: user.id, badge_type: 'tournament_participant', earned_at: new Date().toISOString() });
+      }
+
       await base44.entities.Notification?.create?.({
         user_email: user.email,
         type: 'tournament_invitation',
         title: `🏆 Inscription confirmée`,
-        message: `Vous êtes inscrit à "${tournament.name}"`,
+        message: `Vous êtes inscrit à "${tournament.name}" · +25 XP gagné !`,
         is_read: false
       });
       queryClient.invalidateQueries({ queryKey: ['tournaments'] });
-      toast.success(`Inscrit à ${tournament.name} !`);
+      toast.success(`Inscrit à ${tournament.name} ! +25 XP`);
     } catch (e) {}
   };
 
