@@ -155,8 +155,12 @@ export default function Profile() {
                   <p className="font-bold">{user?.checkers_rating || 1200}</p>
                 </div>
                 <div className="bg-white/10 rounded-lg px-4 py-2 border border-[#D4A574]/20">
-                  <p className="text-xs text-[#D4A574]">Gemmes</p>
-                  <p className="font-bold">{user?.gems || 0}</p>
+                  <p className="text-xs text-[#D4A574]">Jetons</p>
+                  <p className="font-bold">{user?.gems || 0} 🪙</p>
+                </div>
+                <div className="bg-white/10 rounded-lg px-4 py-2 border border-[#D4A574]/20">
+                  <p className="text-xs text-[#D4A574]">XP</p>
+                  <p className="font-bold">{user?.xp || 0} ✨</p>
                 </div>
               </div>
             </div>
