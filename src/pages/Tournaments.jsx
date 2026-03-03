@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
 import CreateTournamentModal from '../components/tournament/CreateTournamentModal';
+import TournamentLeaderboard from '../components/tournament/TournamentLeaderboard';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 
