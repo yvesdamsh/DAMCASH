@@ -128,23 +128,22 @@ export default function Notifications() {
         NOTIFICATION_COLORS[notification.notification_type] || NOTIFICATION_COLORS.system
       }`}
       onClick={() => {
-        if (!notification.read) handleMarkAsRead(notification.id);
-        if (notification.action_link) {
-          window.location.href = notification.action_link;
-        }
+        if (!notification._read) handleMarkAsRead(notification);
+        const link = notification.action_link || notification.link;
+        if (link) window.location.href = link.startsWith('http') ? link : `/${link}`;
       }}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 flex-1 min-w-0">
           <span className="text-2xl flex-shrink-0">
-            {NOTIFICATION_ICONS[notification.notification_type]}
+            {NOTIFICATION_ICONS[notification._type] || '📢'}
           </span>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <h3 className="font-bold text-[#F5E6D3] truncate">
                 {notification.title}
               </h3>
-              {!notification.read && (
+              {!notification._read && (
                 <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
               )}
             </div>
