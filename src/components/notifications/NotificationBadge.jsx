@@ -21,10 +21,11 @@ export default function NotificationBadge({ userEmail }) {
     };
 
     loadUnreadCount();
-    const unsubscribe = base44.entities.Notification?.subscribe?.((event) => {
-      if (event?.data?.user_email === userEmail) {
-        loadUnreadCount();
-      }
+    const unsubscribeNotif = base44.entities.Notification?.subscribe?.((event) => {
+      if (event?.data?.user_email === userEmail) loadUnreadCount();
+    });
+    const unsubscribeLog = base44.entities.NotificationLog?.subscribe?.((event) => {
+      if (event?.data?.user_email === userEmail) loadUnreadCount();
     });
     const interval = setInterval(loadUnreadCount, 30000);
     return () => {
