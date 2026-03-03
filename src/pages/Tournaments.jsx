@@ -253,6 +253,7 @@ export default function Tournaments() {
   const [typeFilter, setTypeFilter] = useState('all');
   const [gameFilter, setGameFilter] = useState('chess');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [leaderboardTournament, setLeaderboardTournament] = useState(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
