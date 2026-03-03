@@ -32,6 +32,7 @@ export default function CreateMiniTournamentModal({ open, onClose, user, onCreat
       players: [user.email],
       player_names: [user.full_name],
       status: 'waiting',
+      time_control_label: form.time_control_label,
     });
     setLoading(false);
     onCreated();
