@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
-import { Crown, ShoppingBag, UserPlus, Building, Gem, TrendingUp, ChevronRight, History } from 'lucide-react';
+import { Crown, ShoppingBag, UserPlus, Building, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import OnlinePlayersList from '@/components/home/OnlinePlayersList';
 
@@ -271,34 +271,6 @@ export default function Home() {
 
       {/* Online Players */}
       <OnlinePlayersList />
-
-      {/* Challenge Banner */}
-      <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 }} className="mb-6">
-        <Link
-          to={createPageUrl('Leaderboard')}
-          className="block p-4 rounded-xl border border-[#D4A574]/25 hover:border-[#D4A574]/50 transition-all group overflow-hidden relative"
-          style={{ background: 'linear-gradient(135deg, rgba(212,165,116,0.08) 0%, rgba(139,90,43,0.05) 100%)' }}
-        >
-          <motion.div
-            animate={{ x: ['-100%', '200%'] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', repeatDelay: 2 }}
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/5 to-transparent pointer-events-none"
-          />
-          <div className="flex items-center justify-between relative z-10">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#D4A574] to-[#8B5A2B] flex items-center justify-center shadow-lg shadow-[#D4A574]/20">
-                <TrendingUp className="w-5 h-5 text-[#2C1810]" />
-              </div>
-              <div>
-                <p className="text-xs text-[#D4A574] uppercase tracking-wider font-semibold">Défi du jour</p>
-                <p className="font-bold text-[#F5E6D3] text-sm">Grimpez le classement !</p>
-              </div>
-            </div>
-            <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }} className="text-[#D4A574]">
-              <ChevronRight className="w-5 h-5" />
-            </motion.div>
-          </div>
-        </Link>
-      </motion.div>
 
       {/* Quick Access */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mb-6">

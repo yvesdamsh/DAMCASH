@@ -248,7 +248,7 @@ export default function Layout({ children, currentPageName }) {
               <>
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full glass-card">
                   <Gem className="w-4 h-4 text-[#D4A574]" />
-                  <span className="font-semibold text-[#F5E6D3]">{userData?.gems || 100}</span>
+                  <span className="font-semibold text-[#F5E6D3]">{userData?.gems || 0} jetons</span>
                 </div>
 
                 <DropdownMenu>
