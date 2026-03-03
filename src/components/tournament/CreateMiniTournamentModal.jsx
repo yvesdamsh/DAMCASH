@@ -2,13 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Users, Gem, Lock, Zap, Clock, Trophy } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-
-const TIME_OPTIONS = [
-  { value: 'bullet', label: '⚡ Bullet', desc: '1 min' },
-  { value: 'blitz', label: '🔥 Blitz', desc: '3-5 min' },
-  { value: 'rapid', label: '⏱ Rapide', desc: '10 min' },
-  { value: 'classic', label: '♟ Classique', desc: '30 min' },
-];
+import TimeControlPicker from '@/components/game/TimeControlPicker';
 
 const PLAYER_COUNTS = [3, 4, 5, 6, 8, 10, 12, 16, 20];
 
@@ -18,6 +12,9 @@ export default function CreateMiniTournamentModal({ open, onClose, user, onCreat
     game_type: 'chess',
     max_players: 4,
     time_control: 'blitz',
+    time_control_label: '3+0',
+    time_control_minutes: 3,
+    time_control_increment: 0,
     format: 'round_robin',
     is_private: false,
     password: '',
