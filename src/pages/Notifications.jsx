@@ -158,11 +158,11 @@ export default function Notifications() {
 
         {/* Actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
-          {!notification.read && (
+          {!notification._read && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                handleMarkAsRead(notification.id);
+                handleMarkAsRead(notification);
               }}
               className="p-1 hover:bg-white/10 rounded transition-all"
               title="Marquer comme lu"
