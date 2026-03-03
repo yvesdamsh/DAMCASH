@@ -107,18 +107,13 @@ export default function CreateMiniTournamentModal({ open, onClose, user, onCreat
                   </div>
                 </div>
 
-                {/* Temps */}
+                {/* Cadence */}
                 <div>
-                  <label className="text-xs text-[#D4A574] font-bold uppercase tracking-widest mb-2 block">Cadence</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {TIME_OPTIONS.map(({ value, label, desc }) => (
-                      <button key={value} onClick={() => setForm(f => ({ ...f, time_control: value }))}
-                        className={`py-2 px-3 rounded-xl text-left transition-all border ${form.time_control === value ? 'bg-[#D4A574]/20 border-[#D4A574]/60' : 'bg-black/20 border-[#D4A574]/10 hover:border-[#D4A574]/30'}`}>
-                        <div className="text-sm font-bold text-[#F5E6D3]">{label}</div>
-                        <div className="text-xs text-[#D4A574]/40">{desc}</div>
-                      </button>
-                    ))}
-                  </div>
+                  <label className="text-xs text-[#D4A574] font-bold uppercase tracking-widest mb-2 block">Cadence (temps + incrément)</label>
+                  <TimeControlPicker
+                    value={{ label: form.time_control_label, minutes: form.time_control_minutes, increment: form.time_control_increment, category: form.time_control }}
+                    onChange={(tc) => setForm(f => ({ ...f, time_control: tc.category, time_control_label: tc.label, time_control_minutes: tc.minutes, time_control_increment: tc.increment }))}
+                  />
                 </div>
 
                 {/* Format */}
