@@ -178,14 +178,12 @@ export default function CreateTournamentModal({ open, onOpenChange, onSuccess, u
                     <option value="checkers">⚫ Dames</option>
                   </select>
                 </div>
-                <div>
+                <div className="col-span-3">
                   <label className="text-xs font-bold text-[#D4A574] block mb-1">Cadence *</label>
-                  <select name="time_control" value={formData.time_control} onChange={handleChange} className="w-full bg-white/5 border border-[#D4A574]/30 text-[#F5E6D3] rounded-lg px-3 py-2 text-sm">
-                    <option value="bullet">⚡ Bullet</option>
-                    <option value="blitz">💨 Blitz</option>
-                    <option value="rapid">🐎 Rapide</option>
-                    <option value="classic">🕐 Classique</option>
-                  </select>
+                  <TimeControlPicker
+                    value={{ label: formData.time_control_label, minutes: formData.time_control_minutes, increment: formData.time_control_increment, category: formData.time_control }}
+                    onChange={(tc) => setFormData(prev => ({ ...prev, time_control: tc.category, time_control_label: tc.label, time_control_minutes: tc.minutes, time_control_increment: tc.increment }))}
+                  />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-[#D4A574] block mb-1">Difficulté *</label>
