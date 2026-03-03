@@ -30,7 +30,8 @@ export default function NotificationBadge({ userEmail }) {
     const interval = setInterval(loadUnreadCount, 30000);
     return () => {
       clearInterval(interval);
-      if (typeof unsubscribe === 'function') unsubscribe();
+      if (typeof unsubscribeNotif === 'function') unsubscribeNotif();
+      if (typeof unsubscribeLog === 'function') unsubscribeLog();
     };
   }, [userEmail]);
 
