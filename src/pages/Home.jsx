@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
-import { Crown, ShoppingBag, UserPlus, Building, History } from 'lucide-react';
+import { Crown, ShoppingBag, UserPlus, Building, History, Gem } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import OnlinePlayersList from '@/components/home/OnlinePlayersList';
 
