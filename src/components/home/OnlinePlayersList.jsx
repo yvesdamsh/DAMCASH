@@ -46,25 +46,28 @@ export default function OnlinePlayersList() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: i * 0.04 }}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#D4A574]/15 bg-black/20 hover:border-[#D4A574]/40 transition-all"
           >
-            <div className="relative">
-              {player.avatar_url ? (
-                <img
-                  src={player.avatar_url}
-                  className="w-5 h-5 rounded-full object-cover"
-                  alt={player.username}
-                />
-              ) : (
-                <div className="w-5 h-5 rounded-full bg-[#5D3A1A] border border-[#D4A574]/30 flex items-center justify-center text-[9px] font-bold text-[#D4A574]">
-                  {player.username?.charAt(0)?.toUpperCase() || '?'}
+            <PlayerPopup
+              playerId={player.user_id}
+              playerName={player.username}
+              playerAvatar={player.avatar_url}
+            >
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#D4A574]/15 bg-black/20 hover:border-[#D4A574]/40 transition-all cursor-pointer">
+                <div className="relative">
+                  {player.avatar_url ? (
+                    <img src={player.avatar_url} className="w-5 h-5 rounded-full object-cover" alt={player.username} />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full bg-[#5D3A1A] border border-[#D4A574]/30 flex items-center justify-center text-[9px] font-bold text-[#D4A574]">
+                      {player.username?.charAt(0)?.toUpperCase() || '?'}
+                    </div>
+                  )}
+                  <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-green-500 border border-[#2C1810]" />
                 </div>
-              )}
-              <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-green-500 border border-[#2C1810]" />
-            </div>
-            <span className="text-xs text-[#F5E6D3]/80 font-medium max-w-[80px] truncate">
-              {player.username || 'Joueur'}
-            </span>
+                <span className="text-xs text-[#F5E6D3]/80 font-medium max-w-[80px] truncate">
+                  {player.username || 'Joueur'}
+                </span>
+              </div>
+            </PlayerPopup>
           </motion.div>
         ))}
       </div>
