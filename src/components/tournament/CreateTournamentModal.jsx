@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { AlertCircle, CheckCircle2, Loader } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
+import TimeControlPicker from '@/components/game/TimeControlPicker';
 
 export default function CreateTournamentModal({ open, onOpenChange, onSuccess, user }) {
   const [isLoading, setIsLoading] = useState(false);
