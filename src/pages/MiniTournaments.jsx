@@ -97,7 +97,7 @@ function MiniTournamentCard({ room, user, onJoin, onSpectate, onLaunch, idx }) {
             <div className="flex items-center gap-2">
               <Gem className={`w-4 h-4 ${canAfford ? 'text-[#D4A574]' : 'text-red-400'}`} />
               <span className={`text-sm font-black ${canAfford ? 'text-[#D4A574]' : 'text-red-400'}`}>
-                {room.entry_gems} gemmes
+                {room.entry_gems} jetons
               </span>
             </div>
             <span className={`text-xs font-semibold ${canAfford ? 'text-[#D4A574]/60' : 'text-red-400/80'}`}>
