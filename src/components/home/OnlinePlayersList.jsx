@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { Users } from 'lucide-react';
-import UserAvatar from '@/components/ui/UserAvatar';
+import PlayerPopup from '@/components/ui/PlayerPopup';
 
 export default function OnlinePlayersList() {
   const [players, setPlayers] = useState([]);
