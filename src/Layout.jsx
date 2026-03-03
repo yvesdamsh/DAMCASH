@@ -51,7 +51,8 @@ export default function Layout({ children, currentPageName }) {
               status: 'online',
               last_seen: new Date().toISOString(),
               avatar_url: user.photoURL || user.avatar_url || null,
-              username: user.full_name
+              username: user.full_name,
+              user_email: user.email
             });
           }
         });
@@ -133,6 +134,7 @@ export default function Layout({ children, currentPageName }) {
             await base44.entities.OnlineUser.create({
               user_id: currentUser.id,
               username: currentUser.full_name,
+              user_email: currentUser.email,
               avatar_url: currentUser.photoURL || currentUser.avatar_url || null,
               status: 'online',
               last_seen: new Date().toISOString()
