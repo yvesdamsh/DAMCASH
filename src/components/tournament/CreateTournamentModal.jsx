@@ -96,6 +96,7 @@ export default function CreateTournamentModal({ open, onOpenChange, onSuccess, u
         description: formData.description,
         game_type: formData.game_type,
         time_control: formData.time_control,
+        time_control_label: formData.time_control_label,
         difficulty: formData.difficulty,
         start_date: startDateTime.toISOString(),
         end_date: endDateTime.toISOString(),
