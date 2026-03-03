@@ -225,7 +225,7 @@ export default function MiniTournaments() {
     if (room.entry_gems > 0) {
       const userGems = user.gems || 0;
       if (userGems < room.entry_gems) {
-        alert(`Gemmes insuffisantes. Il vous faut ${room.entry_gems} gemmes, vous en avez ${userGems}.`);
+        alert(`Jetons insuffisants. Il vous faut ${room.entry_gems} jetons, vous en avez ${userGems}.`);
         return;
       }
       // Déduire les gemmes
