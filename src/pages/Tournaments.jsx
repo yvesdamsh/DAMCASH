@@ -333,7 +333,7 @@ export default function Tournaments() {
         user_email: user.email,
         type: 'tournament_invitation',
         title: `🏆 Inscription confirmée`,
-        message: `Vous êtes inscrit à "${tournament.name}" · +25 XP gagné !`,
+        message: `Inscrit à "${tournament.name}" · Cadence ${tournament.time_control_label || tournament.time_control} · +25 XP gagné !`,
         is_read: false
       });
       queryClient.invalidateQueries({ queryKey: ['tournaments'] });
