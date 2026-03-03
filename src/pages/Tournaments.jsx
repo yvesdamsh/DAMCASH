@@ -455,7 +455,7 @@ export default function Tournaments() {
           <AnimatePresence mode="popLayout">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {filtered.map((t, i) => (
-                <TournamentCard key={t.id} tournament={t} onJoin={handleJoin} idx={i} />
+                <TournamentCard key={t.id} tournament={t} onJoin={handleJoin} onShowLeaderboard={setLeaderboardTournament} idx={i} />
               ))}
             </div>
           </AnimatePresence>
