@@ -21,21 +21,34 @@ export default function TopPlayersSection({ gameType }) {
       const user = await base44.auth.me();
       setCurrentUser(user);
 
-      // Mock data for now - in real app, fetch from leaderboard
-      const mockPlayers = [
-        { id: 1, full_name: 'AlexMaster', elo: 2847, rank: 1, badge: '👑' },
-        { id: 2, full_name: 'ChessNinja', elo: 2756, rank: 2, badge: '🥈' },
-        { id: 3, full_name: 'StrategyKing', elo: 2634, rank: 3, badge: '🥉' },
-        { id: 4, full_name: 'TacticalGamer', elo: 2521, rank: 4, badge: '' },
-        { id: 5, full_name: 'ProPlayer', elo: 2398, rank: 5, badge: '' }
-      ];
+      const ratingField = gameType === 'checkers' ? 'checkers_rating' : 'chess_rating';
 
-      setTopPlayers(mockPlayers);
+      // Fetch real data from PlayerStats
+      const stats = await base44.entities.PlayerStats.list(`-${ratingField}`, 10);
 
-      // Find user's rank
+      const players = (stats || [])
+        .filter(s => s[ratingField] > 0)
+        .slice(0, 5)
+        .map((s, idx) => ({
+          id: s.id,
+          full_name: s.username || 'Joueur',
+          elo: s[ratingField] || 1200,
+          rank: idx + 1,
+          avatar_url: s.avatar_url || null
+        }));
+
+      setTopPlayers(players);
+
+      // Find user's real rank
       if (user) {
-        const userRankMock = { rank: 145, elo: 1650 };
-        setUserRank(userRankMock);
+        const myStats = stats.findIndex(s => s.user_id === user.id);
+        const myData = stats.find(s => s.user_id === user.id);
+        setUserRank(myData ? {
+          rank: myStats + 1,
+          elo: myData[ratingField] || 1200,
+          games_played: myData.games_played || 0,
+          games_won: myData.games_won || 0
+        } : null);
       }
     } catch (e) {
       console.log('Failed to load players');
