@@ -90,6 +90,22 @@ export default function PlayerPopup({ children, playerId, playerName, playerAvat
         status: 'pending',
         room_id: roomId
       });
+
+      // Notification in-app pour que l'adversaire voie le toast en temps réel
+      const onlineUsers = await base44.entities.OnlineUser.filter({ user_id: playerId });
+      const receiverEmail = onlineUsers?.[0]?.user_email;
+      if (receiverEmail) {
+        await base44.entities.Notification.create({
+          user_email: receiverEmail,
+          type: 'match_invitation',
+          title: '⚔️ Invitation de partie',
+          message: `${currentUser.full_name} vous invite à jouer aux Dames`,
+          from_user: currentUser.email,
+          link: `Invitations`,
+          icon: '⚔️'
+        });
+      }
+
       toast.success(`Invitation envoyée à ${playerName}`);
       setOpen(false);
       navigate(`/GameRoom?roomId=${roomId}`);
