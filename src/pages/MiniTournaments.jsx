@@ -270,7 +270,7 @@ export default function MiniTournaments() {
           user_email: email,
           type: 'game_started',
           title: '⚔️ Le tournoi commence !',
-          message: `Le salon "${room.name}" a démarré.`,
+          message: `Le salon "${room.name}" a démarré · Cadence ${room.time_control_label || room.time_control}`,
           link: `GameRoom?roomId=${roomId}`,
           is_read: false
         })
