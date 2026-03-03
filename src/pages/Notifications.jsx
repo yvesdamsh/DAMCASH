@@ -38,48 +38,61 @@ export default function Notifications() {
     loadUser();
   }, []);
 
-  // Charger les notifications
+  // Charger les notifications (les deux entités)
   const { data: notifications = [], isLoading } = useQuery({
-    queryKey: ['notificationLogs', user?.email],
+    queryKey: ['allNotifications', user?.email],
     queryFn: async () => {
       if (!user?.email) return [];
-      const results = await base44.entities.NotificationLog.filter(
-        { user_email: user.email },
-        '-created_date'
-      );
-      return results;
+      const [logs, notifs] = await Promise.all([
+        base44.entities.NotificationLog.filter({ user_email: user.email }, '-created_date'),
+        base44.entities.Notification.filter({ user_email: user.email }, '-created_date')
+      ]);
+      // Normaliser les deux formats en un seul
+      const normalizedLogs = (logs || []).map(n => ({ ...n, _source: 'log', _read: n.read, _type: n.notification_type }));
+      const normalizedNotifs = (notifs || []).map(n => ({ ...n, _source: 'notif', _read: n.is_read, _type: n.type, title: n.title, message: n.message }));
+      return [...normalizedLogs, ...normalizedNotifs].sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
     },
     enabled: !!user?.email
   });
 
   // Subscribe aux changements
   useEffect(() => {
-    const unsubscribe = base44.entities.NotificationLog?.subscribe?.((event) => {
-      if (event?.type === 'create') {
-        queryClient.invalidateQueries({ queryKey: ['notificationLogs', user?.email] });
-      }
+    const unsub1 = base44.entities.NotificationLog?.subscribe?.((event) => {
+      if (event?.data?.user_email === user?.email) queryClient.invalidateQueries({ queryKey: ['allNotifications', user?.email] });
+    });
+    const unsub2 = base44.entities.Notification?.subscribe?.((event) => {
+      if (event?.data?.user_email === user?.email) queryClient.invalidateQueries({ queryKey: ['allNotifications', user?.email] });
     });
     return () => {
-      if (typeof unsubscribe === 'function') unsubscribe();
+      if (typeof unsub1 === 'function') unsub1();
+      if (typeof unsub2 === 'function') unsub2();
     };
   }, [user?.email, queryClient]);
 
-  const unreadNotifications = notifications.filter(n => !n.read);
-  const readNotifications = notifications.filter(n => n.read);
+  const unreadNotifications = notifications.filter(n => !n._read);
+  const readNotifications = notifications.filter(n => n._read);
 
-  const handleMarkAsRead = async (notifId) => {
+  const handleMarkAsRead = async (notif) => {
     try {
-      await base44.entities.NotificationLog.update(notifId, { read: true });
-      queryClient.invalidateQueries({ queryKey: ['notificationLogs', user?.email] });
+      if (notif._source === 'log') {
+        await base44.entities.NotificationLog.update(notif.id, { read: true });
+      } else {
+        await base44.entities.Notification.update(notif.id, { is_read: true });
+      }
+      queryClient.invalidateQueries({ queryKey: ['allNotifications', user?.email] });
     } catch (error) {
       toast.error('Erreur');
     }
   };
 
-  const handleDelete = async (notifId) => {
+  const handleDelete = async (notif) => {
     try {
-      await base44.entities.NotificationLog.delete(notifId);
-      queryClient.invalidateQueries({ queryKey: ['notificationLogs', user?.email] });
+      if (notif._source === 'log') {
+        await base44.entities.NotificationLog.delete(notif.id);
+      } else {
+        await base44.entities.Notification.delete(notif.id);
+      }
+      queryClient.invalidateQueries({ queryKey: ['allNotifications', user?.email] });
       toast.success('Notification supprimée');
     } catch (error) {
       toast.error('Erreur');
@@ -89,11 +102,13 @@ export default function Notifications() {
   const handleMarkAllAsRead = async () => {
     try {
       await Promise.all(
-        unreadNotifications.map(n => 
-          base44.entities.NotificationLog.update(n.id, { read: true })
+        unreadNotifications.map(n =>
+          n._source === 'log'
+            ? base44.entities.NotificationLog.update(n.id, { read: true })
+            : base44.entities.Notification.update(n.id, { is_read: true })
         )
       );
-      queryClient.invalidateQueries({ queryKey: ['notificationLogs', user?.email] });
+      queryClient.invalidateQueries({ queryKey: ['allNotifications', user?.email] });
       toast.success('Toutes marquées comme lues');
     } catch (error) {
       toast.error('Erreur');
