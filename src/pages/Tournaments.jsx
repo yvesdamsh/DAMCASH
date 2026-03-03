@@ -234,11 +234,16 @@ function TournamentCard({ tournament, onJoin, onShowLeaderboard, idx }) {
             )}
           </motion.button>
 
+          <motion.button whileTap={{ scale: 0.97 }} onClick={() => onShowLeaderboard(tournament)}
+            className="px-3 py-2.5 rounded-xl font-black text-xs border border-[#D4A574]/30 text-[#D4A574] bg-black/20 hover:bg-[#D4A574]/10 transition-all flex items-center gap-1">
+            🏅
+          </motion.button>
+
           {isCup && tournament.status !== 'upcoming' && (
             <Link to={`${createPageUrl('CupCalendar')}?id=${tournament.id}`}>
               <motion.button whileTap={{ scale: 0.97 }}
                 className="px-3 py-2.5 rounded-xl font-black text-xs border border-blue-500/30 text-blue-300 bg-blue-900/20 hover:bg-blue-900/40 transition-all flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5" /> Calendrier
+                <Calendar className="w-3.5 h-3.5" />
               </motion.button>
             </Link>
           )}
