@@ -223,7 +223,7 @@ export default function Home() {
               </Link>
 
               {/* Sub-links */}
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2 mb-4">
                 <Link to={`${createPageUrl('Tournaments')}?game=${universe}`}
                   className={`flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold border transition-all ${
                     isChess ? 'border-amber-600/30 text-amber-400/80 hover:bg-amber-900/20' : 'border-blue-600/30 text-blue-400/80 hover:bg-blue-900/20'
@@ -232,9 +232,36 @@ export default function Home() {
                 </Link>
                 <Link to={`${createPageUrl('MiniTournaments')}?game=${universe}`}
                   className={`flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold border transition-all ${
-                    isChess ? 'border-amber-600/30 text-amber-400/80 hover:bg-amber-900/20' : 'border-blue-600/30 text-blue-400/80 hover:bg-blue-900/20'
+                    isChess ? 'border-amber-600/30 text-amber-400/80 hover:bg-blue-900/20' : 'border-blue-600/30 text-blue-400/80 hover:bg-blue-900/20'
                   }`}>
                   ⚔️ Salons
+                </Link>
+              </div>
+
+              {/* Explication Tournois vs Coupes */}
+              <div className={`rounded-xl border p-3 ${isChess ? 'border-amber-500/20 bg-amber-900/10' : 'border-blue-500/20 bg-blue-900/10'}`}>
+                <p className={`text-xs font-bold uppercase tracking-wider mb-2 ${isChess ? 'text-amber-400' : 'text-blue-400'}`}>
+                  Comment ça marche ?
+                </p>
+                <div className="grid grid-cols-2 gap-2 text-left mb-3">
+                  <div className="bg-black/20 rounded-lg p-2">
+                    <p className="text-xs font-bold text-[#F5E6D3] mb-1">🏆 Tournoi Arena</p>
+                    <p className="text-[10px] text-[#D4A574]/70 leading-relaxed">Parties rapides en live. Les adversaires sont assignés aléatoirement. Marquez un maximum de points pendant la durée impartie.</p>
+                  </div>
+                  <div className="bg-black/20 rounded-lg p-2">
+                    <p className="text-xs font-bold text-[#F5E6D3] mb-1">⚔️ Coupe / Salon</p>
+                    <p className="text-[10px] text-[#D4A574]/70 leading-relaxed">Format tous contre tous en groupe. Vous affrontez chaque participant une fois. Le meilleur score l'emporte.</p>
+                  </div>
+                </div>
+                <Link to={createPageUrl('Tournaments')}>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                    className={`w-full py-2 rounded-lg text-xs font-bold text-white transition-all ${
+                      isChess ? 'bg-amber-700/70 hover:bg-amber-700' : 'bg-blue-700/70 hover:bg-blue-700'
+                    }`}
+                  >
+                    🎯 S'inscrire à un tournoi
+                  </motion.button>
                 </Link>
               </div>
             </div>
