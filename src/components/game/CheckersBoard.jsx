@@ -1,7 +1,8 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import VictoryParticles from '../effects/VictoryParticles';
 import GameEndModal from './GameEndModal';
+import useMovePieceSound from '../hooks/useMovePieceSound';
 
 // ── Board initialisation ────────────────────────────────────────────────────
 const createInitialBoard = () => {
