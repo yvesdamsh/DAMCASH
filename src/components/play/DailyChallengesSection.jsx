@@ -86,7 +86,7 @@ export default function DailyChallengesSection({ gameType }) {
                 <div className="flex items-start justify-between mb-4">
                   <div className="text-3xl opacity-60">{challenge.emoji}</div>
                   <Badge className="bg-[#D4A574] text-[#2C1810] font-bold text-xs">
-                    +{challenge.reward} gemmes
+                    +{challenge.reward} jetons
                   </Badge>
                 </div>
 
