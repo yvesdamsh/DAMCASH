@@ -48,10 +48,10 @@ export default function Shop() {
   // Mock shop items
   const mockItems = {
     gems: [
-      { id: '9', name: '50 Gemmes', description: 'Pack starter', price_gems: 0, real_price: '0.49€', category: 'gems', image_url: '💎' },
-      { id: '10', name: '100 Gemmes', description: 'Pack petit', price_gems: 0, real_price: '0.99€', category: 'gems', image_url: '💎' },
-      { id: '11', name: '500 Gemmes', description: 'Pack moyen', price_gems: 0, real_price: '2.99€', category: 'gems', image_url: '💎💎' },
-      { id: '12', name: '1500 Gemmes (+300 BONUS)', description: 'Pack grand', price_gems: 0, real_price: '6.99€', category: 'gems', image_url: '💎💎💎' }
+      { id: '9', name: '50 Jetons', description: 'Pack starter', price_gems: 0, real_price: '0.49€', category: 'gems', image_url: '🪙' },
+      { id: '10', name: '100 Jetons', description: 'Pack petit', price_gems: 0, real_price: '0.99€', category: 'gems', image_url: '🪙' },
+      { id: '11', name: '500 Jetons', description: 'Pack moyen', price_gems: 0, real_price: '2.99€', category: 'gems', image_url: '🪙🪙' },
+      { id: '12', name: '1500 Jetons (+300 BONUS)', description: 'Pack grand', price_gems: 0, real_price: '6.99€', category: 'gems', image_url: '🪙🪙🪙' }
     ],
     themes: [
       { id: '1', name: 'Thème Royal', description: 'Un thème doré élégant', price_gems: 100, category: 'theme', image_url: '🏰' },
@@ -111,7 +111,7 @@ export default function Shop() {
 
     if (item.category !== 'gems' && (user.gems || 0) < item.price_gems) {
       toast.error('Solde insuffisant!', {
-        description: 'Achetez des gemmes pour continuer.'
+        description: 'Achetez des jetons pour continuer.'
       });
       return;
     }
@@ -195,8 +195,8 @@ export default function Shop() {
         </div>
         
         <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
-          <Gem className="w-5 h-5 text-cyan-400" />
-          <span className="font-bold text-amber-200">{user?.gems || 100}</span>
+          🪙
+          <span className="font-bold text-amber-200">{user?.gems || 0} jetons</span>
         </div>
       </div>
 
@@ -209,24 +209,24 @@ export default function Shop() {
           {purchaseDialog && (
             <div className="space-y-4">
               <DialogDescription className="text-gray-300">
-                Voulez-vous acheter <span className="font-semibold text-amber-300">{purchaseDialog.name}</span> pour <span className="font-semibold text-amber-300">{purchaseDialog.real_price || purchaseDialog.price_gems + ' gemmes'}</span>?
+                Voulez-vous acheter <span className="font-semibold text-amber-300">{purchaseDialog.name}</span> pour <span className="font-semibold text-amber-300">{purchaseDialog.real_price || purchaseDialog.price_gems + ' jetons'}</span>?
               </DialogDescription>
 
               {purchaseDialog.category !== 'gems' && (
                 <div className="bg-white/5 rounded-lg p-3 space-y-2 text-sm">
                   <div className="flex justify-between text-gray-300">
                     <span>Solde actuel:</span>
-                    <span className="font-semibold text-amber-200">{user?.gems || 100} gemmes</span>
+                    <span className="font-semibold text-amber-200">{user?.gems || 0} jetons</span>
                   </div>
-                  {(user?.gems || 100) >= purchaseDialog.price_gems ? (
+                  {(user?.gems || 0) >= purchaseDialog.price_gems ? (
                     <div className="flex justify-between text-gray-300">
                       <span>Après achat:</span>
-                      <span className="font-semibold text-green-400">{(user?.gems || 100) - purchaseDialog.price_gems} gemmes</span>
+                      <span className="font-semibold text-green-400">{(user?.gems || 0) - purchaseDialog.price_gems} jetons</span>
                     </div>
                   ) : (
                     <div className="flex justify-between text-red-400">
                       <span>Solde insuffisant!</span>
-                      <span className="font-semibold">Achetez des gemmes</span>
+                      <span className="font-semibold">Achetez des jetons</span>
                     </div>
                   )}
                 </div>
@@ -252,8 +252,7 @@ export default function Shop() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-5 bg-white/5 border border-white/10">
           <TabsTrigger value="gems" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-300">
-            <Gem className="w-4 h-4 mr-1" />
-            Gemmes
+            🪙 Jetons
           </TabsTrigger>
           <TabsTrigger value="themes" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-300">
             <Palette className="w-4 h-4 mr-1" />
@@ -294,7 +293,7 @@ export default function Shop() {
                       <h3 className="font-semibold text-white">{item.name}</h3>
                       <p className="text-sm text-gray-400">{item.description}</p>
                       {item.real_value && (
-                        <p className="text-xs text-gray-500 line-through">Valeur: {item.real_value} gemmes</p>
+                        <p className="text-xs text-gray-500 line-through">Valeur: {item.real_value} jetons</p>
                       )}
                     </div>
                   </div>
@@ -334,8 +333,7 @@ export default function Shop() {
                           <span>{item.real_price}</span>
                         ) : (
                           <>
-                            <Gem className="w-4 h-4 mr-1" />
-                            {item.price_gems}
+                            🪙 {item.price_gems}
                           </>
                         )}
                       </Button>
