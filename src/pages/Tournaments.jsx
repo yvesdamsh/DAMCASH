@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Trophy, Users, Clock, Gem, Flame, Plus, Zap, Activity, Shield, Crown, Calendar, ChevronRight } from 'lucide-react';
+import { Trophy, Users, Clock, Flame, Plus, Zap, Activity, Shield, Crown, Calendar, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
