@@ -1,0 +1,43 @@
+{
+  "name": "WebRTCSignal",
+  "type": "object",
+  "properties": {
+    "room_id": {
+      "type": "string",
+      "description": "ID de la salle de jeu"
+    },
+    "from_user_id": {
+      "type": "string",
+      "description": "ID de l'utilisateur qui envoie le signal"
+    },
+    "to_user_id": {
+      "type": "string",
+      "description": "ID de l'utilisateur qui re\u00e7oit le signal"
+    },
+    "signal_type": {
+      "type": "string",
+      "enum": [
+        "offer",
+        "answer",
+        "ice_candidate"
+      ],
+      "description": "Type de signal WebRTC"
+    },
+    "signal_data": {
+      "type": "string",
+      "description": "Donn\u00e9es du signal (offer/answer/ice en JSON)"
+    },
+    "processed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si le signal a \u00e9t\u00e9 trait\u00e9"
+    }
+  },
+  "required": [
+    "room_id",
+    "from_user_id",
+    "to_user_id",
+    "signal_type",
+    "signal_data"
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "name": "ShopItem",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "theme",
+        "avatar",
+        "board",
+        "pieces",
+        "gems"
+      ]
+    },
+    "price_gems": {
+      "type": "number"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "is_available": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "name",
+    "category",
+    "price_gems"
+  ]
+}

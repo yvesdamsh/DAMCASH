@@ -1,0 +1,31 @@
+{
+  "name": "OnlineUser",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID de l'utilisateur"
+    },
+    "username": {
+      "type": "string",
+      "description": "Nom d'utilisateur"
+    },
+    "last_seen": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Derni\u00e8re activit\u00e9"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "online",
+        "offline"
+      ],
+      "default": "online"
+    }
+  },
+  "required": [
+    "user_id",
+    "username"
+  ]
+}

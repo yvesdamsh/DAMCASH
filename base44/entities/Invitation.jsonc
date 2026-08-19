@@ -1,0 +1,43 @@
+{
+  "name": "Invitation",
+  "type": "object",
+  "properties": {
+    "from_user": {
+      "type": "string",
+      "description": "Email de l'exp\u00e9diteur"
+    },
+    "to_user": {
+      "type": "string",
+      "description": "Email du destinataire"
+    },
+    "game_type": {
+      "type": "string",
+      "enum": [
+        "chess",
+        "checkers"
+      ]
+    },
+    "time_control": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "declined",
+        "expired"
+      ],
+      "default": "pending"
+    },
+    "match_id": {
+      "type": "string",
+      "description": "ID de la partie cr\u00e9\u00e9e si accept\u00e9e"
+    }
+  },
+  "required": [
+    "from_user",
+    "to_user",
+    "game_type"
+  ]
+}

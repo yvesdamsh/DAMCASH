@@ -1,0 +1,27 @@
+{
+  "name": "GameChatMessage",
+  "type": "object",
+  "properties": {
+    "room_id": {
+      "type": "string",
+      "description": "ID de la salle de jeu"
+    },
+    "sender_id": {
+      "type": "string",
+      "description": "ID de l'exp\u00e9diteur"
+    },
+    "sender_name": {
+      "type": "string",
+      "description": "Nom de l'exp\u00e9diteur"
+    },
+    "message": {
+      "type": "string",
+      "description": "Contenu du message"
+    }
+  },
+  "required": [
+    "room_id",
+    "sender_id",
+    "message"
+  ]
+}

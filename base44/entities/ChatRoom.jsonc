@@ -1,0 +1,62 @@
+{
+  "name": "ChatRoom",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nom du salon"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description du salon"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "public",
+        "private",
+        "game"
+      ],
+      "description": "Type de salon: public, priv\u00e9 ou li\u00e9 \u00e0 un jeu"
+    },
+    "members": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Liste des emails des membres"
+    },
+    "creator_id": {
+      "type": "string",
+      "description": "ID du cr\u00e9ateur"
+    },
+    "creator_email": {
+      "type": "string",
+      "description": "Email du cr\u00e9ateur"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Salon actif"
+    },
+    "member_count": {
+      "type": "number",
+      "default": 1,
+      "description": "Nombre de membres"
+    },
+    "game_id": {
+      "type": "string",
+      "description": "ID du jeu associ\u00e9 si applicable"
+    },
+    "last_message_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp du dernier message"
+    }
+  },
+  "required": [
+    "name",
+    "type",
+    "creator_id"
+  ]
+}

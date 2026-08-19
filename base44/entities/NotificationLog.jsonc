@@ -1,0 +1,78 @@
+{
+  "name": "NotificationLog",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email du destinataire"
+    },
+    "notification_type": {
+      "type": "string",
+      "enum": [
+        "game_invitation",
+        "game_turn",
+        "game_result",
+        "friend_request",
+        "tournament_notification",
+        "system"
+      ],
+      "description": "Type de notification"
+    },
+    "title": {
+      "type": "string",
+      "description": "Titre de la notification"
+    },
+    "message": {
+      "type": "string",
+      "description": "Contenu du message"
+    },
+    "related_entity_id": {
+      "type": "string",
+      "description": "ID de l'entit\u00e9 associ\u00e9e (game_id, user_id, etc)"
+    },
+    "related_entity_type": {
+      "type": "string",
+      "enum": [
+        "game",
+        "user",
+        "tournament",
+        "invite"
+      ],
+      "description": "Type d'entit\u00e9 associ\u00e9e"
+    },
+    "sent_via_email": {
+      "type": "boolean",
+      "default": false,
+      "description": "Notifi\u00e9 par email"
+    },
+    "sent_via_push": {
+      "type": "boolean",
+      "default": false,
+      "description": "Notifi\u00e9 via push in-app"
+    },
+    "delivered": {
+      "type": "boolean",
+      "default": false,
+      "description": "Notification livr\u00e9e avec succ\u00e8s"
+    },
+    "read": {
+      "type": "boolean",
+      "default": false,
+      "description": "Notification lue"
+    },
+    "action_link": {
+      "type": "string",
+      "description": "Lien vers l'action associ\u00e9e"
+    },
+    "sender_email": {
+      "type": "string",
+      "description": "Email de l'exp\u00e9diteur (si applicable)"
+    }
+  },
+  "required": [
+    "user_email",
+    "notification_type",
+    "title",
+    "message"
+  ]
+}

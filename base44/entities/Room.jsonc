@@ -1,0 +1,86 @@
+{
+  "name": "Room",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nom du salon"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description du salon"
+    },
+    "owner_id": {
+      "type": "string",
+      "description": "ID du propri\u00e9taire du salon"
+    },
+    "owner_name": {
+      "type": "string",
+      "description": "Nom du propri\u00e9taire"
+    },
+    "game_type": {
+      "type": "string",
+      "enum": [
+        "chess",
+        "checkers"
+      ],
+      "description": "Type de jeu"
+    },
+    "is_private": {
+      "type": "boolean",
+      "default": false,
+      "description": "Salon priv\u00e9 ou public"
+    },
+    "max_players": {
+      "type": "number",
+      "default": 2,
+      "description": "Nombre max de joueurs"
+    },
+    "current_players": {
+      "type": "number",
+      "default": 1,
+      "description": "Nombre actuel de joueurs"
+    },
+    "players": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Liste des IDs des joueurs"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "waiting",
+        "in_progress",
+        "finished"
+      ],
+      "default": "waiting",
+      "description": "\u00c9tat du salon"
+    },
+    "time_control": {
+      "type": "string",
+      "enum": [
+        "bullet",
+        "blitz",
+        "rapid",
+        "classic",
+        "unlimited"
+      ],
+      "default": "classic"
+    },
+    "password": {
+      "type": "string",
+      "description": "Mot de passe pour les salons priv\u00e9s"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "name",
+    "owner_id",
+    "game_type"
+  ]
+}

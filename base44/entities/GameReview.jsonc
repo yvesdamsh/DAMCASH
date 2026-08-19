@@ -1,0 +1,72 @@
+{
+  "name": "GameReview",
+  "type": "object",
+  "properties": {
+    "game_result_id": {
+      "type": "string",
+      "description": "ID du GameResult associ\u00e9"
+    },
+    "game_type": {
+      "type": "string",
+      "enum": [
+        "chess",
+        "checkers"
+      ],
+      "description": "Type de jeu"
+    },
+    "reviewer_id": {
+      "type": "string",
+      "description": "ID de celui qui laisse la revue"
+    },
+    "reviewer_name": {
+      "type": "string",
+      "description": "Nom du relecteur"
+    },
+    "reviewed_player_id": {
+      "type": "string",
+      "description": "ID du joueur revu (adversaire)"
+    },
+    "reviewed_player_name": {
+      "type": "string",
+      "description": "Nom du joueur revu"
+    },
+    "rating": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Note de 1 \u00e0 5 \u00e9toiles"
+    },
+    "comment": {
+      "type": "string",
+      "description": "Commentaire/revue textuelle"
+    },
+    "game_outcome": {
+      "type": "string",
+      "enum": [
+        "win",
+        "loss",
+        "draw"
+      ],
+      "description": "R\u00e9sultat de la partie pour le relecteur"
+    },
+    "is_ranked": {
+      "type": "boolean",
+      "default": false,
+      "description": "Partie class\u00e9e ou non"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags: good_player, bad_loser, fair_play, smart_moves, etc"
+    }
+  },
+  "required": [
+    "game_result_id",
+    "game_type",
+    "reviewer_id",
+    "reviewed_player_id",
+    "rating"
+  ]
+}

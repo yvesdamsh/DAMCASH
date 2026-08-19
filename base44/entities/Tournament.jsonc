@@ -1,0 +1,90 @@
+{
+  "name": "Tournament",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nom du tournoi"
+    },
+    "tournament_type": {
+      "type": "string",
+      "enum": [
+        "arena_daily",
+        "arena_weekly",
+        "arena_monthly",
+        "arena_annual",
+        "cup"
+      ],
+      "default": "arena_daily",
+      "description": "Type: arena DamCash (random pairing) ou coupe (tous contre tous)"
+    },
+    "game_type": {
+      "type": "string",
+      "enum": [
+        "chess",
+        "checkers"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "upcoming",
+        "in_progress",
+        "finished"
+      ],
+      "default": "upcoming"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "duration_hours": {
+      "type": "number",
+      "description": "Dur\u00e9e en heures (1h daily, 2h weekly, 4h monthly, 5h annual)",
+      "default": 1
+    },
+    "max_participants": {
+      "type": "number",
+      "default": 32
+    },
+    "participants": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Liste des emails des participants"
+    },
+    "scores": {
+      "type": "string",
+      "description": "JSON map email->score pour les arenas"
+    },
+    "streaks": {
+      "type": "string",
+      "description": "JSON map email->streak_count pour bonus arena"
+    },
+    "prize_gems": {
+      "type": "number",
+      "default": 100
+    },
+    "time_control": {
+      "type": "string",
+      "enum": [
+        "bullet",
+        "blitz",
+        "rapid",
+        "classic"
+      ]
+    },
+    "image_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "game_type"
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "name": "GameSession",
+  "type": "object",
+  "properties": {
+    "room_id": {
+      "type": "string",
+      "description": "ID unique de la salle"
+    },
+    "player1_id": {
+      "type": "string",
+      "description": "ID du joueur 1 (blancs)"
+    },
+    "player1_email": {
+      "type": "string",
+      "description": "Email du joueur 1"
+    },
+    "player1_name": {
+      "type": "string",
+      "description": "Nom du joueur 1"
+    },
+    "player2_id": {
+      "type": "string",
+      "description": "ID du joueur 2 (noirs)"
+    },
+    "player2_email": {
+      "type": "string",
+      "description": "Email du joueur 2"
+    },
+    "player2_name": {
+      "type": "string",
+      "description": "Nom du joueur 2"
+    },
+    "current_turn": {
+      "type": "string",
+      "enum": [
+        "white",
+        "black"
+      ],
+      "default": "white",
+      "description": "Couleur du joueur actuel"
+    },
+    "board_state": {
+      "type": "string",
+      "description": "\u00c9tat du plateau en JSON"
+    },
+    "game_type": {
+      "type": "string",
+      "enum": [
+        "chess",
+        "checkers"
+      ],
+      "description": "Type de jeu"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "waiting",
+        "in_progress",
+        "finished"
+      ],
+      "default": "waiting",
+      "description": "\u00c9tat de la partie"
+    },
+    "winner": {
+      "type": "string",
+      "description": "ID du gagnant ou 'draw'"
+    },
+    "time_control": {
+      "type": "string",
+      "enum": [
+        "bullet",
+        "blitz",
+        "rapid",
+        "classic",
+        "unlimited"
+      ],
+      "default": "classic",
+      "description": "Contr\u00f4le du temps"
+    },
+    "white_time": {
+      "type": "number",
+      "description": "Temps restant pour les blancs (secondes)"
+    },
+    "black_time": {
+      "type": "number",
+      "description": "Temps restant pour les noirs (secondes)"
+    },
+    "moves": {
+      "type": "string",
+      "description": "Historique des coups en JSON"
+    },
+    "last_move_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp du dernier coup"
+    },
+    "has_wager": {
+      "type": "boolean",
+      "default": false,
+      "description": "Partie avec paris/paiement"
+    },
+    "wager_amount": {
+      "type": "number",
+      "description": "Montant du pari en devise"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "completed",
+        "failed",
+        "cancelled"
+      ],
+      "default": "pending",
+      "description": "Statut du paiement post-victoire"
+    }
+  },
+  "required": [
+    "room_id",
+    "player1_id",
+    "game_type"
+  ]
+}

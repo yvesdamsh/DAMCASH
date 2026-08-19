@@ -1,0 +1,48 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email du destinataire"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "match_invitation",
+        "tournament_invitation",
+        "friend_request",
+        "game_started",
+        "game_ended"
+      ],
+      "description": "Type de notification"
+    },
+    "title": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false
+    },
+    "link": {
+      "type": "string",
+      "description": "Lien vers l'action"
+    },
+    "from_user": {
+      "type": "string",
+      "description": "Email de l'exp\u00e9diteur"
+    },
+    "icon": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_email",
+    "type",
+    "title",
+    "message"
+  ]
+}

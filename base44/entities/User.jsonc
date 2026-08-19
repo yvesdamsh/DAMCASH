@@ -1,0 +1,89 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "username": {
+      "type": "string",
+      "description": "Pseudo choisi par l'utilisateur"
+    },
+    "first_name": {
+      "type": "string",
+      "description": "Pr\u00e9nom"
+    },
+    "last_name": {
+      "type": "string",
+      "description": "Nom"
+    },
+    "country": {
+      "type": "string",
+      "description": "Pays (code ISO 2 caract\u00e8res)"
+    },
+    "date_of_birth": {
+      "type": "string",
+      "format": "date",
+      "description": "Date de naissance (18+ requis)"
+    },
+    "gems": {
+      "type": "number",
+      "default": 100
+    },
+    "level": {
+      "type": "number",
+      "default": 1
+    },
+    "xp": {
+      "type": "number",
+      "default": 0
+    },
+    "chess_rating": {
+      "type": "number",
+      "default": 1200
+    },
+    "checkers_rating": {
+      "type": "number",
+      "default": 1200
+    },
+    "games_played": {
+      "type": "number",
+      "default": 0
+    },
+    "games_won": {
+      "type": "number",
+      "default": 0
+    },
+    "avatar_url": {
+      "type": "string"
+    },
+    "purchased_items": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "is_online": {
+      "type": "boolean",
+      "default": false
+    },
+    "preferred_universe": {
+      "type": "string",
+      "enum": [
+        "chess",
+        "checkers"
+      ],
+      "default": "chess"
+    },
+    "onboarding_completed": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "username",
+    "first_name",
+    "last_name",
+    "country",
+    "date_of_birth",
+    "avatar_url",
+    "purchased_items"
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "name": "InviteCode",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "description": "Code unique d'invitation (6-8 caract\u00e8res)"
+    },
+    "creator_id": {
+      "type": "string",
+      "description": "ID du cr\u00e9ateur du code"
+    },
+    "creator_email": {
+      "type": "string",
+      "description": "Email du cr\u00e9ateur"
+    },
+    "creator_name": {
+      "type": "string",
+      "description": "Nom du cr\u00e9ateur"
+    },
+    "game_type": {
+      "type": "string",
+      "enum": [
+        "chess",
+        "checkers"
+      ],
+      "description": "Type de jeu"
+    },
+    "room_id": {
+      "type": "string",
+      "description": "ID de la salle de jeu associ\u00e9e"
+    },
+    "wager_amount": {
+      "type": "number",
+      "description": "Montant du pari si applicable"
+    },
+    "is_used": {
+      "type": "boolean",
+      "default": false,
+      "description": "Code utilis\u00e9"
+    },
+    "used_by": {
+      "type": "string",
+      "description": "Email de celui qui a utilis\u00e9 le code"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date d'expiration du code (24h)"
+    }
+  },
+  "required": [
+    "code",
+    "creator_id",
+    "creator_email",
+    "game_type",
+    "room_id"
+  ]
+}

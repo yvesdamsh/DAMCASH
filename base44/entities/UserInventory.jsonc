@@ -1,0 +1,42 @@
+{
+  "name": "UserInventory",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID de l'utilisateur"
+    },
+    "item_id": {
+      "type": "string",
+      "description": "ID de l'item achet\u00e9"
+    },
+    "item_name": {
+      "type": "string",
+      "description": "Nom de l'item"
+    },
+    "item_type": {
+      "type": "string",
+      "enum": [
+        "theme",
+        "avatar",
+        "board"
+      ],
+      "description": "Type d'item (th\u00e8me, avatar, plateau)"
+    },
+    "purchase_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date d'achat"
+    },
+    "is_equipped": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si l'item est actuellement \u00e9quip\u00e9"
+    }
+  },
+  "required": [
+    "user_id",
+    "item_id",
+    "item_type"
+  ]
+}

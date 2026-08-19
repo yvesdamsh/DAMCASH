@@ -1,0 +1,92 @@
+{
+  "name": "GameResult",
+  "type": "object",
+  "properties": {
+    "room_id": {
+      "type": "string",
+      "description": "ID de la partie"
+    },
+    "game_type": {
+      "type": "string",
+      "enum": [
+        "chess",
+        "checkers"
+      ],
+      "description": "Type de jeu"
+    },
+    "winner_id": {
+      "type": "string",
+      "description": "ID du gagnant (null si nul)"
+    },
+    "loser_id": {
+      "type": "string",
+      "description": "ID du perdant (null si nul)"
+    },
+    "player1_id": {
+      "type": "string",
+      "description": "ID du joueur 1"
+    },
+    "player1_name": {
+      "type": "string",
+      "description": "Nom du joueur 1"
+    },
+    "player2_id": {
+      "type": "string",
+      "description": "ID du joueur 2"
+    },
+    "player2_name": {
+      "type": "string",
+      "description": "Nom du joueur 2"
+    },
+    "result": {
+      "type": "string",
+      "enum": [
+        "white",
+        "black",
+        "draw"
+      ],
+      "description": "R\u00e9sultat de la partie"
+    },
+    "final_board_state": {
+      "type": "string",
+      "description": "\u00c9tat final du plateau en JSON"
+    },
+    "moves_count": {
+      "type": "number",
+      "description": "Nombre de coups jou\u00e9s"
+    },
+    "duration_seconds": {
+      "type": "number",
+      "description": "Dur\u00e9e de la partie en secondes"
+    },
+    "has_wager": {
+      "type": "boolean",
+      "default": false,
+      "description": "Partie avec paris"
+    },
+    "wager_amount": {
+      "type": "number",
+      "description": "Montant du pari"
+    },
+    "winner_payout": {
+      "type": "number",
+      "description": "Montant re\u00e7u par le gagnant (wager - 10% commission)"
+    },
+    "damcash_commission": {
+      "type": "number",
+      "description": "Commission DamCash (10% du pari)"
+    },
+    "payment_processed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Paiement trait\u00e9"
+    }
+  },
+  "required": [
+    "room_id",
+    "game_type",
+    "player1_id",
+    "player2_id",
+    "result"
+  ]
+}

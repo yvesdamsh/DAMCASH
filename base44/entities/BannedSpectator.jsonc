@@ -1,0 +1,26 @@
+{
+  "name": "BannedSpectator",
+  "type": "object",
+  "properties": {
+    "room_id": {
+      "type": "string",
+      "description": "ID de la partie"
+    },
+    "banned_user_id": {
+      "type": "string",
+      "description": "ID de l'utilisateur banni"
+    },
+    "banned_user_name": {
+      "type": "string",
+      "description": "Nom de l'utilisateur banni"
+    },
+    "banned_by": {
+      "type": "string",
+      "description": "ID de l'h\u00f4te qui a banni"
+    }
+  },
+  "required": [
+    "room_id",
+    "banned_user_id"
+  ]
+}

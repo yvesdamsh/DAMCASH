@@ -1,0 +1,42 @@
+{
+  "name": "GameInvitation",
+  "type": "object",
+  "properties": {
+    "sender_id": {
+      "type": "string",
+      "description": "ID du joueur qui envoie l'invitation"
+    },
+    "receiver_id": {
+      "type": "string",
+      "description": "ID du joueur qui re\u00e7oit l'invitation"
+    },
+    "game_type": {
+      "type": "string",
+      "enum": [
+        "chess",
+        "checkers"
+      ],
+      "description": "Type de jeu"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "declined"
+      ],
+      "default": "pending",
+      "description": "Statut de l'invitation"
+    },
+    "room_id": {
+      "type": "string",
+      "description": "ID de la salle de jeu"
+    }
+  },
+  "required": [
+    "sender_id",
+    "receiver_id",
+    "game_type",
+    "room_id"
+  ]
+}

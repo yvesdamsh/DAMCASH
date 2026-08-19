@@ -1,0 +1,83 @@
+{
+  "name": "PlayerStats",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID de l'utilisateur"
+    },
+    "username": {
+      "type": "string",
+      "description": "Nom d'utilisateur"
+    },
+    "chess_wins": {
+      "type": "number",
+      "default": 0,
+      "description": "Victoires aux \u00e9checs"
+    },
+    "chess_losses": {
+      "type": "number",
+      "default": 0,
+      "description": "D\u00e9faites aux \u00e9checs"
+    },
+    "chess_draws": {
+      "type": "number",
+      "default": 0,
+      "description": "Nuls aux \u00e9checs"
+    },
+    "checkers_wins": {
+      "type": "number",
+      "default": 0,
+      "description": "Victoires aux dames"
+    },
+    "checkers_losses": {
+      "type": "number",
+      "default": 0,
+      "description": "D\u00e9faites aux dames"
+    },
+    "checkers_draws": {
+      "type": "number",
+      "default": 0,
+      "description": "Nuls aux dames"
+    },
+    "ranked_games_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Nombre de parties class\u00e9es jou\u00e9es"
+    },
+    "casual_games_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Nombre de parties non class\u00e9es jou\u00e9es"
+    },
+    "average_rating": {
+      "type": "number",
+      "default": 0,
+      "description": "Note moyenne re\u00e7ue"
+    },
+    "total_reviews_received": {
+      "type": "number",
+      "default": 0,
+      "description": "Nombre total de revues re\u00e7ues"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Derni\u00e8re mise \u00e0 jour des stats"
+    },
+    "longest_win_streak": {
+      "type": "number",
+      "default": 0,
+      "description": "Plus longue s\u00e9rie de victoires"
+    },
+    "current_win_streak": {
+      "type": "number",
+      "default": 0,
+      "description": "S\u00e9rie de victoires actuelle"
+    }
+  },
+  "required": [
+    "user_id",
+    "username"
+  ]
+}

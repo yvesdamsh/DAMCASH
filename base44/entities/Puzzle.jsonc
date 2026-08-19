@@ -1,0 +1,41 @@
+{
+  "name": "Puzzle",
+  "type": "object",
+  "properties": {
+    "game_type": {
+      "type": "string",
+      "enum": [
+        "chess",
+        "checkers"
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "easy",
+        "medium",
+        "hard"
+      ]
+    },
+    "initial_board": {
+      "type": "string",
+      "description": "\u00c9tat initial du plateau en JSON"
+    },
+    "solution": {
+      "type": "string",
+      "description": "Solution en JSON"
+    },
+    "reward_gems": {
+      "type": "number",
+      "default": 5
+    }
+  },
+  "required": [
+    "game_type",
+    "title",
+    "difficulty"
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "name": "GameMatch",
+  "type": "object",
+  "properties": {
+    "game_type": {
+      "type": "string",
+      "enum": [
+        "chess",
+        "checkers"
+      ],
+      "description": "Type de jeu"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "ai",
+        "online",
+        "friend"
+      ],
+      "description": "Mode de jeu"
+    },
+    "time_control": {
+      "type": "string",
+      "enum": [
+        "bullet",
+        "blitz",
+        "rapid",
+        "classic",
+        "unlimited"
+      ],
+      "description": "Contr\u00f4le du temps"
+    },
+    "player_white": {
+      "type": "string",
+      "description": "Email du joueur blancs"
+    },
+    "player_black": {
+      "type": "string",
+      "description": "Email du joueur noirs"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "waiting",
+        "in_progress",
+        "finished",
+        "abandoned"
+      ],
+      "default": "waiting"
+    },
+    "winner": {
+      "type": "string",
+      "description": "Email du gagnant ou 'draw'"
+    },
+    "board_state": {
+      "type": "string",
+      "description": "\u00c9tat du plateau en JSON"
+    },
+    "moves_history": {
+      "type": "string",
+      "description": "Historique des coups en JSON"
+    },
+    "ai_level": {
+      "type": "string",
+      "enum": [
+        "easy",
+        "medium",
+        "hard"
+      ]
+    },
+    "spectators_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "game_type",
+    "mode"
+  ]
+}

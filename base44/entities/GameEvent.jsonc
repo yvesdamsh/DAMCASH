@@ -1,0 +1,41 @@
+{
+  "name": "GameEvent",
+  "type": "object",
+  "properties": {
+    "room_id": {
+      "type": "string",
+      "description": "ID de la partie"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "resign",
+        "draw",
+        "timeout"
+      ],
+      "description": "Type d'\u00e9v\u00e9nement"
+    },
+    "player_id": {
+      "type": "string",
+      "description": "ID du joueur qui abandonne/propose"
+    },
+    "player_name": {
+      "type": "string",
+      "description": "Nom du joueur"
+    },
+    "winner_id": {
+      "type": "string",
+      "description": "ID du gagnant"
+    },
+    "winner_name": {
+      "type": "string",
+      "description": "Nom du gagnant"
+    }
+  },
+  "required": [
+    "room_id",
+    "type",
+    "player_id",
+    "winner_id"
+  ]
+}

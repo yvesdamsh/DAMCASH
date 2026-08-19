@@ -1,0 +1,86 @@
+{
+  "name": "CupMatch",
+  "type": "object",
+  "properties": {
+    "tournament_id": {
+      "type": "string",
+      "description": "ID du tournoi coupe"
+    },
+    "player1_email": {
+      "type": "string"
+    },
+    "player1_name": {
+      "type": "string"
+    },
+    "player2_email": {
+      "type": "string"
+    },
+    "player2_name": {
+      "type": "string"
+    },
+    "scheduled_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date/heure programm\u00e9e du match"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "scheduled",
+        "in_progress",
+        "finished",
+        "forfeit",
+        "forfeited"
+      ],
+      "default": "scheduled"
+    },
+    "result": {
+      "type": "string",
+      "enum": [
+        "player1_win",
+        "player2_win",
+        "draw",
+        "player1_forfeit",
+        "player2_forfeit",
+        "forfeit"
+      ],
+      "description": "R\u00e9sultat du match"
+    },
+    "winner_email": {
+      "type": "string"
+    },
+    "notification_sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Notif 30mn avant envoy\u00e9e"
+    },
+    "reminder_sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Rappel 30mn envoy\u00e9"
+    },
+    "game_session_id": {
+      "type": "string"
+    },
+    "game_type": {
+      "type": "string",
+      "enum": [
+        "chess",
+        "checkers"
+      ]
+    },
+    "time_control": {
+      "type": "string"
+    },
+    "round": {
+      "type": "number",
+      "description": "Num\u00e9ro de journ\u00e9e"
+    }
+  },
+  "required": [
+    "tournament_id",
+    "player1_email",
+    "player2_email",
+    "scheduled_date"
+  ]
+}

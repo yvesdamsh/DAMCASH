@@ -1,0 +1,37 @@
+{
+  "name": "SpectatorRequest",
+  "type": "object",
+  "properties": {
+    "room_id": {
+      "type": "string",
+      "description": "ID de la partie"
+    },
+    "requester_id": {
+      "type": "string",
+      "description": "ID du spectateur"
+    },
+    "requester_name": {
+      "type": "string",
+      "description": "Nom du spectateur"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "declined"
+      ],
+      "default": "pending",
+      "description": "Statut de la demande"
+    },
+    "host_id": {
+      "type": "string",
+      "description": "ID de l'h\u00f4te de la partie"
+    }
+  },
+  "required": [
+    "room_id",
+    "requester_id",
+    "host_id"
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "name": "DrawOffer",
+  "type": "object",
+  "properties": {
+    "room_id": {
+      "type": "string",
+      "description": "ID de la partie"
+    },
+    "from_player_id": {
+      "type": "string",
+      "description": "ID du joueur qui propose"
+    },
+    "from_player_name": {
+      "type": "string",
+      "description": "Nom du joueur qui propose"
+    },
+    "to_player_id": {
+      "type": "string",
+      "description": "ID du joueur qui re\u00e7oit"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "declined"
+      ],
+      "default": "pending",
+      "description": "Statut de la proposition"
+    }
+  },
+  "required": [
+    "room_id",
+    "from_player_id",
+    "to_player_id"
+  ]
+}

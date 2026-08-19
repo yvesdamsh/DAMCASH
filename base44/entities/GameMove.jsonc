@@ -1,0 +1,38 @@
+{
+  "name": "GameMove",
+  "type": "object",
+  "properties": {
+    "room_id": {
+      "type": "string",
+      "description": "ID unique de la salle de jeu"
+    },
+    "player_id": {
+      "type": "string",
+      "description": "ID du joueur qui a fait le coup"
+    },
+    "board_state": {
+      "type": "string",
+      "description": "\u00c9tat du plateau en JSON apr\u00e8s le coup"
+    },
+    "next_turn": {
+      "type": "string",
+      "enum": [
+        "white",
+        "black"
+      ],
+      "description": "Couleur du prochain joueur"
+    },
+    "white_time": {
+      "type": "number",
+      "description": "Temps restant pour les blancs (secondes)"
+    },
+    "black_time": {
+      "type": "number",
+      "description": "Temps restant pour les noirs (secondes)"
+    }
+  },
+  "required": [
+    "room_id",
+    "player_id"
+  ]
+}

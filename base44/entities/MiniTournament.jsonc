@@ -1,0 +1,94 @@
+{
+  "name": "MiniTournament",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nom du salon"
+    },
+    "game_type": {
+      "type": "string",
+      "enum": [
+        "chess",
+        "checkers"
+      ],
+      "description": "Type de jeu"
+    },
+    "host_id": {
+      "type": "string",
+      "description": "ID du cr\u00e9ateur"
+    },
+    "host_name": {
+      "type": "string",
+      "description": "Nom du cr\u00e9ateur"
+    },
+    "max_players": {
+      "type": "number",
+      "description": "Nombre max de joueurs",
+      "default": 4
+    },
+    "players": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Liste des emails des joueurs"
+    },
+    "player_names": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Liste des noms des joueurs"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "waiting",
+        "in_progress",
+        "finished"
+      ],
+      "default": "waiting"
+    },
+    "time_control": {
+      "type": "string",
+      "enum": [
+        "bullet",
+        "blitz",
+        "rapid",
+        "classic"
+      ],
+      "default": "blitz"
+    },
+    "is_private": {
+      "type": "boolean",
+      "default": false
+    },
+    "password": {
+      "type": "string"
+    },
+    "entry_gems": {
+      "type": "number",
+      "default": 0,
+      "description": "Mise d'entr\u00e9e en gemmes"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "round_robin",
+        "elimination"
+      ],
+      "default": "round_robin"
+    },
+    "room_id": {
+      "type": "string",
+      "description": "ID de la GameSession associ\u00e9e"
+    }
+  },
+  "required": [
+    "name",
+    "game_type",
+    "host_id",
+    "max_players"
+  ]
+}

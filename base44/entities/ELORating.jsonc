@@ -1,0 +1,49 @@
+{
+  "name": "ELORating",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID de l'utilisateur"
+    },
+    "game_type": {
+      "type": "string",
+      "enum": [
+        "chess",
+        "checkers"
+      ],
+      "description": "Type de jeu"
+    },
+    "rating_before": {
+      "type": "number",
+      "description": "Rating avant la partie"
+    },
+    "rating_after": {
+      "type": "number",
+      "description": "Rating apr\u00e8s la partie"
+    },
+    "rating_change": {
+      "type": "number",
+      "description": "Changement du rating (+/-)"
+    },
+    "opponent_rating": {
+      "type": "number",
+      "description": "Rating de l'adversaire"
+    },
+    "game_result_id": {
+      "type": "string",
+      "description": "ID du GameResult associ\u00e9"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp de la partie"
+    }
+  },
+  "required": [
+    "user_id",
+    "game_type",
+    "rating_before",
+    "rating_after"
+  ]
+}

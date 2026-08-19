@@ -1,0 +1,46 @@
+{
+  "name": "ChatMessage",
+  "type": "object",
+  "properties": {
+    "room_id": {
+      "type": "string",
+      "description": "ID du salon"
+    },
+    "sender_id": {
+      "type": "string",
+      "description": "ID de l'exp\u00e9diteur"
+    },
+    "sender_name": {
+      "type": "string",
+      "description": "Nom de l'exp\u00e9diteur"
+    },
+    "sender_email": {
+      "type": "string",
+      "description": "Email de l'exp\u00e9diteur"
+    },
+    "content": {
+      "type": "string",
+      "description": "Contenu du message"
+    },
+    "is_system": {
+      "type": "boolean",
+      "default": false,
+      "description": "Message syst\u00e8me (ex: jointure)"
+    },
+    "edited_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp de modification"
+    },
+    "pinned": {
+      "type": "boolean",
+      "default": false,
+      "description": "Message \u00e9pingl\u00e9"
+    }
+  },
+  "required": [
+    "room_id",
+    "sender_id",
+    "content"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "name": "Badge",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID de l'utilisateur"
+    },
+    "badge_type": {
+      "type": "string",
+      "enum": [
+        "first_blood",
+        "on_fire",
+        "champion",
+        "level_10",
+        "level_20",
+        "level_50",
+        "level_100",
+        "millionaire",
+        "streak_5",
+        "streak_10",
+        "none_player"
+      ],
+      "description": "Type de badge"
+    },
+    "badge_name": {
+      "type": "string",
+      "description": "Nom du badge"
+    },
+    "badge_icon": {
+      "type": "string",
+      "description": "Emoji du badge"
+    },
+    "earned_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date d'obtention du badge"
+    }
+  },
+  "required": [
+    "user_id",
+    "badge_type",
+    "badge_name",
+    "badge_icon"
+  ]
+}

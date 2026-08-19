@@ -1,0 +1,45 @@
+{
+  "name": "Message",
+  "type": "object",
+  "properties": {
+    "sender_id": {
+      "type": "string",
+      "description": "ID de l'exp\u00e9diteur"
+    },
+    "sender_name": {
+      "type": "string",
+      "description": "Nom de l'exp\u00e9diteur"
+    },
+    "sender_avatar": {
+      "type": "string",
+      "description": "Avatar de l'exp\u00e9diteur"
+    },
+    "receiver_id": {
+      "type": "string",
+      "description": "ID du destinataire"
+    },
+    "receiver_name": {
+      "type": "string",
+      "description": "Nom du destinataire"
+    },
+    "content": {
+      "type": "string",
+      "description": "Contenu du message"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si le message a \u00e9t\u00e9 lu"
+    },
+    "read_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Quand le message a \u00e9t\u00e9 lu"
+    }
+  },
+  "required": [
+    "sender_id",
+    "receiver_id",
+    "content"
+  ]
+}

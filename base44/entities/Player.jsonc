@@ -1,0 +1,37 @@
+{
+  "name": "Player",
+  "type": "object",
+  "properties": {
+    "username": {
+      "type": "string",
+      "description": "Nom d'utilisateur"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email du joueur"
+    },
+    "avatar_url": {
+      "type": "string",
+      "description": "URL de la photo de profil"
+    },
+    "level": {
+      "type": "number",
+      "default": 1,
+      "description": "Niveau du joueur"
+    },
+    "is_online": {
+      "type": "boolean",
+      "default": false,
+      "description": "Statut en ligne"
+    },
+    "chess_rating": {
+      "type": "number",
+      "default": 1200,
+      "description": "Classement \u00e9checs"
+    }
+  },
+  "required": [
+    "username",
+    "email"
+  ]
+}

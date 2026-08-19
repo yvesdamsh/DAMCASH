@@ -1,0 +1,54 @@
+{
+  "name": "ChessOpeningStats",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID de l'utilisateur"
+    },
+    "color": {
+      "type": "string",
+      "enum": [
+        "white",
+        "black"
+      ],
+      "description": "Couleur jou\u00e9e"
+    },
+    "opening_name": {
+      "type": "string",
+      "description": "Nom de l'ouverture (ex: Ruy Lopez, Sicilian Defense)"
+    },
+    "opening_eco": {
+      "type": "string",
+      "description": "Code ECO de l'ouverture"
+    },
+    "games_played": {
+      "type": "number",
+      "default": 0,
+      "description": "Nombre de parties jou\u00e9es avec cette ouverture"
+    },
+    "games_won": {
+      "type": "number",
+      "default": 0,
+      "description": "Victoires"
+    },
+    "games_drawn": {
+      "type": "number",
+      "default": 0,
+      "description": "Nuls"
+    },
+    "win_rate": {
+      "type": "number",
+      "description": "Taux de victoire %"
+    },
+    "average_opponent_rating": {
+      "type": "number",
+      "description": "Rating moyen des adversaires"
+    }
+  },
+  "required": [
+    "user_id",
+    "color",
+    "opening_name"
+  ]
+}
